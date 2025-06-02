@@ -103,7 +103,7 @@ def salvar_receita():
         flash('Erro ao salvar receita. Tente novamente.', 'error')
         return redirect(url_for('receita.receita'))
 
-@receita_bp.route('/refazer/receita/<int:id>', methods=['GET'])
+@receita_bp.route('/receita/refazer/<int:id>', methods=['GET'])
 def refazer_receita(id):
     """Refill prescription from prontuario"""
     if 'usuario' not in session:
@@ -111,6 +111,10 @@ def refazer_receita(id):
     
     try:
         receita_obj = Receita.query.get_or_404(id)
+        
+        # Check if this is a PDF generation request
+        if request.args.get('print') == '1':
+            return gerar_pdf_reimprimir_receita(receita_obj)
         
         medicamentos = receita_obj.medicamentos.split(',')
         posologias = receita_obj.posologias.split(',')
@@ -127,4 +131,34 @@ def refazer_receita(id):
     except Exception as e:
         logging.error(f'Refill prescription error: {e}')
         flash('Erro ao carregar receita.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+def gerar_pdf_reimprimir_receita(receita_obj):
+    """Generate PDF for existing prescription with current date"""
+    try:
+        medico = Medico.query.get(session['usuario']['id'])
+        data_atual = datetime.now().strftime('%d/%m/%Y')
+        
+        pdf_html = render_template('receita_pdf.html',
+                                 nome_paciente=receita_obj.nome_paciente,
+                                 medicamentos=receita_obj.medicamentos.split(','),
+                                 posologias=receita_obj.posologias.split(','),
+                                 duracoes=receita_obj.duracoes.split(','),
+                                 vias=receita_obj.vias.split(','),
+                                 medico_nome=medico.nome,
+                                 medico_crm=medico.crm,
+                                 data=data_atual,
+                                 assinatura=medico.assinatura)
+        
+        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=receita_{receita_obj.nome_paciente}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        return response
+        
+    except Exception as e:
+        logging.error(f'Error generating prescription PDF: {e}')
+        flash('Erro ao gerar PDF da receita.', 'error')
         return redirect(url_for('prontuario.prontuario'))

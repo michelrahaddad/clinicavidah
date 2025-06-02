@@ -92,7 +92,7 @@ def salvar_exames_img():
         flash('Erro ao salvar exames. Tente novamente.', 'error')
         return redirect(url_for('exames_img.exames_img'))
 
-@exames_img_bp.route('/refazer/exame_img/<int:id>', methods=['GET'])
+@exames_img_bp.route('/exames_img/refazer/<int:id>', methods=['GET'])
 def refazer_exame_img(id):
     """Refill imaging exam from prontuario"""
     if 'usuario' not in session:
@@ -100,6 +100,11 @@ def refazer_exame_img(id):
     
     try:
         exame = ExameImg.query.get_or_404(id)
+        
+        # Check if this is a PDF generation request
+        if request.args.get('print') == '1':
+            return gerar_pdf_reimprimir_exame_img(exame)
+        
         exames = exame.exames.split(',')
         
         return render_template('exames_img.html',
@@ -111,4 +116,31 @@ def refazer_exame_img(id):
     except Exception as e:
         logging.error(f'Refill imaging exam error: {e}')
         flash('Erro ao carregar exame.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+def gerar_pdf_reimprimir_exame_img(exame):
+    """Generate PDF for existing imaging exam with current date"""
+    try:
+        medico = Medico.query.get(session['usuario']['id'])
+        data_atual = datetime.now().strftime('%d/%m/%Y')
+        
+        pdf_html = render_template('exames_img_pdf.html',
+                                 nome_paciente=exame.nome_paciente,
+                                 exames=exame.exames.split(','),
+                                 medico_nome=medico.nome,
+                                 medico_crm=medico.crm,
+                                 data=data_atual,
+                                 assinatura=medico.assinatura)
+        
+        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=exames_img_{exame.nome_paciente}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        return response
+        
+    except Exception as e:
+        logging.error(f'Error generating imaging exam PDF: {e}')
+        flash('Erro ao gerar PDF do exame.', 'error')
         return redirect(url_for('prontuario.prontuario'))
