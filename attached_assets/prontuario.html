@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-file-medical me-3"></i>
+                Prontuário Médico
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filtros de Busca</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('prontuario.prontuario') }}">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="busca_paciente" class="form-label">Nome do Paciente</label>
+                        <input type="text" 
+                               name="busca_paciente" 
+                               id="busca_paciente"
+                               class="form-control" 
+                               placeholder="Digite o nome do paciente"
+                               value="{{ busca_paciente }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="tipo" class="form-label">Tipo</label>
+                        <select name="tipo" id="tipo" class="form-select">
+                            <option value="">Todos</option>
+                            <option value="receita" {% if filtro_tipo == 'receita' %}selected{% endif %}>Receitas</option>
+                            <option value="exame_lab" {% if filtro_tipo == 'exame_lab' %}selected{% endif %}>Exames Lab</option>
+                            <option value="exame_img" {% if filtro_tipo == 'exame_img' %}selected{% endif %}>Exames Imagem</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="data_inicio" class="form-label">Data Início</label>
+                        <input type="date" 
+                               name="data_inicio" 
+                               id="data_inicio"
+                               class="form-control"
+                               value="{{ filtro_data_inicio }}">
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <label for="data_fim" class="form-label">Data Fim</label>
+                        <input type="date" 
+                               name="data_fim" 
+                               id="data_fim"
+                               class="form-control"
+                               value="{{ filtro_data_fim }}">
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Registros Encontrados</h5>
+        </div>
+        <div class="card-body">
+            {% if resultados %}
+                <div class="row">
+                    {% for item in resultados %}
+                    <div class="col-12 mb-3">
+                        <div class="card {% if item.tipo == 'receita' %}border-primary{% elif item.tipo == 'exame_lab' %}border-success{% else %}border-info{% endif %}">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-8">
+                                        <h6 class="card-title mb-1">
+                                            {% if item.tipo == 'receita' %}
+                                                <i class="fas fa-prescription-bottle-alt text-primary me-2"></i>Receita Médica
+                                            {% elif item.tipo == 'exame_lab' %}
+                                                <i class="fas fa-flask text-success me-2"></i>Exames Laboratoriais
+                                            {% else %}
+                                                <i class="fas fa-x-ray text-info me-2"></i>Exames de Imagem
+                                            {% endif %}
+                                        </h6>
+                                        <p class="mb-1">
+                                            <strong>Paciente:</strong> {{ item.nome_paciente }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Médico:</strong> {{ item.medico_nome }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Data:</strong> {{ item.data }}
+                                        </p>
+                                        <p class="text-muted mb-0">
+                                            {{ item.detalhes_registro }}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        <a href="{{ url_for('receita.refazer_receita', id=item.id_registro) if item.tipo == 'receita' 
+                                                   else url_for('exames_lab.refazer_exame_lab', id=item.id_registro) if item.tipo == 'exame_lab'
+                                                   else url_for('exames_img.refazer_exame_img', id=item.id_registro) }}" 
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-redo me-2"></i>Refazer
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if resultados|length == 50 %}
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Mostrando os primeiros 50 resultados. Use filtros para refinar a busca.
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum registro encontrado</h5>
+                    <p class="text-muted">
+                        {% if busca_paciente or filtro_tipo or filtro_data_inicio %}
+                            Tente ajustar os filtros de busca ou
+                        {% endif %}
+                        comece criando receitas e pedidos de exames.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

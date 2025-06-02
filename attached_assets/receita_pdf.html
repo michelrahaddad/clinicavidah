@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Receita Médica</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #2c5aa0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #2c5aa0;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .header p {
+            color: #666;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        
+        .patient-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2c5aa0;
+        }
+        
+        .patient-info h3 {
+            margin: 0 0 10px 0;
+            color: #2c5aa0;
+            font-size: 16px;
+        }
+        
+        .patient-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .prescription-box {
+            border: 2px solid #2c5aa0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            min-height: 200px;
+        }
+        
+        .prescription-title {
+            color: #2c5aa0;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .medication {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .medication-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c5aa0;
+            margin-bottom: 5px;
+        }
+        
+        .medication-details {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .doctor-info {
+            text-align: left;
+        }
+        
+        .signature-area {
+            text-align: right;
+            min-width: 200px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 200px;
+            margin: 30px 0 10px auto;
+        }
+        
+        .doctor-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #2c5aa0;
+        }
+        
+        .doctor-crm {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .date-issued {
+            position: absolute;
+            top: 2cm;
+            right: 2cm;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .watermark {
+            position: fixed;
+            bottom: 1cm;
+            right: 1cm;
+            font-size: 10px;
+            color: #ccc;
+            transform: rotate(-45deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="date-issued">
+        Data de emissão: {{ data }}
+    </div>
+    
+    <div class="header">
+        <h1>RECEITA MÉDICA</h1>
+        <p>Sistema Médico Vidah - Prescrição Digital</p>
+    </div>
+    
+    <div class="patient-info">
+        <h3>Dados do Paciente</h3>
+        <div class="patient-name">{{ nome_paciente }}</div>
+    </div>
+    
+    <div class="prescription-box">
+        <div class="prescription-title">PRESCRIÇÃO</div>
+        
+        {% for medicamento, posologia, duracao, via in zip(medicamentos, posologias, duracoes, vias) %}
+        <div class="medication">
+            <div class="medication-name">{{ medicamento }}</div>
+            <div class="medication-details">
+                <strong>Posologia:</strong> {{ posologia }}<br>
+                <strong>Duração:</strong> {{ duracao }}<br>
+                <strong>Via de administração:</strong> {{ via }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="footer">
+        <div class="doctor-info">
+            <div class="doctor-name">{{ medico }}</div>
+            <div class="doctor-crm">CRM: {{ crm }}</div>
+        </div>
+        
+        <div class="signature-area">
+            <div class="signature-line"></div>
+            <div style="font-size: 12px; color: #666;">Assinatura Digital</div>
+        </div>
+    </div>
+    
+    <div class="watermark">
+        Sistema Vidah
+    </div>
+</body>
+</html>

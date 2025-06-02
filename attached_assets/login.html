@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-heartbeat text-primary" style="font-size: 3rem;"></i>
+                        <h2 class="mt-3">Sistema Médico Vidah</h2>
+                        <p class="text-muted">Faça login para acessar o sistema</p>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.nome.id }}" class="form-label">
+                                <i class="fas fa-user me-2"></i>Nome do Médico
+                            </label>
+                            {{ form.nome(class="form-control", placeholder="Digite seu nome completo") }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.crm.id }}" class="form-label">
+                                <i class="fas fa-id-badge me-2"></i>CRM
+                            </label>
+                            {{ form.crm(class="form-control", placeholder="Digite seu CRM") }}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.senha.id }}" class="form-label">
+                                <i class="fas fa-lock me-2"></i>Senha
+                            </label>
+                            {{ form.senha(class="form-control", placeholder="Digite sua senha") }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                        </button>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <p class="text-muted mb-2">Não tem conta?</p>
+                        <a href="{{ url_for('medicos.cadastrar_medico') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-user-plus me-2"></i>Cadastrar Médico
+                        </a>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-dark rounded">
+                        <small class="text-muted">
+                            <strong>Dados de teste:</strong><br>
+                            Nome: Dr. Teste<br>
+                            CRM: crm123<br>
+                            Senha: senha123
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

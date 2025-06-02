@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-flask me-3"></i>
+                Pedido de Exames Laboratoriais
+            </h2>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('exames_lab.salvar_exames_lab') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="refazer" value="{{ refazer|default(false) }}">
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dados do Paciente</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="nome_paciente" class="form-label">
+                        <i class="fas fa-user me-2"></i>Nome do Paciente *
+                    </label>
+                    <input type="text" 
+                           name="nome_paciente" 
+                           id="nome_paciente"
+                           class="form-control" 
+                           placeholder="Digite o nome completo do paciente"
+                           value="{{ exame.nome_paciente if refazer and exame else '' }}"
+                           required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Selecione os Exames</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Hemograma -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-tint me-2"></i>Hemograma
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Hemograma Completo" id="hemograma_completo"
+                                   {% if refazer and 'Hemograma Completo' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="hemograma_completo">
+                                Hemograma Completo
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Hemoglobina" id="hemoglobina"
+                                   {% if refazer and 'Hemoglobina' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="hemoglobina">
+                                Hemoglobina
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Leucócitos" id="leucocitos"
+                                   {% if refazer and 'Leucócitos' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="leucocitos">
+                                Leucócitos
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Plaquetas" id="plaquetas"
+                                   {% if refazer and 'Plaquetas' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="plaquetas">
+                                Plaquetas
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Bioquímica -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-success mb-3">
+                            <i class="fas fa-vial me-2"></i>Bioquímica
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Glicose" id="glicose"
+                                   {% if refazer and 'Glicose' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="glicose">
+                                Glicose
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Creatinina" id="creatinina"
+                                   {% if refazer and 'Creatinina' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="creatinina">
+                                Creatinina
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Ureia" id="ureia"
+                                   {% if refazer and 'Ureia' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="ureia">
+                                Ureia
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Colesterol Total" id="colesterol"
+                                   {% if refazer and 'Colesterol Total' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="colesterol">
+                                Colesterol Total
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Triglicerídeos" id="triglicerideos"
+                                   {% if refazer and 'Triglicerídeos' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="triglicerideos">
+                                Triglicerídeos
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Hormônios -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-info mb-3">
+                            <i class="fas fa-dna me-2"></i>Hormônios
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="TSH" id="tsh"
+                                   {% if refazer and 'TSH' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="tsh">
+                                TSH
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="T4 Livre" id="t4_livre"
+                                   {% if refazer and 'T4 Livre' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="t4_livre">
+                                T4 Livre
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Outros -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-warning mb-3">
+                            <i class="fas fa-plus me-2"></i>Outros
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Exame de Urina" id="exame_urina"
+                                   {% if refazer and 'Exame de Urina' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="exame_urina">
+                                Exame de Urina
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Parasitológico de Fezes" id="parasitologico"
+                                   {% if refazer and 'Parasitológico de Fezes' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="parasitologico">
+                                Parasitológico de Fezes
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-success btn-lg" onclick="showLoading(this)">
+                <i class="fas fa-save me-2"></i>Salvar Pedido e Gerar PDF
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

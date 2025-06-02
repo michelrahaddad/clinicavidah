@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-calendar-alt me-3"></i>
+                Agenda de Consultas
+            </h2>
+        </div>
+    </div>
+    
+    <!-- New Appointment Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Novo Agendamento</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('agenda.agenda') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="data" class="form-label">Data *</label>
+                        <input type="date" name="data" id="data" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="paciente" class="form-label">Paciente *</label>
+                        <input type="text" name="paciente" id="paciente" class="form-control" 
+                               placeholder="Nome do paciente" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="motivo" class="form-label">Motivo</label>
+                        <input type="text" name="motivo" id="motivo" class="form-control" 
+                               placeholder="Ex: Consulta de rotina">
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100" onclick="showLoading(this)">
+                            <i class="fas fa-plus me-2"></i>Agendar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filtros</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('agenda.agenda') }}">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="data_filtro" class="form-label">Data</label>
+                        <input type="date" name="data" id="data_filtro" class="form-control" 
+                               value="{{ filtro_data }}">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="paciente_filtro" class="form-label">Paciente</label>
+                        <input type="text" name="paciente" id="paciente_filtro" class="form-control" 
+                               placeholder="Nome do paciente" value="{{ filtro_paciente }}">
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-secondary w-100">
+                            <i class="fas fa-filter me-2"></i>Filtrar
+                        </button>
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <a href="{{ url_for('agenda.agenda') }}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-times me-2"></i>Limpar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Appointments List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Agendamentos</h5>
+        </div>
+        <div class="card-body">
+            {% if agendamentos %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Paciente</th>
+                                <th>Motivo</th>
+                                <th width="200">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for agendamento in agendamentos %}
+                            <tr>
+                                <td>
+                                    <strong>{{ agendamento.data }}</strong>
+                                </td>
+                                <td>
+                                    <i class="fas fa-user me-2"></i>{{ agendamento.paciente }}
+                                </td>
+                                <td>
+                                    {{ agendamento.motivo or '-' }}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" 
+                                                class="btn btn-outline-primary btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#editModal{{ agendamento.id }}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <form method="POST" 
+                                              action="{{ url_for('agenda.excluir_agendamento', id=agendamento.id) }}" 
+                                              class="d-inline"
+                                              onsubmit="return confirmarExclusao('Tem certeza que deseja excluir este agendamento?')">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <!-- Edit Modal -->
+                            <div class="modal fade" id="editModal{{ agendamento.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Editar Agendamento</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <form method="POST" action="{{ url_for('agenda.editar_agendamento', id=agendamento.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Data *</label>
+                                                    <input type="date" name="data" class="form-control" 
+                                                           value="{{ agendamento.data }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Paciente *</label>
+                                                    <input type="text" name="paciente" class="form-control" 
+                                                           value="{{ agendamento.paciente }}" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Motivo</label>
+                                                    <input type="text" name="motivo" class="form-control" 
+                                                           value="{{ agendamento.motivo or '' }}">
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Cancelar
+                                                </button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    Salvar Alterações
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if agendamentos|length == 50 %}
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Mostrando os primeiros 50 agendamentos. Use filtros para refinar a busca.
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum agendamento encontrado</h5>
+                    <p class="text-muted">
+                        {% if filtro_data or filtro_paciente %}
+                            Tente ajustar os filtros ou crie um novo agendamento.
+                        {% else %}
+                            Crie seu primeiro agendamento usando o formulário acima.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Set minimum date to today
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('data').setAttribute('min', today);
+});
+</script>
+{% endblock %}

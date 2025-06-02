@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-tachometer-alt me-3"></i>
+                Dashboard
+            </h1>
+            <p class="text-muted mb-4">Bem-vindo ao sistema médico, {{ usuario.nome }}!</p>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Pacientes</h5>
+                            <h2 class="mb-0">{{ total_pacientes }}</h2>
+                        </div>
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Receitas</h5>
+                            <h2 class="mb-0">{{ total_receitas }}</h2>
+                        </div>
+                        <i class="fas fa-prescription-bottle-alt fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Exames Lab</h5>
+                            <h2 class="mb-0">{{ total_exames_lab }}</h2>
+                        </div>
+                        <i class="fas fa-flask fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title">Exames Imagem</h5>
+                            <h2 class="mb-0">{{ total_exames_img }}</h2>
+                        </div>
+                        <i class="fas fa-x-ray fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3">Ações Rápidas</h3>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary w-100 py-3">
+                <i class="fas fa-prescription-bottle-alt fa-2x d-block mb-2"></i>
+                Nova Receita
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success w-100 py-3">
+                <i class="fas fa-flask fa-2x d-block mb-2"></i>
+                Exames Lab
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-info w-100 py-3">
+                <i class="fas fa-x-ray fa-2x d-block mb-2"></i>
+                Exames Imagem
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('agenda.agenda') }}" class="btn btn-outline-warning w-100 py-3">
+                <i class="fas fa-calendar-alt fa-2x d-block mb-2"></i>
+                Agenda
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics Chart -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Estatísticas Gerais
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Statistics Chart
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Pacientes', 'Receitas', 'Exames Lab', 'Exames Imagem', 'Agendamentos'],
+            datasets: [{
+                label: 'Quantidade',
+                data: [
+                    {{ total_pacientes }},
+                    {{ total_receitas }},
+                    {{ total_exames_lab }},
+                    {{ total_exames_img }},
+                    {{ total_agendamentos }}
+                ],
+                backgroundColor: [
+                    'rgba(13, 110, 253, 0.8)',
+                    'rgba(25, 135, 84, 0.8)',
+                    'rgba(13, 202, 240, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(13, 110, 253, 1)',
+                    'rgba(25, 135, 84, 1)',
+                    'rgba(13, 202, 240, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

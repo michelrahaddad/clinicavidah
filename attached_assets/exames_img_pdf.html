@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedido de Exames de Imagem</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #0dcaf0;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #0dcaf0;
+            font-size: 28px;
+            margin: 0;
+            font-weight: bold;
+        }
+        
+        .header p {
+            color: #666;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        
+        .patient-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #0dcaf0;
+        }
+        
+        .patient-info h3 {
+            margin: 0 0 10px 0;
+            color: #0dcaf0;
+            font-size: 16px;
+        }
+        
+        .patient-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .exam-request-box {
+            border: 2px solid #0dcaf0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            min-height: 200px;
+        }
+        
+        .exam-title {
+            color: #0dcaf0;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .exam-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .exam-item {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #0dcaf0;
+            position: relative;
+        }
+        
+        .exam-item::before {
+            content: "📋";
+            margin-right: 10px;
+        }
+        
+        .exam-category {
+            background-color: #e7f6fd;
+            padding: 10px;
+            margin: 15px 0 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #0dcaf0;
+            text-align: center;
+        }
+        
+        .clinical-indication {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .clinical-indication h4 {
+            color: #856404;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .clinical-indication-text {
+            font-size: 12px;
+            color: #856404;
+            line-height: 1.5;
+        }
+        
+        .instructions {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .instructions h4 {
+            color: #0c5460;
+            margin: 0 0 10px 0;
+            font-size: 14px;
+        }
+        
+        .instructions ul {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 12px;
+            color: #0c5460;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        
+        .doctor-info {
+            text-align: left;
+        }
+        
+        .signature-area {
+            text-align: right;
+            min-width: 200px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 200px;
+            margin: 30px 0 10px auto;
+        }
+        
+        .doctor-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #0dcaf0;
+        }
+        
+        .doctor-crm {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .date-issued {
+            position: absolute;
+            top: 2cm;
+            right: 2cm;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .watermark {
+            position: fixed;
+            bottom: 1cm;
+            right: 1cm;
+            font-size: 10px;
+            color: #ccc;
+            transform: rotate(-45deg);
+        }
+        
+        .urgent-notice {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 12px;
+            text-align: center;
+        }
+        
+        .contrast-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="date-issued">
+        Data de emissão: {{ data }}
+    </div>
+    
+    <div class="header">
+        <h1>PEDIDO DE EXAMES DE IMAGEM</h1>
+        <p>Sistema Médico Vidah - Solicitação Digital</p>
+    </div>
+    
+    <div class="patient-info">
+        <h3>Dados do Paciente</h3>
+        <div class="patient-name">{{ nome_paciente }}</div>
+    </div>
+    
+    <div class="exam-request-box">
+        <div class="exam-title">EXAMES SOLICITADOS</div>
+        
+        <ul class="exam-list">
+            {% for exame in exames %}
+            <li class="exam-item">{{ exame }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div class="clinical-indication">
+        <h4>INDICAÇÃO CLÍNICA:</h4>
+        <div class="clinical-indication-text">
+            Investigação diagnóstica conforme avaliação clínica.
+            Favor correlacionar com dados clínicos e laboratoriais.
+        </div>
+    </div>
+    
+    <div class="contrast-warning">
+        <strong>ATENÇÃO:</strong> Para exames com contraste, informar função renal e alergias.
+        Jejum de 4 horas para exames abdominais com contraste.
+    </div>
+    
+    <div class="instructions">
+        <h4>INSTRUÇÕES PARA O PACIENTE:</h4>
+        <ul>
+            <li>Trazer documento de identidade com foto</li>
+            <li>Trazer exames anteriores relacionados (quando houver)</li>
+            <li>Informar sobre marcapassos, próteses metálicas ou gravidez</li>
+            <li>Chegar com 30 minutos de antecedência</li>
+            <li>Este pedido tem validade de 60 dias</li>
+            <li>Para ressonância magnética: retirar objetos metálicos</li>
+            <li>Para exames com contraste: jejum conforme orientação</li>
+        </ul>
+    </div>
+    
+    <div class="urgent-notice">
+        <strong>IMPORTANTE:</strong> Seguir rigorosamente as instruções de preparo específicas para cada exame.
+        Em caso de dúvidas sobre preparo ou contraindicações, entrar em contato com a clínica.
+    </div>
+    
+    <div class="footer">
+        <div class="doctor-info">
+            <div class="doctor-name">{{ medico }}</div>
+            <div class="doctor-crm">CRM: {{ crm }}</div>
+        </div>
+        
+        <div class="signature-area">
+            <div class="signature-line"></div>
+            <div style="font-size: 12px; color: #666;">Assinatura Digital</div>
+        </div>
+    </div>
+    
+    <div class="watermark">
+        Sistema Vidah
+    </div>
+</body>
+</html>

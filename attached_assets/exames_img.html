@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-x-ray me-3"></i>
+                Pedido de Exames de Imagem
+            </h2>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('exames_img.salvar_exames_img') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="refazer" value="{{ refazer|default(false) }}">
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dados do Paciente</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="nome_paciente" class="form-label">
+                        <i class="fas fa-user me-2"></i>Nome do Paciente *
+                    </label>
+                    <input type="text" 
+                           name="nome_paciente" 
+                           id="nome_paciente"
+                           class="form-control" 
+                           placeholder="Digite o nome completo do paciente"
+                           value="{{ exame.nome_paciente if refazer and exame else '' }}"
+                           required>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Selecione os Exames</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Radiografia -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-x-ray me-2"></i>Radiografia
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Raio-X de Tórax" id="raio_x_torax"
+                                   {% if refazer and 'Raio-X de Tórax' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="raio_x_torax">
+                                Raio-X de Tórax
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Raio-X de Abdome" id="raio_x_abdome"
+                                   {% if refazer and 'Raio-X de Abdome' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="raio_x_abdome">
+                                Raio-X de Abdome
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="Raio-X de Coluna" id="raio_x_coluna"
+                                   {% if refazer and 'Raio-X de Coluna' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="raio_x_coluna">
+                                Raio-X de Coluna
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ultrassonografia -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-success mb-3">
+                            <i class="fas fa-wave-square me-2"></i>Ultrassonografia
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="USG Abdome Total" id="usg_abdome"
+                                   {% if refazer and 'USG Abdome Total' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="usg_abdome">
+                                USG Abdome Total
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="USG Pélvica" id="usg_pelvica"
+                                   {% if refazer and 'USG Pélvica' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="usg_pelvica">
+                                USG Pélvica
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="USG Obstétrica" id="usg_obstetrica"
+                                   {% if refazer and 'USG Obstétrica' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="usg_obstetrica">
+                                USG Obstétrica
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="USG Tireoide" id="usg_tireoide"
+                                   {% if refazer and 'USG Tireoide' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="usg_tireoide">
+                                USG Tireoide
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Tomografia -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-info mb-3">
+                            <i class="fas fa-brain me-2"></i>Tomografia
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="TC Crânio" id="tc_cranio"
+                                   {% if refazer and 'TC Crânio' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="tc_cranio">
+                                TC de Crânio
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="TC Tórax" id="tc_torax"
+                                   {% if refazer and 'TC Tórax' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="tc_torax">
+                                TC de Tórax
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="TC Abdome" id="tc_abdome"
+                                   {% if refazer and 'TC Abdome' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="tc_abdome">
+                                TC de Abdome
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Ressonância -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-warning mb-3">
+                            <i class="fas fa-magnet me-2"></i>Ressonância Magnética
+                        </h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="RM Crânio" id="rm_cranio"
+                                   {% if refazer and 'RM Crânio' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="rm_cranio">
+                                RM de Crânio
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="RM Coluna" id="rm_coluna"
+                                   {% if refazer and 'RM Coluna' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="rm_coluna">
+                                RM de Coluna
+                            </label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="RM Joelho" id="rm_joelho"
+                                   {% if refazer and 'RM Joelho' in exame.exames %}checked{% endif %}>
+                            <label class="form-check-label" for="rm_joelho">
+                                RM de Joelho
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-info btn-lg" onclick="showLoading(this)">
+                <i class="fas fa-save me-2"></i>Salvar Pedido e Gerar PDF
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
