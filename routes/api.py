@@ -127,6 +127,50 @@ def buscar_medicamentos():
         logging.error(f'Error searching medications: {e}')
         return jsonify([])
 
+@api_bp.route('/record_details/<string:tipo>/<int:record_id>')
+def record_details(tipo, record_id):
+    """Get detailed record information"""
+    if 'medico_id' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        if tipo == 'receita':
+            record = Receita.query.get_or_404(record_id)
+            return jsonify({
+                'id': record.id,
+                'nome_paciente': record.nome_paciente,
+                'medicamentos': record.medicamentos,
+                'posologias': record.posologias,
+                'duracoes': record.duracoes,
+                'vias': record.vias,
+                'medico_nome': record.medico_nome,
+                'data': record.data
+            })
+        elif tipo == 'exame_lab':
+            record = ExameLab.query.get_or_404(record_id)
+            return jsonify({
+                'id': record.id,
+                'nome_paciente': record.nome_paciente,
+                'exames': record.exames,
+                'medico_nome': record.medico_nome,
+                'data': record.data
+            })
+        elif tipo == 'exame_img':
+            record = ExameImg.query.get_or_404(record_id)
+            return jsonify({
+                'id': record.id,
+                'nome_paciente': record.nome_paciente,
+                'exames': record.exames,
+                'medico_nome': record.medico_nome,
+                'data': record.data
+            })
+        else:
+            return jsonify({'error': 'Invalid record type'}), 400
+            
+    except Exception as e:
+        logging.error(f'Error loading record details: {e}')
+        return jsonify({'error': 'Record not found'}), 404
+
 @api_bp.route('/exames_laboratoriais')
 def buscar_exames_lab():
     """Get common lab exams"""

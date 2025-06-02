@@ -325,19 +325,32 @@ class ProntuarioSearch {
             this.clearSearch();
         });
         
-        // Filter buttons
-        document.getElementById('show-all-records').addEventListener('click', () => {
-            this.filterRecords('all');
-        });
-        document.getElementById('show-receitas').addEventListener('click', () => {
-            this.filterRecords('receita');
-        });
-        document.getElementById('show-exames-lab').addEventListener('click', () => {
-            this.filterRecords('exame_lab');
-        });
-        document.getElementById('show-exames-img').addEventListener('click', () => {
-            this.filterRecords('exame_img');
-        });
+        // Filter buttons (with null checks)
+        const showAllBtn = document.getElementById('show-all-records');
+        const showReceitasBtn = document.getElementById('show-receitas');
+        const showExamesLabBtn = document.getElementById('show-exames-lab');
+        const showExamesImgBtn = document.getElementById('show-exames-img');
+        
+        if (showAllBtn) {
+            showAllBtn.addEventListener('click', () => {
+                this.filterRecords('all');
+            });
+        }
+        if (showReceitasBtn) {
+            showReceitasBtn.addEventListener('click', () => {
+                this.filterRecords('receita');
+            });
+        }
+        if (showExamesLabBtn) {
+            showExamesLabBtn.addEventListener('click', () => {
+                this.filterRecords('exame_lab');
+            });
+        }
+        if (showExamesImgBtn) {
+            showExamesImgBtn.addEventListener('click', () => {
+                this.filterRecords('exame_img');
+            });
+        }
         
         // Click outside to hide suggestions
         document.addEventListener('click', (e) => {
@@ -458,7 +471,11 @@ class ProntuarioSearch {
                         </button>
                         <button class="btn btn-sm btn-outline-info neural-btn" 
                                 onclick="prontuarioSearch.printRecord('${record.tipo}', ${record.id})">
-                            <i class="fas fa-print me-1"></i>Reimprimir
+                            <i class="fas fa-print me-1"></i>Gerar PDF
+                        </button>
+                        <button class="btn btn-sm btn-outline-success neural-btn" 
+                                onclick="prontuarioSearch.viewRecord('${record.tipo}', ${record.id})">
+                            <i class="fas fa-eye me-1"></i>Visualizar
                         </button>
                     </div>
                 </div>
@@ -524,16 +541,24 @@ class ProntuarioSearch {
     filterRecords(type) {
         const recordItems = document.querySelectorAll('.record-item');
         
-        // Update active button
+        // Update active button with null checks
         document.querySelectorAll('[id^="show-"]').forEach(btn => {
-            btn.classList.remove('active');
+            if (btn) {
+                btn.classList.remove('active');
+            }
         });
         
         if (type === 'all') {
-            document.getElementById('show-all-records').classList.add('active');
+            const allBtn = document.getElementById('show-all-records');
+            if (allBtn) {
+                allBtn.classList.add('active');
+            }
             recordItems.forEach(item => item.style.display = 'block');
         } else {
-            document.getElementById(`show-${type.replace('_', '-')}`).classList.add('active');
+            const typeBtn = document.getElementById(`show-${type.replace('_', '-')}`);
+            if (typeBtn) {
+                typeBtn.classList.add('active');
+            }
             recordItems.forEach(item => {
                 item.style.display = item.dataset.type === type ? 'block' : 'none';
             });
@@ -561,6 +586,114 @@ class ProntuarioSearch {
         
         if (routes[tipo]) {
             window.open(routes[tipo], '_blank');
+        }
+    }
+    
+    viewRecord(tipo, id) {
+        // Show detailed view in modal
+        this.showRecordModal(tipo, id);
+    }
+    
+    async showRecordModal(tipo, id) {
+        try {
+            const response = await fetch(`/api/record_details/${tipo}/${id}`);
+            const record = await response.json();
+            
+            let modalContent = '';
+            const typeConfig = this.getTypeConfig(tipo);
+            
+            modalContent = `
+                <div class="modal fade" id="recordModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--glass-border);">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-light">
+                                    <i class="${typeConfig.icon} me-2"></i>
+                                    ${typeConfig.label} - ${record.nome_paciente}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Paciente:</strong> ${record.nome_paciente}</p>
+                                        <p><strong>Data:</strong> ${this.formatDate(record.data)}</p>
+                                        <p><strong>Médico:</strong> ${record.medico_nome}</p>
+                                    </div>
+                                </div>
+                                <hr>
+                                ${this.formatDetailedContent(record, tipo)}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-primary neural-btn" 
+                                        onclick="prontuarioSearch.editRecord('${tipo}', ${id})">
+                                    <i class="fas fa-edit me-1"></i>Editar
+                                </button>
+                                <button type="button" class="btn btn-outline-info neural-btn" 
+                                        onclick="prontuarioSearch.printRecord('${tipo}', ${id})">
+                                    <i class="fas fa-print me-1"></i>Gerar PDF
+                                </button>
+                                <button type="button" class="btn btn-secondary neural-btn" data-bs-dismiss="modal">
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('recordModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalContent);
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('recordModal'));
+            modal.show();
+            
+        } catch (error) {
+            console.error('Erro ao carregar detalhes do registro:', error);
+            alert('Erro ao carregar detalhes do registro.');
+        }
+    }
+    
+    formatDetailedContent(record, tipo) {
+        switch(tipo) {
+            case 'receita':
+                const medicamentos = record.medicamentos.split(',');
+                const posologias = record.posologias.split(',');
+                const duracoes = record.duracoes.split(',');
+                const vias = record.vias.split(',');
+                
+                let html = '<h6>Medicamentos Prescritos:</h6><div class="table-responsive"><table class="table table-dark table-sm"><thead><tr><th>Medicamento</th><th>Posologia</th><th>Duração</th><th>Via</th></tr></thead><tbody>';
+                
+                for (let i = 0; i < medicamentos.length; i++) {
+                    html += `<tr>
+                        <td>${medicamentos[i]?.trim() || ''}</td>
+                        <td>${posologias[i]?.trim() || ''}</td>
+                        <td>${duracoes[i]?.trim() || ''}</td>
+                        <td>${vias[i]?.trim() || ''}</td>
+                    </tr>`;
+                }
+                html += '</tbody></table></div>';
+                return html;
+                
+            case 'exame_lab':
+            case 'exame_img':
+                const exames = record.exames.split(',');
+                let examHtml = `<h6>Exames Solicitados:</h6><ul class="list-group">`;
+                exames.forEach(exame => {
+                    examHtml += `<li class="list-group-item bg-transparent text-light border-secondary">${exame.trim()}</li>`;
+                });
+                examHtml += '</ul>';
+                return examHtml;
+                
+            default:
+                return '<p>Detalhes não disponíveis.</p>';
         }
     }
     
