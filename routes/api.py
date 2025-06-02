@@ -173,40 +173,112 @@ def record_details(tipo, record_id):
 
 @api_bp.route('/exames_laboratoriais')
 def buscar_exames_lab():
-    """Get common lab exams"""
+    """Get common lab exams organized by categories"""
     try:
-        exames_comuns = [
-            "Hemograma completo",
-            "Glicemia de jejum",
-            "Colesterol total e frações",
-            "Triglicerídeos",
-            "Ureia e Creatinina",
-            "Ácido úrico",
-            "TGO (AST) e TGP (ALT)",
-            "Bilirrubinas",
-            "Proteínas totais e frações",
-            "TSH e T4 livre",
-            "Exame de urina (EAS)",
-            "Urocultura",
-            "Proteína C reativa (PCR)",
-            "VHS (Velocidade de hemossedimentação)",
-            "Ferro sérico e ferritina",
-            "Vitamina B12",
-            "Vitamina D",
-            "HbA1c (Hemoglobina glicada)",
-            "Cortisol",
-            "Testosterona",
-            "PSA (Antígeno prostático específico)",
-            "Beta HCG",
-            "Parasitológico de fezes",
-            "Coprocultura",
-            "Hepatite B e C",
-            "HIV",
-            "VDRL",
-            "Toxoplasmose IgG e IgM",
-            "Rubéola IgG e IgM",
-            "Citomegalovírus IgG e IgM"
-        ]
+        exames_por_categoria = {
+            "Hematologia": [
+                "Hemograma completo",
+                "VHS (Velocidade de hemossedimentação)",
+                "Coagulograma (TAP/TTPA)",
+                "Tempo de sangramento",
+                "Contagem de plaquetas"
+            ],
+            "Bioquímica": [
+                "Glicemia de jejum",
+                "Colesterol total e frações",
+                "Triglicerídeos",
+                "Ureia",
+                "Creatinina",
+                "Ácido úrico",
+                "TGO (AST)",
+                "TGP (ALT)",
+                "Bilirrubinas",
+                "Proteínas totais e frações",
+                "HbA1c (Hemoglobina glicada)",
+                "Ferro sérico",
+                "Ferritina",
+                "Proteína C reativa (PCR)"
+            ],
+            "Endocrinologia": [
+                "TSH",
+                "T4 livre",
+                "Cortisol",
+                "Testosterona total",
+                "Testosterona livre",
+                "FSH",
+                "Estradiol",
+                "Progesterona sérica",
+                "Insulina",
+                "Prolactina"
+            ],
+            "Urologia/Nefrologia": [
+                "Exame de urina (EAS)",
+                "Urina 1",
+                "Urocultura",
+                "PSA",
+                "Clearance de creatinina",
+                "Proteinúria 24h"
+            ],
+            "Gastroenterologia": [
+                "Exame de fezes",
+                "Parasitológico de fezes",
+                "Coprocultura",
+                "Sangue oculto nas fezes",
+                "Elastase fecal"
+            ],
+            "Oncologia/Marcadores": [
+                "PSA (Antígeno prostático específico)",
+                "CEA",
+                "CA 19-9",
+                "CA 125",
+                "AFP (Alfa-fetoproteína)",
+                "Beta HCG"
+            ],
+            "Imunologia/Reumatologia": [
+                "FAN (Fator antinuclear)",
+                "Fator reumatoide",
+                "Anti-CCP",
+                "Complemento C3 e C4",
+                "Anti-DNA"
+            ],
+            "Sorologias Virais": [
+                "HBsAg",
+                "Anti-HBs",
+                "HCV",
+                "Anti-HCV",
+                "HIV (Anti-HIV)",
+                "HTLV I/II",
+                "Citomegalovírus IgG e IgM"
+            ],
+            "Sorologias Bacterianas/Parasitárias": [
+                "VDRL",
+                "FTA-ABS",
+                "Sorologia Chagas",
+                "Sorologia Toxoplasmose IgG e IgM",
+                "Sorologia Rubéola IgG e IgM",
+                "Sorologia para Hepatite A"
+            ],
+            "Tireoide": [
+                "TSH",
+                "T4 livre",
+                "T3",
+                "Anti-TPO",
+                "Anti-tireoglobulina",
+                "Tireoglobulina"
+            ],
+            "Vitaminas": [
+                "Vitamina B12",
+                "Vitamina D",
+                "Ácido fólico",
+                "Vitamina A",
+                "Vitamina E"
+            ]
+        }
+        
+        # Flatten all exams into a single list for search functionality
+        exames_comuns = []
+        for categoria, exames in exames_por_categoria.items():
+            exames_comuns.extend(exames)
         
         query = request.args.get('q', '').strip().lower()
         
