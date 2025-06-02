@@ -268,3 +268,40 @@ def buscar_exames_img():
     except Exception as e:
         logging.error(f'Error getting imaging exams: {e}')
         return jsonify([])
+
+@api_bp.route('/update_record_date', methods=['POST'])
+def update_record_date():
+    """Update record date"""
+    if 'usuario' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        data = request.get_json()
+        record_id = data.get('id')
+        tipo = data.get('tipo')
+        new_date = data.get('data')
+        
+        if not all([record_id, tipo, new_date]):
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        # Update the appropriate table based on type
+        if tipo == 'receita':
+            record = Receita.query.get_or_404(record_id)
+        elif tipo == 'exame_lab':
+            record = ExameLab.query.get_or_404(record_id)
+        elif tipo == 'exame_img':
+            record = ExameImg.query.get_or_404(record_id)
+        else:
+            return jsonify({'error': 'Invalid record type'}), 400
+        
+        # Update the date
+        record.data = new_date
+        db.session.commit()
+        
+        logging.info(f'Record date updated: {tipo} {record_id} to {new_date}')
+        return jsonify({'success': True})
+        
+    except Exception as e:
+        logging.error(f'Error updating record date: {e}')
+        db.session.rollback()
+        return jsonify({'error': 'Internal server error'}), 500

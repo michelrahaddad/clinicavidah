@@ -48,19 +48,35 @@
                 <i class="fas fa-user me-2"></i>
                 Histórico do Paciente: <span id="selected-patient-name" class="text-primary"></span>
             </h5>
-            <div>
-                <button type="button" id="show-all-records" class="btn btn-sm btn-outline-info neural-btn me-2">
-                    <i class="fas fa-list me-1"></i>Todos
-                </button>
-                <button type="button" id="show-receitas" class="btn btn-sm btn-outline-primary neural-btn me-2">
-                    <i class="fas fa-prescription-bottle-alt me-1"></i>Receitas
-                </button>
-                <button type="button" id="show-exames-lab" class="btn btn-sm btn-outline-success neural-btn me-2">
-                    <i class="fas fa-flask me-1"></i>Lab
-                </button>
-                <button type="button" id="show-exames-img" class="btn btn-sm btn-outline-warning neural-btn">
-                    <i class="fas fa-x-ray me-1"></i>Imagem
-                </button>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="filter-buttons">
+                    <button type="button" id="show-all-records" class="btn btn-sm btn-outline-info neural-btn me-2 filter-btn" data-type="all">
+                        <i class="fas fa-list me-1"></i>Todos
+                    </button>
+                    <button type="button" id="show-receitas" class="btn btn-sm btn-outline-primary neural-btn me-2 filter-btn" data-type="receita">
+                        <i class="fas fa-prescription-bottle-alt me-1"></i>Receitas
+                    </button>
+                    <button type="button" id="show-exames-lab" class="btn btn-sm btn-outline-success neural-btn me-2 filter-btn" data-type="exame_lab">
+                        <i class="fas fa-flask me-1"></i>Lab
+                    </button>
+                    <button type="button" id="show-exames-img" class="btn btn-sm btn-outline-warning neural-btn filter-btn" data-type="exame_img">
+                        <i class="fas fa-x-ray me-1"></i>Imagem
+                    </button>
+                </div>
+                
+                <div class="batch-actions" id="batch-actions">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm btn-outline-info neural-btn" onclick="prontuarioSearch.printAllByCategory()" title="Imprimir todos visíveis">
+                            <i class="fas fa-print me-1"></i>Imprimir Todos
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary neural-btn" onclick="prontuarioSearch.toggleEditMode()" title="Editar registros" id="edit-mode-btn">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </button>
+                        <button class="btn btn-sm btn-outline-success neural-btn" onclick="prontuarioSearch.addNewRecord()" title="Adicionar novo registro">
+                            <i class="fas fa-plus me-1"></i>Adicionar
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="card-body">
@@ -530,7 +546,11 @@ class ProntuarioSearch {
                         <div class="row g-3 align-items-center">
                             <div class="col-md-2 text-center">
                                 <small>DATA</small>
-                                <div><strong>${this.formatDate(record.data)}</strong></div>
+                                <div class="editable-date" data-id="${record.id}" data-tipo="${record.tipo}">
+                                    <strong class="date-display">${this.formatDate(record.data)}</strong>
+                                    <input type="date" class="form-control form-control-sm date-input d-none" 
+                                           value="${record.data}" onchange="prontuarioSearch.updateRecordDate(${record.id}, '${record.tipo}', this.value)">
+                                </div>
                             </div>
                             <div class="col-md-2">
                                 <small>PACIENTE</small>
@@ -882,6 +902,200 @@ class ProntuarioSearch {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
+    }
+    
+    // Advanced functionalities
+    printAllByCategory() {
+        const visibleRecords = document.querySelectorAll('.record-item[style*="block"], .record-item:not([style*="none"])');
+        const currentFilter = this.getCurrentFilter();
+        
+        if (visibleRecords.length === 0) {
+            alert('Nenhum registro visível para impressão.');
+            return;
+        }
+        
+        // Open all PDFs in sequence
+        visibleRecords.forEach((record, index) => {
+            const tipo = record.dataset.type;
+            const id = record.querySelector('.edit-record-btn').dataset.id;
+            
+            setTimeout(() => {
+                window.open(`/${tipo === 'receita' ? 'receita' : tipo === 'exame_lab' ? 'exames_lab' : 'exames_img'}/refazer/${id}?print=1`, '_blank');
+            }, index * 500); // Delay to avoid browser blocking
+        });
+    }
+    
+    getCurrentFilter() {
+        const activeBtn = document.querySelector('.filter-btn.active');
+        return activeBtn ? activeBtn.dataset.type : 'all';
+    }
+    
+    toggleEditMode() {
+        const editBtn = document.getElementById('edit-mode-btn');
+        const isEditMode = editBtn.classList.contains('active');
+        
+        if (isEditMode) {
+            // Exit edit mode
+            editBtn.classList.remove('active');
+            editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Editar';
+            this.exitEditMode();
+        } else {
+            // Enter edit mode
+            editBtn.classList.add('active');
+            editBtn.innerHTML = '<i class="fas fa-save me-1"></i>Salvar';
+            this.enterEditMode();
+        }
+    }
+    
+    enterEditMode() {
+        // Make dates editable
+        document.querySelectorAll('.editable-date').forEach(dateEl => {
+            const display = dateEl.querySelector('.date-display');
+            const input = dateEl.querySelector('.date-input');
+            
+            display.classList.add('d-none');
+            input.classList.remove('d-none');
+        });
+        
+        // Show edit controls for record details
+        document.querySelectorAll('.record-content-summary').forEach(content => {
+            content.classList.add('editable-content');
+            content.setAttribute('contenteditable', 'true');
+            content.style.border = '1px dashed var(--primary)';
+            content.style.padding = '8px';
+            content.style.borderRadius = '4px';
+        });
+    }
+    
+    exitEditMode() {
+        // Hide date inputs
+        document.querySelectorAll('.editable-date').forEach(dateEl => {
+            const display = dateEl.querySelector('.date-display');
+            const input = dateEl.querySelector('.date-input');
+            
+            display.classList.remove('d-none');
+            input.classList.add('d-none');
+        });
+        
+        // Hide edit controls
+        document.querySelectorAll('.record-content-summary').forEach(content => {
+            content.classList.remove('editable-content');
+            content.removeAttribute('contenteditable');
+            content.style.border = 'none';
+            content.style.padding = '0';
+        });
+    }
+    
+    async updateRecordDate(recordId, tipo, newDate) {
+        try {
+            const response = await fetch('/api/update_record_date', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: recordId,
+                    tipo: tipo,
+                    data: newDate
+                })
+            });
+            
+            if (response.ok) {
+                // Update the display
+                const dateEl = document.querySelector(`[data-id="${recordId}"][data-tipo="${tipo}"] .date-display`);
+                if (dateEl) {
+                    dateEl.textContent = this.formatDate(newDate);
+                }
+                
+                // Show success feedback
+                this.showNotification('Data atualizada com sucesso!', 'success');
+            } else {
+                throw new Error('Erro ao atualizar data');
+            }
+        } catch (error) {
+            console.error('Error updating date:', error);
+            this.showNotification('Erro ao atualizar data', 'error');
+        }
+    }
+    
+    addNewRecord() {
+        const currentFilter = this.getCurrentFilter();
+        let url = '/receita'; // default
+        
+        switch(currentFilter) {
+            case 'receita':
+                url = '/receita';
+                break;
+            case 'exame_lab':
+                url = '/exames_lab';
+                break;
+            case 'exame_img':
+                url = '/exames_img';
+                break;
+            default:
+                // Show modal to choose type
+                this.showAddRecordModal();
+                return;
+        }
+        
+        // Pre-fill with current patient
+        const patientName = this.currentPatient ? this.currentPatient.nome : '';
+        window.location.href = `${url}?paciente=${encodeURIComponent(patientName)}`;
+    }
+    
+    showAddRecordModal() {
+        const modalHtml = `
+            <div class="modal fade" id="addRecordModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--glass-border);">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-light">Adicionar Novo Registro</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-light">Que tipo de registro deseja adicionar?</p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary neural-btn" onclick="prontuarioSearch.redirectToForm('receita')">
+                                    <i class="fas fa-prescription-bottle-alt me-2"></i>Nova Receita
+                                </button>
+                                <button class="btn btn-outline-success neural-btn" onclick="prontuarioSearch.redirectToForm('exames_lab')">
+                                    <i class="fas fa-flask me-2"></i>Exame Laboratorial
+                                </button>
+                                <button class="btn btn-outline-warning neural-btn" onclick="prontuarioSearch.redirectToForm('exames_img')">
+                                    <i class="fas fa-x-ray me-2"></i>Exame de Imagem
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        const modal = new bootstrap.Modal(document.getElementById('addRecordModal'));
+        modal.show();
+    }
+    
+    redirectToForm(tipo) {
+        const patientName = this.currentPatient ? this.currentPatient.nome : '';
+        const url = tipo === 'receita' ? '/receita' : `/${tipo}`;
+        window.location.href = `${url}?paciente=${encodeURIComponent(patientName)}`;
+    }
+    
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
     }
 }
 
