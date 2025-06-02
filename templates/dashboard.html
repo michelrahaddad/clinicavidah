@@ -12,8 +12,54 @@
         </div>
     </div>
     
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3 text-light">
+                <i class="fas fa-bolt me-2 text-primary"></i>
+                Ações Rápidas
+            </h3>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-file-medical fa-2x d-block mb-2"></i>
+                Prontuário
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="#" class="btn btn-outline-info w-100 py-3 neural-btn glass-card" onclick="showNewPatientModal()">
+                <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
+                Novo Paciente
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-prescription-bottle-alt fa-2x d-block mb-2"></i>
+                Nova Receita
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-x-ray fa-2x d-block mb-2"></i>
+                Exames Imagem
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-flask fa-2x d-block mb-2"></i>
+                Exames Lab
+            </a>
+        </div>
+    </div>
+    
     <!-- Statistics Cards -->
     <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3 text-light">
+                <i class="fas fa-chart-line me-2 text-primary"></i>
+                Estatísticas do Sistema
+            </h3>
+        </div>
         <div class="col-md-6 col-lg-3 mb-3">
             <div class="card glass-card stat-card bg-primary">
                 <div class="card-body">
@@ -68,46 +114,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Quick Actions -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h3 class="mb-3 text-light">
-                <i class="fas fa-bolt me-2 text-primary"></i>
-                Ações Rápidas
-            </h3>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary w-100 py-3 neural-btn glass-card">
-                <i class="fas fa-prescription-bottle-alt fa-2x d-block mb-2"></i>
-                Nova Receita
-            </a>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success w-100 py-3 neural-btn glass-card">
-                <i class="fas fa-flask fa-2x d-block mb-2"></i>
-                Exames Lab
-            </a>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-info w-100 py-3 neural-btn glass-card">
-                <i class="fas fa-x-ray fa-2x d-block mb-2"></i>
-                Exames Imagem
-            </a>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('agenda.agenda') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card">
-                <i class="fas fa-calendar-alt fa-2x d-block mb-2"></i>
-                Agenda
-            </a>
-        </div>
-        <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary w-100 py-3 neural-btn glass-card">
-                <i class="fas fa-file-medical fa-2x d-block mb-2"></i>
-                Prontuário
-            </a>
         </div>
     </div>
     
