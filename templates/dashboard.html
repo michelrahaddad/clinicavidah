@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4 page-title">
+                <i class="fas fa-tachometer-alt me-3 text-primary"></i>
+                <span class="gradient-text">Dashboard Neural</span>
+            </h1>
+            <p class="text-muted mb-4">Bem-vindo ao sistema médico VIDAH, {{ usuario.nome }}!</p>
+        </div>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card glass-card stat-card bg-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-white">Pacientes</h5>
+                            <h2 class="mb-0 text-white counter" data-target="{{ total_pacientes }}">0</h2>
+                        </div>
+                        <i class="fas fa-users fa-2x text-white opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card glass-card stat-card bg-success">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-white">Receitas</h5>
+                            <h2 class="mb-0 text-white counter" data-target="{{ total_receitas }}">0</h2>
+                        </div>
+                        <i class="fas fa-prescription-bottle-alt fa-2x text-white opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card glass-card stat-card bg-info">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-white">Exames Lab</h5>
+                            <h2 class="mb-0 text-white counter" data-target="{{ total_exames_lab }}">0</h2>
+                        </div>
+                        <i class="fas fa-flask fa-2x text-white opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card glass-card stat-card bg-warning">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title text-white">Exames Imagem</h5>
+                            <h2 class="mb-0 text-white counter" data-target="{{ total_exames_img }}">0</h2>
+                        </div>
+                        <i class="fas fa-x-ray fa-2x text-white opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-3 text-light">
+                <i class="fas fa-bolt me-2 text-primary"></i>
+                Ações Rápidas
+            </h3>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-prescription-bottle-alt fa-2x d-block mb-2"></i>
+                Nova Receita
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-flask fa-2x d-block mb-2"></i>
+                Exames Lab
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-info w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-x-ray fa-2x d-block mb-2"></i>
+                Exames Imagem
+            </a>
+        </div>
+        <div class="col-md-6 col-lg-3 mb-3">
+            <a href="{{ url_for('agenda.agenda') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card">
+                <i class="fas fa-calendar-alt fa-2x d-block mb-2"></i>
+                Agenda
+            </a>
+        </div>
+    </div>
+    
+    <!-- Statistics Chart -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        Estatísticas Neurais
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="statsChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Statistics Chart with futuristic theme
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Pacientes', 'Receitas', 'Exames Lab', 'Exames Imagem', 'Agendamentos'],
+            datasets: [{
+                label: 'Quantidade',
+                data: [
+                    {{ total_pacientes }},
+                    {{ total_receitas }},
+                    {{ total_exames_lab }},
+                    {{ total_exames_img }},
+                    {{ total_agendamentos }}
+                ],
+                backgroundColor: [
+                    'rgba(0, 150, 255, 0.8)',
+                    'rgba(40, 200, 120, 0.8)',
+                    'rgba(0, 200, 255, 0.8)',
+                    'rgba(255, 170, 0, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(0, 150, 255, 1)',
+                    'rgba(40, 200, 120, 1)',
+                    'rgba(0, 200, 255, 1)',
+                    'rgba(255, 170, 0, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: '#rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

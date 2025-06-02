@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitação de Exames Laboratoriais</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.4;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        .doctor-info {
+            margin-bottom: 10px;
+        }
+        .patient-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #28a745;
+            margin-bottom: 20px;
+        }
+        .exams-list {
+            list-style: none;
+            padding: 0;
+        }
+        .exams-list li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ccc;
+        }
+        .exams-list li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+        }
+        .footer {
+            position: fixed;
+            bottom: 2cm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+        }
+        .signature {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 300px;
+            margin: 0 auto;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">SISTEMA VIDAH</div>
+        <div class="doctor-info">
+            <strong>Dr(a). {{ medico }}</strong><br>
+            CRM: {{ crm }}
+        </div>
+        <div>{{ data }}</div>
+    </div>
+    
+    <div class="patient-info">
+        <strong>Paciente:</strong> {{ nome_paciente }}
+    </div>
+    
+    <h3 style="color: #28a745; margin-bottom: 20px;">SOLICITAÇÃO DE EXAMES LABORATORIAIS</h3>
+    
+    <p>Solicito a realização dos seguintes exames laboratoriais:</p>
+    
+    <ul class="exams-list">
+        {% for exame in exames %}
+        <li>{{ exame }}</li>
+        {% endfor %}
+    </ul>
+    
+    <div class="signature">
+        <div class="signature-line">
+            <strong>Dr(a). {{ medico }}</strong><br>
+            CRM: {{ crm }}
+        </div>
+    </div>
+    
+    <div class="footer">
+        Sistema Médico VIDAH - {{ data }}
+    </div>
+</body>
+</html>

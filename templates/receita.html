@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 page-title">
+                <i class="fas fa-prescription-bottle-alt me-3 text-primary"></i>
+                <span class="gradient-text">Prescrição Neural</span>
+            </h2>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('receita.salvar_receita') }}" method="post">
+        <input type="hidden" name="refazer" value="{{ refazer|default(false) }}">
+        
+        <div class="card glass-card">
+            <div class="card-header">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-user me-2"></i>
+                    Dados do Paciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="nome_paciente" class="form-label text-light">
+                                <i class="fas fa-user me-2"></i>Nome do Paciente *
+                            </label>
+                            <input type="text" 
+                                   name="nome_paciente" 
+                                   id="nome_paciente"
+                                   class="form-control glass-input" 
+                                   placeholder="Digite o nome completo do paciente"
+                                   value="{{ receita.nome_paciente if refazer and receita else '' }}"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card glass-card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-pills me-2"></i>
+                    Medicamentos
+                </h5>
+                <button type="button" class="btn btn-sm btn-outline-primary neural-btn" onclick="adicionarMedicamento()">
+                    <i class="fas fa-plus me-2"></i>Adicionar Medicamento
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="medicamentos-container">
+                    {% if refazer and receita and receita.medicamentos %}
+                        {% for med in receita.medicamentos %}
+                        <div class="medicamento-row mb-3 glass-card p-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label text-light">Medicamento *</label>
+                                    <input type="text" name="medicamento[]" class="form-control glass-input" 
+                                           placeholder="Nome do medicamento" value="{{ med.nome }}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-light">Posologia *</label>
+                                    <input type="text" name="posologia[]" class="form-control glass-input" 
+                                           placeholder="Ex: 1 comprimido" value="{{ med.posologia }}" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-light">Duração *</label>
+                                    <input type="text" name="duracao[]" class="form-control glass-input" 
+                                           placeholder="Ex: 7 dias" value="{{ med.duracao }}" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-light">Via *</label>
+                                    <input type="text" name="via[]" class="form-control glass-input" 
+                                           placeholder="Ex: Oral" value="{{ med.via }}" required>
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="medicamento-row mb-3 glass-card p-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label class="form-label text-light">Medicamento *</label>
+                                    <input type="text" name="medicamento[]" class="form-control glass-input" 
+                                           placeholder="Nome do medicamento" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-light">Posologia *</label>
+                                    <input type="text" name="posologia[]" class="form-control glass-input" 
+                                           placeholder="Ex: 1 comprimido" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label text-light">Duração *</label>
+                                    <input type="text" name="duracao[]" class="form-control glass-input" 
+                                           placeholder="Ex: 7 dias" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label text-light">Via *</label>
+                                    <input type="text" name="via[]" class="form-control glass-input" 
+                                           placeholder="Ex: Oral" required>
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-primary btn-lg neural-btn" onclick="showLoading(this)">
+                <i class="fas fa-save me-2"></i>Salvar Receita e Gerar PDF
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+function adicionarMedicamento() {
+    const container = document.getElementById('medicamentos-container');
+    const div = document.createElement('div');
+    div.className = 'medicamento-row mb-3 glass-card p-3';
+    div.innerHTML = `
+        <div class="row">
+            <div class="col-md-3">
+                <label class="form-label text-light">Medicamento *</label>
+                <input type="text" name="medicamento[]" class="form-control glass-input" 
+                       placeholder="Nome do medicamento" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-light">Posologia *</label>
+                <input type="text" name="posologia[]" class="form-control glass-input" 
+                       placeholder="Ex: 1 comprimido" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-light">Duração *</label>
+                <input type="text" name="duracao[]" class="form-control glass-input" 
+                       placeholder="Ex: 7 dias" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-light">Via *</label>
+                <input type="text" name="via[]" class="form-control glass-input" 
+                       placeholder="Ex: Oral" required>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    container.appendChild(div);
+    
+    // Add entrance animation
+    div.style.opacity = '0';
+    div.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+        div.style.transition = 'all 0.3s ease';
+        div.style.opacity = '1';
+        div.style.transform = 'translateY(0)';
+    }, 10);
+}
+
+function removerMedicamento(button) {
+    const container = document.getElementById('medicamentos-container');
+    if (container.children.length > 1) {
+        const row = button.closest('.medicamento-row');
+        row.style.transition = 'all 0.3s ease';
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-100%)';
+        setTimeout(() => row.remove(), 300);
+    } else {
+        alert('É necessário pelo menos um medicamento.');
+    }
+}
+</script>
+{% endblock %}

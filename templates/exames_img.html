@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 page-title">
+                <i class="fas fa-x-ray me-3 text-primary"></i>
+                <span class="gradient-text">Exames de Imagem</span>
+            </h2>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('exames_img.salvar_exames_img') }}" method="post">
+        <div class="card glass-card">
+            <div class="card-header">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-user me-2"></i>
+                    Dados do Paciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="nome_paciente" class="form-label text-light">
+                                <i class="fas fa-user me-2"></i>Nome do Paciente *
+                            </label>
+                            <input type="text" 
+                                   name="nome_paciente" 
+                                   id="nome_paciente"
+                                   class="form-control glass-input" 
+                                   placeholder="Digite o nome completo do paciente"
+                                   value="{{ exame.nome_paciente if refazer and exame else '' }}"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card glass-card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-x-ray me-2"></i>
+                    Exames de Imagem
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% set exames_selecionados = exame.exames if refazer and exame else [] %}
+                    
+                    <!-- Radiologia Simples -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-x-ray me-2"></i>Radiologia Simples
+                        </h6>
+                        <div class="row">
+                            {% for exame_nome in ['RX Tórax PA', 'RX Tórax Perfil', 'RX Abdome', 'RX Crânio', 'RX Coluna Cervical', 'RX Coluna Lombar'] %}
+                            <div class="col-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                                           value="{{ exame_nome }}" 
+                                           id="exame_{{ loop.index }}"
+                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                    <label class="form-check-label text-light" for="exame_{{ loop.index }}">
+                                        {{ exame_nome }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Tomografia -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-success mb-3">
+                            <i class="fas fa-circle-notch me-2"></i>Tomografia
+                        </h6>
+                        <div class="row">
+                            {% for exame_nome in ['TC Crânio', 'TC Tórax', 'TC Abdome', 'TC Pelve', 'TC Coluna', 'TC com Contraste'] %}
+                            <div class="col-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                                           value="{{ exame_nome }}" 
+                                           id="exame_{{ loop.index + 6 }}"
+                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                    <label class="form-check-label text-light" for="exame_{{ loop.index + 6 }}">
+                                        {{ exame_nome }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Ressonância -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-info mb-3">
+                            <i class="fas fa-magnet me-2"></i>Ressonância Magnética
+                        </h6>
+                        <div class="row">
+                            {% for exame_nome in ['RM Crânio', 'RM Coluna Cervical', 'RM Coluna Lombar', 'RM Joelho', 'RM Ombro', 'RM com Contraste'] %}
+                            <div class="col-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                                           value="{{ exame_nome }}" 
+                                           id="exame_{{ loop.index + 12 }}"
+                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                    <label class="form-check-label text-light" for="exame_{{ loop.index + 12 }}">
+                                        {{ exame_nome }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Ultrassom -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="text-warning mb-3">
+                            <i class="fas fa-wave-square me-2"></i>Ultrassonografia
+                        </h6>
+                        <div class="row">
+                            {% for exame_nome in ['US Abdome Total', 'US Pelve', 'US Tireoide', 'US Doppler', 'US Obstétrico', 'Ecocardiograma'] %}
+                            <div class="col-12 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                                           value="{{ exame_nome }}" 
+                                           id="exame_{{ loop.index + 18 }}"
+                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                    <label class="form-check-label text-light" for="exame_{{ loop.index + 18 }}">
+                                        {{ exame_nome }}
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-info btn-lg neural-btn">
+                <i class="fas fa-save me-2"></i>Salvar Exames e Gerar PDF
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

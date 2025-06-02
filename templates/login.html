@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card glass-card">
+        <div class="text-center mb-4">
+            <div class="login-logo">
+                <i class="fas fa-heartbeat text-primary fa-3x mb-3"></i>
+                <h1 class="gradient-text fw-bold">VIDAH</h1>
+                <p class="text-muted">Sistema Médico Neural</p>
+            </div>
+        </div>
+        
+        <form method="post" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="nome" class="form-label">
+                    <i class="fas fa-user me-2"></i>Nome Completo
+                </label>
+                <input type="text" 
+                       name="nome" 
+                       id="nome"
+                       class="form-control glass-input" 
+                       placeholder="Digite seu nome completo"
+                       required>
+                <div class="invalid-feedback">
+                    Por favor, informe seu nome completo.
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="crm" class="form-label">
+                    <i class="fas fa-id-card me-2"></i>CRM
+                </label>
+                <input type="text" 
+                       name="crm" 
+                       id="crm"
+                       class="form-control glass-input" 
+                       placeholder="Ex: 123456-SP"
+                       required>
+                <div class="invalid-feedback">
+                    Por favor, informe seu CRM.
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="senha" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Senha
+                </label>
+                <input type="password" 
+                       name="senha" 
+                       id="senha"
+                       class="form-control glass-input" 
+                       placeholder="Digite sua senha"
+                       required>
+                <div class="invalid-feedback">
+                    Por favor, informe sua senha.
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3 neural-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Acessar Sistema
+            </button>
+        </form>
+        
+        <div class="text-center">
+            <p class="text-muted">Não possui conta?</p>
+            <a href="{{ url_for('medicos.cadastrar_medico') }}" class="btn btn-outline-primary neural-btn">
+                <i class="fas fa-user-plus me-2"></i>
+                Cadastrar Médico
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

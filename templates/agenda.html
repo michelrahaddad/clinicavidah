@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 page-title">
+                <i class="fas fa-calendar-alt me-3 text-primary"></i>
+                <span class="gradient-text">Agenda Neural</span>
+            </h2>
+        </div>
+    </div>
+    
+    <!-- New Appointment Form -->
+    <div class="card glass-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-plus me-2"></i>
+                Novo Agendamento
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                <div class="col-md-3">
+                    <label for="data" class="form-label text-light">Data *</label>
+                    <input type="date" 
+                           name="data" 
+                           id="data"
+                           class="form-control glass-input" 
+                           required>
+                </div>
+                <div class="col-md-4">
+                    <label for="paciente" class="form-label text-light">Paciente *</label>
+                    <input type="text" 
+                           name="paciente" 
+                           id="paciente"
+                           class="form-control glass-input" 
+                           placeholder="Nome do paciente"
+                           required>
+                </div>
+                <div class="col-md-4">
+                    <label for="motivo" class="form-label text-light">Motivo</label>
+                    <input type="text" 
+                           name="motivo" 
+                           id="motivo"
+                           class="form-control glass-input" 
+                           placeholder="Motivo da consulta">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary neural-btn w-100">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card glass-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-filter me-2"></i>
+                Filtros
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filtro_data" class="form-label text-light">Data</label>
+                    <input type="date" 
+                           name="data" 
+                           id="filtro_data"
+                           class="form-control glass-input"
+                           value="{{ filtro_data }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="filtro_paciente" class="form-label text-light">Paciente</label>
+                    <input type="text" 
+                           name="paciente" 
+                           id="filtro_paciente"
+                           class="form-control glass-input" 
+                           placeholder="Nome do paciente"
+                           value="{{ filtro_paciente }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary neural-btn w-100">
+                        <i class="fas fa-search me-2"></i>Filtrar
+                    </button>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{{ url_for('agenda.agenda') }}" class="btn btn-outline-secondary neural-btn w-100">
+                        <i class="fas fa-times me-2"></i>Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Appointments List -->
+    <div class="card glass-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-list me-2"></i>
+                Agendamentos ({{ agendamentos|length }})
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if agendamentos %}
+            <div class="row">
+                {% for agendamento in agendamentos %}
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card glass-card appointment-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="text-primary mb-0">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    {{ agendamento.data }}
+                                </h6>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-light neural-btn" 
+                                            type="button" 
+                                            data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-dark">
+                                        <li>
+                                            <button class="dropdown-item" 
+                                                    onclick="editarAgendamento({{ agendamento.id }}, '{{ agendamento.data }}', '{{ agendamento.paciente }}', '{{ agendamento.motivo or '' }}')">
+                                                <i class="fas fa-edit me-2"></i>Editar
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <form method="post" 
+                                                  action="{{ url_for('agenda.excluir_agendamento', id=agendamento.id) }}" 
+                                                  style="display: inline;">
+                                                <button type="submit" 
+                                                        class="dropdown-item text-danger"
+                                                        onclick="return confirm('Tem certeza que deseja excluir este agendamento?')">
+                                                    <i class="fas fa-trash me-2"></i>Excluir
+                                                </button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <p class="mb-1">
+                                <i class="fas fa-user me-2 text-success"></i>
+                                <strong>{{ agendamento.paciente }}</strong>
+                            </p>
+                            {% if agendamento.motivo %}
+                            <p class="text-muted mb-0">
+                                <i class="fas fa-comment me-2"></i>
+                                {{ agendamento.motivo }}
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Nenhum agendamento encontrado</h5>
+                <p class="text-muted">Crie um novo agendamento usando o formulário acima.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header">
+                <h5 class="modal-title text-light">
+                    <i class="fas fa-edit me-2"></i>Editar Agendamento
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editForm" method="post">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_data" class="form-label text-light">Data *</label>
+                        <input type="date" name="data" id="edit_data" class="form-control glass-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_paciente" class="form-label text-light">Paciente *</label>
+                        <input type="text" name="paciente" id="edit_paciente" class="form-control glass-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_motivo" class="form-label text-light">Motivo</label>
+                        <input type="text" name="motivo" id="edit_motivo" class="form-control glass-input">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary neural-btn" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary neural-btn">
+                        <i class="fas fa-save me-2"></i>Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function editarAgendamento(id, data, paciente, motivo) {
+    document.getElementById('edit_data').value = data;
+    document.getElementById('edit_paciente').value = paciente;
+    document.getElementById('edit_motivo').value = motivo;
+    document.getElementById('editForm').action = '/agenda/editar/' + id;
+    
+    const modal = new bootstrap.Modal(document.getElementById('editModal'));
+    modal.show();
+}
+
+// Add hover effects to appointment cards
+document.querySelectorAll('.appointment-card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-5px)';
+        this.style.transition = 'all 0.3s ease';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+    });
+});
+</script>
+{% endblock %}

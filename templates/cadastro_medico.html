@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card glass-card">
+        <div class="text-center mb-4">
+            <div class="login-logo">
+                <i class="fas fa-user-md text-primary fa-3x mb-3"></i>
+                <h1 class="gradient-text fw-bold">Cadastro Médico</h1>
+                <p class="text-muted">Registre-se no Sistema VIDAH</p>
+            </div>
+        </div>
+        
+        <form method="post" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="nome" class="form-label">
+                    <i class="fas fa-user me-2"></i>Nome Completo *
+                </label>
+                <input type="text" 
+                       name="nome" 
+                       id="nome"
+                       class="form-control glass-input" 
+                       placeholder="Digite seu nome completo"
+                       required>
+                <div class="invalid-feedback">
+                    Por favor, informe seu nome completo.
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="crm" class="form-label">
+                    <i class="fas fa-id-card me-2"></i>CRM *
+                </label>
+                <input type="text" 
+                       name="crm" 
+                       id="crm"
+                       class="form-control glass-input" 
+                       placeholder="Ex: 123456-SP"
+                       required>
+                <div class="invalid-feedback">
+                    Por favor, informe seu CRM.
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label for="senha" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Senha *
+                </label>
+                <input type="password" 
+                       name="senha" 
+                       id="senha"
+                       class="form-control glass-input" 
+                       placeholder="Digite uma senha segura"
+                       minlength="6"
+                       required>
+                <div class="invalid-feedback">
+                    A senha deve ter pelo menos 6 caracteres.
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-lg w-100 mb-3 neural-btn">
+                <i class="fas fa-user-plus me-2"></i>
+                Cadastrar
+            </button>
+        </form>
+        
+        <div class="text-center">
+            <p class="text-muted">Já possui conta?</p>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary neural-btn">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Fazer Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

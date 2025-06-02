@@ -1,0 +1,627 @@
+/* VIDAH Medical System - Future Neural Theme */
+
+:root {
+    /* Neural Color Palette */
+    --primary: hsl(210, 100%, 50%);
+    --primary-dark: hsl(210, 100%, 35%);
+    --secondary: hsl(165, 70%, 45%);
+    --success: hsl(140, 60%, 50%);
+    --info: hsl(195, 100%, 50%);
+    --warning: hsl(45, 100%, 60%);
+    --danger: hsl(0, 85%, 60%);
+    
+    /* Neural Background */
+    --bg-primary: hsl(220, 25%, 8%);
+    --bg-secondary: hsl(220, 20%, 12%);
+    --bg-tertiary: hsl(220, 15%, 16%);
+    
+    /* Glass Effects */
+    --glass-bg: hsla(220, 20%, 20%, 0.1);
+    --glass-border: hsla(220, 100%, 80%, 0.1);
+    --glass-shadow: hsla(210, 100%, 50%, 0.15);
+    
+    /* Text Colors */
+    --text-primary: hsl(220, 20%, 95%);
+    --text-secondary: hsl(220, 15%, 75%);
+    --text-muted: hsl(220, 10%, 55%);
+    
+    /* Neural Glow */
+    --glow-primary: 0 0 20px hsla(210, 100%, 50%, 0.3);
+    --glow-secondary: 0 0 15px hsla(165, 70%, 45%, 0.25);
+    --glow-success: 0 0 15px hsla(140, 60%, 50%, 0.25);
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Neural Background Animation */
+.neural-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: 
+        radial-gradient(circle at 20% 20%, hsla(210, 100%, 50%, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, hsla(165, 70%, 45%, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 40% 70%, hsla(140, 60%, 50%, 0.03) 0%, transparent 50%),
+        linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    animation: neuralPulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes neuralPulse {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 
+        0 8px 32px hsla(0, 0%, 0%, 0.3),
+        inset 0 1px 0 hsla(255, 255%, 255%, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px hsla(0, 0%, 0%, 0.4),
+        0 0 0 1px var(--glass-border),
+        var(--glow-primary);
+}
+
+/* Neural Buttons */
+.neural-btn {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: white !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+.neural-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, hsla(255, 255%, 255%, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.neural-btn:hover::before {
+    left: 100%;
+}
+
+.neural-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--glow-primary);
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+}
+
+.neural-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Button Variants */
+.btn-outline-primary.neural-btn {
+    background: transparent !important;
+    border: 2px solid var(--primary) !important;
+    color: var(--primary) !important;
+}
+
+.btn-outline-primary.neural-btn:hover {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+.btn-outline-success.neural-btn {
+    background: transparent !important;
+    border: 2px solid var(--success) !important;
+    color: var(--success) !important;
+}
+
+.btn-outline-success.neural-btn:hover {
+    background: var(--success) !important;
+    color: white !important;
+    box-shadow: var(--glow-success);
+}
+
+.btn-outline-info.neural-btn {
+    background: transparent !important;
+    border: 2px solid var(--info) !important;
+    color: var(--info) !important;
+}
+
+.btn-outline-info.neural-btn:hover {
+    background: var(--info) !important;
+    color: white !important;
+}
+
+.btn-outline-warning.neural-btn {
+    background: transparent !important;
+    border: 2px solid var(--warning) !important;
+    color: var(--warning) !important;
+}
+
+.btn-outline-warning.neural-btn:hover {
+    background: var(--warning) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-outline-danger.neural-btn {
+    background: transparent !important;
+    border: 2px solid var(--danger) !important;
+    color: var(--danger) !important;
+}
+
+.btn-outline-danger.neural-btn:hover {
+    background: var(--danger) !important;
+    color: white !important;
+}
+
+/* Glass Inputs */
+.glass-input {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 12px !important;
+    color: var(--text-primary) !important;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: hsla(220, 20%, 25%, 0.15) !important;
+    border-color: var(--primary) !important;
+    box-shadow: 
+        0 0 0 3px hsla(210, 100%, 50%, 0.1),
+        var(--glow-primary);
+    color: var(--text-primary) !important;
+}
+
+.glass-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Sidebar Styles */
+.sidebar {
+    background: var(--bg-secondary) !important;
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--glass-border);
+    min-height: 100vh;
+}
+
+.sidebar .nav-link {
+    color: var(--text-secondary) !important;
+    border-radius: 12px;
+    margin: 4px 0;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar .nav-link:hover {
+    background: var(--glass-bg);
+    color: var(--primary) !important;
+    transform: translateX(5px);
+    box-shadow: var(--glow-primary);
+}
+
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white !important;
+}
+
+.sidebar .navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 800;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.sidebar .user-info {
+    background: var(--glass-bg);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid var(--glass-border);
+}
+
+/* Content Wrapper */
+.content-wrapper {
+    background: transparent;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Page Titles */
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 3s ease-in-out infinite alternate;
+}
+
+@keyframes gradientShift {
+    0% { 
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+    100% { 
+        background: linear-gradient(135deg, var(--secondary), var(--primary));
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+}
+
+/* Statistics Cards */
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.05);
+}
+
+.stat-card.bg-primary:hover {
+    box-shadow: var(--glow-primary);
+}
+
+.stat-card.bg-success:hover {
+    box-shadow: var(--glow-success);
+}
+
+.stat-card.bg-info:hover {
+    box-shadow: 0 0 20px hsla(195, 100%, 50%, 0.3);
+}
+
+.stat-card.bg-warning:hover {
+    box-shadow: 0 0 20px hsla(45, 100%, 60%, 0.3);
+}
+
+/* Login Styles */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    animation: slideInUp 0.8s ease-out;
+}
+
+.login-logo i {
+    animation: pulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+
+/* Table Styles */
+.table-dark {
+    background: transparent;
+}
+
+.table-dark th {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    color: var(--text-primary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
+}
+
+.table-dark td {
+    background: transparent;
+    border-color: var(--glass-border);
+    color: var(--text-secondary);
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background: var(--glass-bg);
+}
+
+/* Badge Styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Modal Styles */
+.modal-content {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--glass-border);
+}
+
+/* Alert Styles */
+.alert {
+    border: none;
+    border-radius: 12px;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+.alert-success {
+    background: hsla(140, 60%, 50%, 0.15);
+    color: var(--success);
+    border-left: 4px solid var(--success);
+}
+
+.alert-danger {
+    background: hsla(0, 85%, 60%, 0.15);
+    color: var(--danger);
+    border-left: 4px solid var(--danger);
+}
+
+.alert-info {
+    background: hsla(195, 100%, 50%, 0.15);
+    color: var(--info);
+    border-left: 4px solid var(--info);
+}
+
+/* Dropdown Styles */
+.dropdown-menu {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px hsla(0, 0%, 0%, 0.3);
+}
+
+.dropdown-item {
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: var(--glass-bg);
+    color: var(--primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .login-card {
+        padding: 30px 20px;
+    }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.slide-in-left {
+    animation: slideInLeft 0.6s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    animation: slideInRight 0.6s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Counter Animation */
+.counter {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Loading States */
+.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Form Validation */
+.is-invalid.glass-input {
+    border-color: var(--danger) !important;
+    box-shadow: 0 0 0 3px hsla(0, 85%, 60%, 0.1);
+}
+
+.is-valid.glass-input {
+    border-color: var(--success) !important;
+    box-shadow: 0 0 0 3px hsla(140, 60%, 50%, 0.1);
+}
+
+/* Appointment Cards */
+.appointment-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glow-primary);
+}
+
+/* Medication Row */
+.medicamento-row {
+    transition: all 0.3s ease;
+}
+
+.medicamento-row:hover {
+    background: var(--glass-bg);
+}
+
+/* Neural Network Decoration */
+.neural-decoration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 2px 2px, var(--primary) 1px, transparent 0);
+    background-size: 40px 40px;
+    opacity: 0.05;
+    animation: neuralMove 20s linear infinite;
+}
+
+@keyframes neuralMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(40px, 40px); }
+}
+
+/* Print Styles */
+@media print {
+    .sidebar,
+    .neural-bg,
+    .btn,
+    .modal {
+        display: none !important;
+    }
+    
+    .content-wrapper {
+        margin: 0;
+        padding: 0;
+    }
+    
+    .glass-card {
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+    }
+}
