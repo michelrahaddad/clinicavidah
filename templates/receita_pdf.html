@@ -113,6 +113,11 @@
     </table>
     
     <div class="signature">
+        {% if assinatura %}
+        <div style="margin-bottom: 10px;">
+            <img src="data:image/png;base64,{{ assinatura }}" alt="Assinatura" style="max-width: 200px; max-height: 80px;">
+        </div>
+        {% endif %}
         <div class="signature-line">
             <strong>Dr(a). {{ medico }}</strong><br>
             CRM: {{ crm }}

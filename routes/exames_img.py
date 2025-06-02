@@ -74,6 +74,7 @@ def salvar_exames_img():
                                  exames=exames,
                                  medico=medico.nome,
                                  crm=medico.crm,
+                                 assinatura=medico.assinatura,
                                  data=data)
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
@@ -127,8 +128,8 @@ def gerar_pdf_reimprimir_exame_img(exame):
         pdf_html = render_template('exames_img_pdf.html',
                                  nome_paciente=exame.nome_paciente,
                                  exames=exame.exames.split(','),
-                                 medico_nome=medico.nome,
-                                 medico_crm=medico.crm,
+                                 medico=medico.nome,
+                                 crm=medico.crm,
                                  data=data_atual,
                                  assinatura=medico.assinatura)
         
