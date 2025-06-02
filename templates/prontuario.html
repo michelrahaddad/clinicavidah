@@ -313,6 +313,36 @@
     font-size: 0.8rem;
     font-weight: 600;
 }
+
+.clickable-badge {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.clickable-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    filter: brightness(1.1);
+}
+
+.clickable-badge:active {
+    transform: translateY(0);
+}
+
+.clickable-badge::after {
+    content: '📄';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.7rem;
+    opacity: 0.8;
+}
+
+.clickable-badge:hover::after {
+    opacity: 1;
+}
 </style>
 
 <script>
@@ -509,9 +539,12 @@ class ProntuarioSearch {
                             <div class="col-md-2">
                                 <small>TIPO</small>
                                 <div>
-                                    <span class="badge ${typeConfig.badgeClass}">
+                                    <button class="badge ${typeConfig.badgeClass} border-0 clickable-badge" 
+                                            data-tipo="${record.tipo}" data-id="${record.id}"
+                                            onclick="window.open('/${record.tipo === 'receita' ? 'receita' : record.tipo === 'exame_lab' ? 'exames_lab' : 'exames_img'}/refazer/${record.id}?print=1', '_blank')"
+                                            style="cursor: pointer; text-decoration: none;">
                                         <i class="${typeConfig.icon} me-1"></i>${typeConfig.label}
-                                    </span>
+                                    </button>
                                 </div>
                             </div>
                             <div class="col-md-3">
