@@ -90,8 +90,11 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <label class="form-label text-light">Medicamento *</label>
-                                    <input type="text" name="medicamento[]" class="form-control glass-input" 
-                                           placeholder="Nome do medicamento" required>
+                                    <div class="position-relative">
+                                        <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
+                                               placeholder="Digite para buscar medicamento..." required autocomplete="off">
+                                        <div class="medicamento-suggestions"></div>
+                                    </div>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label text-light">Posologia *</label>
@@ -137,8 +140,11 @@ function adicionarMedicamento() {
         <div class="row">
             <div class="col-md-3">
                 <label class="form-label text-light">Medicamento *</label>
-                <input type="text" name="medicamento[]" class="form-control glass-input" 
-                       placeholder="Nome do medicamento" required>
+                <div class="position-relative">
+                    <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
+                           placeholder="Digite para buscar medicamento..." required autocomplete="off">
+                    <div class="medicamento-suggestions"></div>
+                </div>
             </div>
             <div class="col-md-3">
                 <label class="form-label text-light">Posologia *</label>
@@ -186,5 +192,129 @@ function removerMedicamento(button) {
         alert('É necessário pelo menos um medicamento.');
     }
 }
+
+// Medication Autocomplete System
+class MedicationAutocomplete {
+    constructor() {
+        this.setupEventListeners();
+    }
+    
+    setupEventListeners() {
+        // Event delegation for dynamically added inputs
+        document.addEventListener('input', (e) => {
+            if (e.target.classList.contains('medicamento-autocomplete')) {
+                this.handleSearch(e.target);
+            }
+        });
+        
+        document.addEventListener('focus', (e) => {
+            if (e.target.classList.contains('medicamento-autocomplete')) {
+                if (e.target.value.length >= 2) {
+                    this.handleSearch(e.target);
+                }
+            }
+        });
+        
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.position-relative')) {
+                this.hideAllSuggestions();
+            }
+        });
+    }
+    
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    handleSearch = this.debounce(async (input) => {
+        const query = input.value.trim();
+        const suggestionsContainer = input.parentNode.querySelector('.medicamento-suggestions');
+        
+        if (query.length < 2) {
+            this.hideSuggestions(suggestionsContainer);
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/medicamentos?q=${encodeURIComponent(query)}`);
+            const medications = await response.json();
+            this.showSuggestions(input, suggestionsContainer, medications);
+        } catch (error) {
+            console.error('Erro ao buscar medicamentos:', error);
+        }
+    }, 300);
+    
+    showSuggestions(input, container, medications) {
+        container.innerHTML = '';
+        
+        if (medications.length === 0) {
+            container.innerHTML = '<div class="suggestion-item">Nenhum medicamento encontrado</div>';
+        } else {
+            medications.forEach(med => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <div class="medication-name">${med.nome}</div>
+                    <div class="medication-details text-muted">
+                        <small>${med.principio_ativo}</small>
+                    </div>
+                `;
+                item.addEventListener('click', () => {
+                    this.selectMedication(input, med);
+                });
+                container.appendChild(item);
+            });
+        }
+        
+        container.style.display = 'block';
+    }
+    
+    selectMedication(input, medication) {
+        // Fill medication name
+        input.value = medication.nome;
+        
+        // Auto-fill related fields in the same row
+        const row = input.closest('.medicamento-row');
+        const posologiaInput = row.querySelector('input[name="posologia[]"]');
+        const viaInput = row.querySelector('input[name="via[]"]');
+        
+        if (posologiaInput && !posologiaInput.value && medication.posologia_sugerida) {
+            posologiaInput.value = medication.posologia_sugerida;
+        }
+        
+        if (viaInput && !viaInput.value && medication.via_administracao) {
+            viaInput.value = medication.via_administracao;
+        }
+        
+        // Hide suggestions
+        this.hideSuggestions(input.parentNode.querySelector('.medicamento-suggestions'));
+    }
+    
+    hideSuggestions(container) {
+        if (container) {
+            container.style.display = 'none';
+        }
+    }
+    
+    hideAllSuggestions() {
+        document.querySelectorAll('.medicamento-suggestions').forEach(container => {
+            container.style.display = 'none';
+        });
+    }
+}
+
+// Initialize autocomplete system
+document.addEventListener('DOMContentLoaded', function() {
+    new MedicationAutocomplete();
+});
 </script>
 {% endblock %}

@@ -45,6 +45,7 @@ def create_app():
     from routes.prontuario import prontuario_bp
     from routes.agenda import agenda_bp
     from routes.medicos import medicos_bp
+    from routes.api import api_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -54,6 +55,7 @@ def create_app():
     app.register_blueprint(prontuario_bp)
     app.register_blueprint(agenda_bp)
     app.register_blueprint(medicos_bp)
+    app.register_blueprint(api_bp)
     
     # Create tables
     with app.app_context():

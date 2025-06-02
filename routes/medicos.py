@@ -28,13 +28,18 @@ def cadastrar_medico():
             
             # Hash password and insert doctor
             senha_hash = generate_password_hash(senha)
-            medico = Medico()
-            medico.nome = nome
-            medico.crm = crm
-            medico.senha = senha_hash
-            medico.assinatura = assinatura
             
-            db.session.add(medico)
+            # Create new doctor with proper SQLAlchemy syntax
+            from sqlalchemy import text
+            db.session.execute(text(
+                "INSERT INTO medicos (nome, crm, senha, assinatura) VALUES (:nome, :crm, :senha, :assinatura)"
+            ), {
+                'nome': nome,
+                'crm': crm, 
+                'senha': senha_hash,
+                'assinatura': assinatura
+            })
+            
             db.session.commit()
             
             flash('Médico cadastrado com sucesso! Faça login para continuar.', 'success')
