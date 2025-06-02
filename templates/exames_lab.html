@@ -56,6 +56,28 @@
 
                         <div class="row">
                             {% set exames_selecionados = exame.exames.split(',') if refazer and exame and exame.exames else [] %}
+                            {% set exames_pre_selecionados = [
+                                'Hemograma completo',
+                                'Coagulograma (TAP/TTPA)',
+                                'HbA1c (Hemoglobina glicada)',
+                                'Glicemia de jejum',
+                                'TGO (AST)',
+                                'TGP (ALT)',
+                                'Ureia',
+                                'Creatinina',
+                                'Ferritina',
+                                'Colesterol total e frações',
+                                'Triglicerídeos',
+                                'Ácido úrico',
+                                'Proteína C reativa (PCR)',
+                                'T4 livre',
+                                'TSH',
+                                'Testosterona total',
+                                'FSH',
+                                'Exame de urina (EAS)',
+                                'Urina 1',
+                                'PSA'
+                            ] %}
                             
                             <!-- Hematologia -->
                             <div class="col-md-6 mb-4">
@@ -69,7 +91,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_hema_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_hema_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -91,7 +113,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_bio_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_bio_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -113,7 +135,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_endo_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_endo_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -135,7 +157,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_uro_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_uro_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -157,7 +179,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_gastro_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_gastro_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -179,7 +201,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_onco_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_onco_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -201,7 +223,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_imuno_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_imuno_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -223,7 +245,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_viral_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_viral_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -245,7 +267,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_bact_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_bact_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -267,7 +289,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_tir_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_tir_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
@@ -289,7 +311,7 @@
                                             <input class="form-check-input" type="checkbox" name="exames[]" 
                                                    value="{{ exame_nome }}" 
                                                    id="exame_vit_{{ loop.index }}"
-                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                                   {{ 'checked' if (refazer and exame_nome in exames_selecionados) or (not refazer and exame_nome in exames_pre_selecionados) else '' }}>
                                             <label class="form-check-label text-light" for="exame_vit_{{ loop.index }}">
                                                 {{ exame_nome }}
                                             </label>
