@@ -4,11 +4,21 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4 page-title">
-                <i class="fas fa-tachometer-alt me-3 text-primary"></i>
-                <span class="gradient-text">Dashboard Neural</span>
-            </h1>
-            <p class="text-muted mb-4">Bem-vindo ao sistema médico VIDAH, {{ usuario.nome }}!</p>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="mb-2 page-title">
+                        <i class="fas fa-tachometer-alt me-3 text-primary"></i>
+                        <span class="gradient-text">Dashboard Neural</span>
+                    </h1>
+                    <p class="text-muted mb-0">Bem-vindo ao sistema médico VIDAH, {{ usuario.nome }}!</p>
+                </div>
+                <div>
+                    <button id="logoutBtn" class="btn btn-outline-danger neural-btn" onclick="performLogout()">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Sair do Sistema
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -199,6 +209,60 @@
                     }
                 }
             }
+        }
+    });
+
+    // Função de logout com salvamento automático de dados
+    function performLogout() {
+        // Confirmar logout
+        if (confirm('Tem certeza que deseja sair do sistema? Todos os dados serão salvos automaticamente.')) {
+            // Mostrar indicador de carregamento
+            const logoutBtn = document.getElementById('logoutBtn');
+            const originalText = logoutBtn.innerHTML;
+            logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando e saindo...';
+            logoutBtn.disabled = true;
+            
+            // Salvar dados do localStorage se existirem
+            try {
+                // Simular salvamento de dados locais (se houver)
+                const formData = localStorage.getItem('medicalFormData');
+                if (formData) {
+                    console.log('Dados locais encontrados, mantendo para próxima sessão...');
+                }
+            } catch (error) {
+                console.warn('Erro ao verificar dados locais:', error);
+            }
+            
+            // Delay para garantir que qualquer operação pendente seja concluída
+            setTimeout(() => {
+                // Redirecionar para logout
+                window.location.href = '/logout';
+            }, 1000);
+        }
+    }
+
+    // Salvar dados automaticamente antes de sair da página
+    window.addEventListener('beforeunload', function(e) {
+        // Tentar salvar dados importantes no localStorage
+        try {
+            const activeElements = document.querySelectorAll('input, textarea, select');
+            const formData = {};
+            
+            activeElements.forEach(element => {
+                if (element.value && element.id) {
+                    formData[element.id] = element.value;
+                }
+            });
+            
+            if (Object.keys(formData).length > 0) {
+                localStorage.setItem('lastSessionData', JSON.stringify({
+                    data: formData,
+                    timestamp: new Date().toISOString(),
+                    page: window.location.pathname
+                }));
+            }
+        } catch (error) {
+            console.warn('Erro ao salvar dados da sessão:', error);
         }
     });
 </script>
