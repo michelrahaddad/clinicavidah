@@ -239,57 +239,79 @@
 }
 
 .record-timeline {
-    border-left: 3px solid var(--primary);
-    padding-left: 20px;
-    margin-left: 15px;
+    margin: 0;
+    padding: 0;
 }
 
 .record-item {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     transition: all 0.3s ease;
-    position: relative;
+    backdrop-filter: blur(10px);
 }
 
 .record-item:hover {
     transform: translateY(-2px);
-    box-shadow: var(--glow-primary);
+    box-shadow: 0 8px 25px rgba(0, 191, 255, 0.15);
+    border-color: var(--primary);
 }
 
-.record-item::before {
-    content: '';
-    position: absolute;
-    left: -23px;
-    top: 20px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--primary);
-    border: 3px solid var(--bg-primary);
+.record-item .card-body {
+    padding: 20px;
+    color: var(--text-primary);
 }
 
-.record-date {
-    font-size: 0.875rem;
+.record-item .row {
+    align-items: center;
+    margin: 0;
+}
+
+.record-item .col-2,
+.record-item .col-3 {
+    padding: 10px;
+}
+
+.record-item small {
+    font-size: 0.75rem;
     color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.record-item strong {
+    color: var(--text-primary);
     font-weight: 600;
 }
 
-.record-type {
-    display: inline-block;
-    margin-bottom: 8px;
-}
-
-.record-content {
+.record-content-summary {
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    margin-bottom: 12px;
+    line-height: 1.4;
 }
 
-.record-actions {
-    display: flex;
-    gap: 8px;
+.btn-group .btn {
+    margin: 0 2px;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 </style>
 
@@ -473,44 +495,46 @@ class ProntuarioSearch {
         records.forEach(record => {
             const typeConfig = this.getTypeConfig(record.tipo);
             html += `
-                <div class="record-item card mb-3" data-type="${record.tipo}" style="background: var(--glass-bg); border: 1px solid var(--glass-border);">
+                <div class="record-item card" data-type="${record.tipo}">
                     <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-2 text-center">
-                                <small class="text-muted d-block">DATA</small>
-                                <strong>${this.formatDate(record.data)}</strong>
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-2 text-center">
+                                <small>DATA</small>
+                                <div><strong>${this.formatDate(record.data)}</strong></div>
                             </div>
-                            <div class="col-2">
-                                <small class="text-muted d-block">PACIENTE</small>
-                                <i class="fas fa-user me-1"></i>${this.currentPatient.nome}
+                            <div class="col-md-2">
+                                <small>PACIENTE</small>
+                                <div><i class="fas fa-user me-1"></i>${this.currentPatient.nome}</div>
                             </div>
-                            <div class="col-2">
-                                <small class="text-muted d-block">TIPO</small>
-                                <span class="badge ${typeConfig.badgeClass}">
-                                    <i class="${typeConfig.icon} me-1"></i>${typeConfig.label}
-                                </span>
+                            <div class="col-md-2">
+                                <small>TIPO</small>
+                                <div>
+                                    <span class="badge ${typeConfig.badgeClass}">
+                                        <i class="${typeConfig.icon} me-1"></i>${typeConfig.label}
+                                    </span>
+                                </div>
                             </div>
-                            <div class="col-3">
-                                <small class="text-muted d-block">DETALHES</small>
+                            <div class="col-md-3">
+                                <small>DETALHES</small>
                                 <div class="record-content-summary">
                                     ${this.formatRecordContent(record)}
                                 </div>
                             </div>
-                            <div class="col-3 text-end">
-                                <small class="text-muted d-block">MÉDICO</small>
-                                <div class="mb-2">${record.medico_nome || 'Sistema'}</div>
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-outline-primary neural-btn edit-record-btn" 
+                            <div class="col-md-3 text-end">
+                                <small>MÉDICO</small>
+                                <div class="mb-2 text-truncate">${record.medico_nome || 'Sistema'}</div>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button class="btn btn-outline-primary neural-btn edit-record-btn" 
                                             data-tipo="${record.tipo}" data-id="${record.id}"
                                             title="Editar registro">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-info neural-btn print-record-btn" 
+                                    <button class="btn btn-outline-info neural-btn print-record-btn" 
                                             data-tipo="${record.tipo}" data-id="${record.id}"
                                             title="Gerar PDF">
                                         <i class="fas fa-print"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-success neural-btn view-record-btn" 
+                                    <button class="btn btn-outline-success neural-btn view-record-btn" 
                                             data-tipo="${record.tipo}" data-id="${record.id}"
                                             title="Visualizar detalhes">
                                         <i class="fas fa-eye"></i>
