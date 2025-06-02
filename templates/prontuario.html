@@ -421,12 +421,35 @@ class ProntuarioSearch {
     
     async loadPatientRecords(patientId) {
         try {
+            console.log('Carregando prontuário para paciente ID:', patientId);
             const response = await fetch(`/api/prontuario_paciente/${patientId}`);
-            this.allRecords = await response.json();
+            
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/login';
+                    return;
+                }
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            this.allRecords = data;
             this.displayRecords(this.allRecords);
+            console.log('Prontuário carregado com sucesso:', this.allRecords);
+            
         } catch (error) {
             console.error('Erro ao carregar prontuário:', error);
-            this.patientRecords.innerHTML = '<p class="text-danger">Erro ao carregar prontuário do paciente.</p>';
+            this.patientRecords.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${error.message || 'Erro ao carregar prontuário do paciente.'}
+                </div>
+            `;
         }
     }
     
@@ -571,30 +594,41 @@ class ProntuarioSearch {
     }
     
     filterRecords(type) {
-        const recordItems = document.querySelectorAll('.record-item');
+        console.log('Filtrando registros por tipo:', type);
         
-        // Update active button with null checks
-        document.querySelectorAll('[id^="show-"]').forEach(btn => {
-            if (btn) {
-                btn.classList.remove('active');
-            }
+        // Update active button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
         
+        const recordItems = document.querySelectorAll('.record-item');
+        console.log('Total de registros encontrados:', recordItems.length);
+        
         if (type === 'all') {
-            const allBtn = document.getElementById('show-all-records');
-            if (allBtn) {
-                allBtn.classList.add('active');
-            }
-            recordItems.forEach(item => item.style.display = 'block');
-        } else {
-            const typeBtn = document.getElementById(`show-${type.replace('_', '-')}`);
-            if (typeBtn) {
-                typeBtn.classList.add('active');
-            }
+            document.getElementById('show-all-records').classList.add('active');
             recordItems.forEach(item => {
-                item.style.display = item.dataset.type === type ? 'block' : 'none';
+                item.style.display = 'block';
+            });
+        } else {
+            const btnId = `show-${type.replace('_', '-')}`;
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.classList.add('active');
+            }
+            
+            recordItems.forEach(item => {
+                const itemType = item.dataset.type;
+                if (itemType === type) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         }
+        
+        // Update record count
+        const visibleRecords = document.querySelectorAll('.record-item[style*="block"], .record-item:not([style*="none"])').length;
+        console.log('Registros visíveis após filtro:', visibleRecords);
     }
     
     editRecord(tipo, id) {
@@ -628,41 +662,54 @@ class ProntuarioSearch {
     
     async showRecordModal(tipo, id) {
         try {
+            console.log('Carregando detalhes do registro:', tipo, id);
             const response = await fetch(`/api/record_details/${tipo}/${id}`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
             const record = await response.json();
             
-            let modalContent = '';
+            if (record.error) {
+                throw new Error(record.error);
+            }
+            
             const typeConfig = this.getTypeConfig(tipo);
             
-            modalContent = `
+            const modalContent = `
                 <div class="modal fade" id="recordModal" tabindex="-1">
                     <div class="modal-dialog modal-lg">
-                        <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--glass-border);">
-                            <div class="modal-header">
+                        <div class="modal-content" style="background: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: 12px;">
+                            <div class="modal-header" style="border-bottom: 1px solid var(--glass-border);">
                                 <h5 class="modal-title text-light">
-                                    <i class="${typeConfig.icon} me-2"></i>
+                                    <i class="${typeConfig.icon} me-2" style="color: ${typeConfig.color}"></i>
                                     ${typeConfig.label} - ${record.nome_paciente}
                                 </h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <p><strong>Paciente:</strong> ${record.nome_paciente}</p>
-                                        <p><strong>Data:</strong> ${this.formatDate(record.data)}</p>
-                                        <p><strong>Médico:</strong> ${record.medico_nome}</p>
+                            <div class="modal-body text-light">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <p><strong>Paciente:</strong><br>${record.nome_paciente}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Data:</strong><br>${this.formatDate(record.data)}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Médico:</strong><br>${record.medico_nome}</p>
                                     </div>
                                 </div>
-                                <hr>
+                                <hr style="border-color: var(--glass-border);">
                                 ${this.formatDetailedContent(record, tipo)}
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-primary neural-btn" 
-                                        onclick="prontuarioSearch.editRecord('${tipo}', ${id})">
+                            <div class="modal-footer" style="border-top: 1px solid var(--glass-border);">
+                                <button type="button" class="btn btn-outline-primary neural-btn edit-modal-btn" 
+                                        data-tipo="${tipo}" data-id="${id}">
                                     <i class="fas fa-edit me-1"></i>Editar
                                 </button>
-                                <button type="button" class="btn btn-outline-info neural-btn" 
-                                        onclick="prontuarioSearch.printRecord('${tipo}', ${id})">
+                                <button type="button" class="btn btn-outline-info neural-btn print-modal-btn" 
+                                        data-tipo="${tipo}" data-id="${id}">
                                     <i class="fas fa-print me-1"></i>Gerar PDF
                                 </button>
                                 <button type="button" class="btn btn-secondary neural-btn" data-bs-dismiss="modal">
@@ -683,13 +730,26 @@ class ProntuarioSearch {
             // Add modal to page
             document.body.insertAdjacentHTML('beforeend', modalContent);
             
+            // Add event listeners to modal buttons
+            document.querySelector('.edit-modal-btn').addEventListener('click', (e) => {
+                const tipo = e.target.dataset.tipo;
+                const id = e.target.dataset.id;
+                this.editRecord(tipo, id);
+            });
+            
+            document.querySelector('.print-modal-btn').addEventListener('click', (e) => {
+                const tipo = e.target.dataset.tipo;
+                const id = e.target.dataset.id;
+                this.printRecord(tipo, id);
+            });
+            
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('recordModal'));
             modal.show();
             
         } catch (error) {
             console.error('Erro ao carregar detalhes do registro:', error);
-            alert('Erro ao carregar detalhes do registro.');
+            alert(`Erro ao carregar detalhes: ${error.message}`);
         }
     }
     
