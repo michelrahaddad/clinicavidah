@@ -10,6 +10,7 @@ class Medico(db.Model):
     nome = Column(String(200), nullable=False)
     crm = Column(String(20), unique=True, nullable=False)
     senha = Column(String(256), nullable=False)
+    assinatura = Column(Text, nullable=True)  # Base64 encoded signature
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

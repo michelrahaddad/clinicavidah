@@ -11,8 +11,65 @@
         </div>
     </div>
     
-    <!-- Filters -->
+    <!-- Patient Search -->
     <div class="card glass-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-search me-2"></i>
+                Busca de Pacientes
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label for="busca_paciente" class="form-label text-light">Nome do Paciente</label>
+                    <div class="position-relative">
+                        <input type="text" 
+                               id="busca_paciente"
+                               class="form-control glass-input" 
+                               placeholder="Digite o nome do paciente para buscar..."
+                               autocomplete="off">
+                        <div id="paciente-suggestions" class="patient-suggestions"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="button" id="limpar-busca" class="btn btn-outline-secondary neural-btn">
+                        <i class="fas fa-times me-2"></i>Limpar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Patient History -->
+    <div id="patient-history" class="card glass-card" style="display: none;">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-user me-2"></i>
+                Histórico do Paciente: <span id="selected-patient-name" class="text-primary"></span>
+            </h5>
+            <div>
+                <button type="button" id="show-all-records" class="btn btn-sm btn-outline-info neural-btn me-2">
+                    <i class="fas fa-list me-1"></i>Todos
+                </button>
+                <button type="button" id="show-receitas" class="btn btn-sm btn-outline-primary neural-btn me-2">
+                    <i class="fas fa-prescription-bottle-alt me-1"></i>Receitas
+                </button>
+                <button type="button" id="show-exames-lab" class="btn btn-sm btn-outline-success neural-btn me-2">
+                    <i class="fas fa-flask me-1"></i>Lab
+                </button>
+                <button type="button" id="show-exames-img" class="btn btn-sm btn-outline-warning neural-btn">
+                    <i class="fas fa-x-ray me-1"></i>Imagem
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div id="patient-records"></div>
+        </div>
+    </div>
+    
+    <!-- Legacy Filters (hidden by default) -->
+    <div class="card glass-card mb-4" id="legacy-filters" style="display: none;">
         <div class="card-header">
             <h5 class="mb-0 text-light">
                 <i class="fas fa-filter me-2"></i>
@@ -22,10 +79,10 @@
         <div class="card-body">
             <form method="get" class="row g-3">
                 <div class="col-md-4">
-                    <label for="busca_paciente" class="form-label text-light">Nome do Paciente</label>
+                    <label for="busca_paciente_legacy" class="form-label text-light">Nome do Paciente</label>
                     <input type="text" 
                            name="busca_paciente" 
-                           id="busca_paciente"
+                           id="busca_paciente_legacy"
                            class="form-control glass-input" 
                            placeholder="Digite o nome do paciente"
                            value="{{ busca_paciente }}">

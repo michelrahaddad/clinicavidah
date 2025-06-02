@@ -14,9 +14,10 @@ def cadastrar_medico():
             nome = request.form.get('nome', '').strip()
             crm = request.form.get('crm', '').strip()
             senha = request.form.get('senha', '')
+            assinatura = request.form.get('assinatura', '')
             
-            if not nome or not crm or not senha:
-                flash('Todos os campos são obrigatórios.', 'error')
+            if not nome or not crm or not senha or not assinatura:
+                flash('Todos os campos são obrigatórios, incluindo a assinatura digital.', 'error')
                 return render_template('cadastro_medico.html')
             
             # Check if CRM already exists
@@ -27,7 +28,11 @@ def cadastrar_medico():
             
             # Hash password and insert doctor
             senha_hash = generate_password_hash(senha)
-            medico = Medico(nome=nome, crm=crm, senha=senha_hash)
+            medico = Medico()
+            medico.nome = nome
+            medico.crm = crm
+            medico.senha = senha_hash
+            medico.assinatura = assinatura
             
             db.session.add(medico)
             db.session.commit()
