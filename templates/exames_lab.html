@@ -4,148 +4,350 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <h2 class="mb-4 page-title">
-                <i class="fas fa-flask me-3 text-primary"></i>
+            <h1 class="mb-4 page-title">
+                <i class="fas fa-flask me-3 text-success"></i>
                 <span class="gradient-text">Exames Laboratoriais</span>
-            </h2>
+            </h1>
+            <p class="text-muted mb-4">Solicite exames laboratoriais organizados por especialidade médica</p>
         </div>
     </div>
     
-    <form action="{{ url_for('exames_lab.salvar_exames_lab') }}" method="post">
-        <div class="card glass-card">
-            <div class="card-header">
-                <h5 class="mb-0 text-light">
-                    <i class="fas fa-user me-2"></i>
-                    Dados do Paciente
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="mb-3">
-                            <label for="nome_paciente" class="form-label text-light">
-                                <i class="fas fa-user me-2"></i>Nome do Paciente *
-                            </label>
-                            <input type="text" 
-                                   name="nome_paciente" 
-                                   id="nome_paciente"
-                                   class="form-control glass-input" 
-                                   placeholder="Digite o nome completo do paciente"
-                                   value="{{ exame.nome_paciente if refazer and exame else '' }}"
-                                   required>
+    <div class="row">
+        <div class="col-12">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-clipboard-list me-2 text-success"></i>
+                        Solicitação de Exames Laboratoriais
+                    </h5>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('exames_lab.salvar_exames_lab') }}">
+                        <!-- Patient Name -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="nome_paciente" class="form-label text-light">Nome do Paciente</label>
+                                <input type="text" class="form-control glass-input" 
+                                       id="nome_paciente" name="nome_paciente" 
+                                       value="{{ request.args.get('paciente', '') if not refazer else exame.nome_paciente }}"
+                                       placeholder="Digite o nome do paciente" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="data" class="form-label text-light">Data</label>
+                                <input type="date" class="form-control glass-input" 
+                                       id="data" name="data" 
+                                       value="{{ exame.data if refazer and exame else '' }}" required>
+                            </div>
                         </div>
-                    </div>
+                        
+                        <!-- Search Box -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="input-group">
+                                    <span class="input-group-text glass-input">
+                                        <i class="fas fa-search text-primary"></i>
+                                    </span>
+                                    <input type="text" class="form-control glass-input" 
+                                           id="examSearch" placeholder="Buscar exame específico...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            {% set exames_selecionados = exame.exames.split(',') if refazer and exame and exame.exames else [] %}
+                            
+                            <!-- Hematologia -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-tint me-2"></i>Hematologia
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['Hemograma completo', 'VHS (Velocidade de hemossedimentação)', 'Coagulograma (TAP/TTPA)', 'Tempo de sangramento', 'Contagem de plaquetas'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_hema_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_hema_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Bioquímica -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-success mb-3">
+                                    <i class="fas fa-atom me-2"></i>Bioquímica
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['Glicemia de jejum', 'Colesterol total e frações', 'Triglicerídeos', 'Ureia', 'Creatinina', 'Ácido úrico', 'TGO (AST)', 'TGP (ALT)', 'Bilirrubinas', 'Proteínas totais e frações', 'HbA1c (Hemoglobina glicada)', 'Ferro sérico', 'Ferritina', 'Proteína C reativa (PCR)'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_bio_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_bio_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Endocrinologia -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-info mb-3">
+                                    <i class="fas fa-dna me-2"></i>Endocrinologia
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['TSH', 'T4 livre', 'Cortisol', 'Testosterona total', 'Testosterona livre', 'FSH', 'Estradiol', 'Progesterona sérica', 'Insulina', 'Prolactina'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_endo_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_endo_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Urologia/Nefrologia -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-warning mb-3">
+                                    <i class="fas fa-kidneys me-2"></i>Urologia/Nefrologia
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['Exame de urina (EAS)', 'Urina 1', 'Urocultura', 'PSA', 'Clearance de creatinina', 'Proteinúria 24h'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_uro_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_uro_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Gastroenterologia -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-danger mb-3">
+                                    <i class="fas fa-stomach me-2"></i>Gastroenterologia
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['Exame de fezes', 'Parasitológico de fezes', 'Coprocultura', 'Sangue oculto nas fezes', 'Elastase fecal'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_gastro_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_gastro_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Oncologia/Marcadores -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-secondary mb-3">
+                                    <i class="fas fa-ribbon me-2"></i>Oncologia/Marcadores
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['PSA (Antígeno prostático específico)', 'CEA', 'CA 19-9', 'CA 125', 'AFP (Alfa-fetoproteína)', 'Beta HCG'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_onco_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_onco_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Imunologia/Reumatologia -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-light mb-3">
+                                    <i class="fas fa-shield-alt me-2"></i>Imunologia/Reumatologia
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['FAN (Fator antinuclear)', 'Fator reumatoide', 'Anti-CCP', 'Complemento C3 e C4', 'Anti-DNA'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_imuno_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_imuno_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Sorologias Virais -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-virus me-2"></i>Sorologias Virais
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['HBsAg', 'Anti-HBs', 'HCV', 'Anti-HCV', 'HIV (Anti-HIV)', 'HTLV I/II', 'Citomegalovírus IgG e IgM'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_viral_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_viral_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Sorologias Bacterianas/Parasitárias -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-warning mb-3">
+                                    <i class="fas fa-bacterium me-2"></i>Sorologias Bacterianas/Parasitárias
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['VDRL', 'FTA-ABS', 'Sorologia Chagas', 'Sorologia Toxoplasmose IgG e IgM', 'Sorologia Rubéola IgG e IgM', 'Sorologia para Hepatite A'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_bact_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_bact_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Tireoide -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-info mb-3">
+                                    <i class="fas fa-lungs me-2"></i>Tireoide
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['TSH', 'T4 livre', 'T3', 'Anti-TPO', 'Anti-tireoglobulina', 'Tireoglobulina'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_tir_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_tir_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Vitaminas -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="text-success mb-3">
+                                    <i class="fas fa-pills me-2"></i>Vitaminas
+                                </h6>
+                                <div class="row">
+                                    {% for exame_nome in ['Vitamina B12', 'Vitamina D', 'Ácido fólico', 'Vitamina A', 'Vitamina E'] %}
+                                    <div class="col-12 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_vit_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_vit_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="row mt-4">
+                            <div class="col-12 d-flex justify-content-between">
+                                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary neural-btn">
+                                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                                </a>
+                                <button type="submit" class="btn btn-success neural-btn">
+                                    <i class="fas fa-save me-2"></i>Gerar PDF
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        
-        <div class="card glass-card mt-4">
-            <div class="card-header">
-                <h5 class="mb-0 text-light">
-                    <i class="fas fa-flask me-2"></i>
-                    Exames Laboratoriais
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    {% set exames_selecionados = exame.exames if refazer and exame else [] %}
-                    
-                    <!-- Hematologia -->
-                    <div class="col-md-6 mb-4">
-                        <h6 class="text-primary mb-3">
-                            <i class="fas fa-tint me-2"></i>Hematologia
-                        </h6>
-                        <div class="row">
-                            {% for exame_nome in ['Hemograma Completo', 'Eritrograma', 'Leucograma', 'Plaquetas', 'VHS', 'PCR'] %}
-                            <div class="col-12 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="exames[]" 
-                                           value="{{ exame_nome }}" 
-                                           id="exame_{{ loop.index }}"
-                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
-                                    <label class="form-check-label text-light" for="exame_{{ loop.index }}">
-                                        {{ exame_nome }}
-                                    </label>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <!-- Bioquímica -->
-                    <div class="col-md-6 mb-4">
-                        <h6 class="text-success mb-3">
-                            <i class="fas fa-atom me-2"></i>Bioquímica
-                        </h6>
-                        <div class="row">
-                            {% for exame_nome in ['Glicemia de Jejum', 'Ureia', 'Creatinina', 'Ácido Úrico', 'Colesterol Total', 'HDL', 'LDL', 'Triglicérides'] %}
-                            <div class="col-12 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="exames[]" 
-                                           value="{{ exame_nome }}" 
-                                           id="exame_{{ loop.index + 6 }}"
-                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
-                                    <label class="form-check-label text-light" for="exame_{{ loop.index + 6 }}">
-                                        {{ exame_nome }}
-                                    </label>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <!-- Hormônios -->
-                    <div class="col-md-6 mb-4">
-                        <h6 class="text-info mb-3">
-                            <i class="fas fa-dna me-2"></i>Hormônios
-                        </h6>
-                        <div class="row">
-                            {% for exame_nome in ['TSH', 'T4 Livre', 'T3', 'Insulina', 'Cortisol', 'Testosterona'] %}
-                            <div class="col-12 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="exames[]" 
-                                           value="{{ exame_nome }}" 
-                                           id="exame_{{ loop.index + 14 }}"
-                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
-                                    <label class="form-check-label text-light" for="exame_{{ loop.index + 14 }}">
-                                        {{ exame_nome }}
-                                    </label>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <!-- Microbiologia -->
-                    <div class="col-md-6 mb-4">
-                        <h6 class="text-warning mb-3">
-                            <i class="fas fa-microscope me-2"></i>Microbiologia
-                        </h6>
-                        <div class="row">
-                            {% for exame_nome in ['Cultura de Urina', 'Cultura de Fezes', 'ASLO', 'Hepatite B', 'Hepatite C', 'HIV'] %}
-                            <div class="col-12 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="exames[]" 
-                                           value="{{ exame_nome }}" 
-                                           id="exame_{{ loop.index + 20 }}"
-                                           {{ 'checked' if exame_nome in exames_selecionados else '' }}>
-                                    <label class="form-check-label text-light" for="exame_{{ loop.index + 20 }}">
-                                        {{ exame_nome }}
-                                    </label>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mt-4 text-center">
-            <button type="submit" class="btn btn-success btn-lg neural-btn">
-                <i class="fas fa-save me-2"></i>Salvar Exames e Gerar PDF
-            </button>
-        </div>
-    </form>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current date as default
+    const dateInput = document.getElementById('data');
+    if (!dateInput.value) {
+        const today = new Date();
+        const formattedDate = today.getFullYear() + '-' + 
+            String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+            String(today.getDate()).padStart(2, '0');
+        dateInput.value = formattedDate;
+    }
+    
+    // Search functionality
+    const searchInput = document.getElementById('examSearch');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][name="exames[]"]');
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        checkboxes.forEach(checkbox => {
+            const label = checkbox.nextElementSibling.textContent.toLowerCase();
+            const container = checkbox.closest('.col-12');
+            
+            if (label.includes(searchTerm) || searchTerm === '') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
