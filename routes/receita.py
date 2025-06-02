@@ -84,6 +84,7 @@ def salvar_receita():
                                  vias=vias,
                                  medico=medico.nome,
                                  crm=medico.crm,
+                                 assinatura=medico.assinatura,
                                  data=data,
                                  zip=zip)
         
@@ -145,10 +146,11 @@ def gerar_pdf_reimprimir_receita(receita_obj):
                                  posologias=receita_obj.posologias.split(','),
                                  duracoes=receita_obj.duracoes.split(','),
                                  vias=receita_obj.vias.split(','),
-                                 medico_nome=medico.nome,
-                                 medico_crm=medico.crm,
+                                 medico=medico.nome,
+                                 crm=medico.crm,
                                  data=data_atual,
-                                 assinatura=medico.assinatura)
+                                 assinatura=medico.assinatura,
+                                 zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
         
