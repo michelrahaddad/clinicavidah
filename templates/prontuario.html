@@ -465,16 +465,16 @@ class ProntuarioSearch {
                     </div>
                     
                     <div class="record-actions">
-                        <button class="btn btn-sm btn-outline-primary neural-btn" 
-                                onclick="prontuarioSearch.editRecord('${record.tipo}', ${record.id})">
+                        <button class="btn btn-sm btn-outline-primary neural-btn edit-record-btn" 
+                                data-tipo="${record.tipo}" data-id="${record.id}">
                             <i class="fas fa-edit me-1"></i>Editar
                         </button>
-                        <button class="btn btn-sm btn-outline-info neural-btn" 
-                                onclick="prontuarioSearch.printRecord('${record.tipo}', ${record.id})">
+                        <button class="btn btn-sm btn-outline-info neural-btn print-record-btn" 
+                                data-tipo="${record.tipo}" data-id="${record.id}">
                             <i class="fas fa-print me-1"></i>Gerar PDF
                         </button>
-                        <button class="btn btn-sm btn-outline-success neural-btn" 
-                                onclick="prontuarioSearch.viewRecord('${record.tipo}', ${record.id})">
+                        <button class="btn btn-sm btn-outline-success neural-btn view-record-btn" 
+                                data-tipo="${record.tipo}" data-id="${record.id}">
                             <i class="fas fa-eye me-1"></i>Visualizar
                         </button>
                     </div>
@@ -484,6 +484,38 @@ class ProntuarioSearch {
         
         html += '</div>';
         this.patientRecords.innerHTML = html;
+        
+        // Add event listeners to the newly created buttons
+        this.setupRecordButtonListeners();
+    }
+    
+    setupRecordButtonListeners() {
+        // Edit buttons
+        document.querySelectorAll('.edit-record-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tipo = e.currentTarget.dataset.tipo;
+                const id = e.currentTarget.dataset.id;
+                this.editRecord(tipo, id);
+            });
+        });
+        
+        // Print buttons
+        document.querySelectorAll('.print-record-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tipo = e.currentTarget.dataset.tipo;
+                const id = e.currentTarget.dataset.id;
+                this.printRecord(tipo, id);
+            });
+        });
+        
+        // View buttons
+        document.querySelectorAll('.view-record-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tipo = e.currentTarget.dataset.tipo;
+                const id = e.currentTarget.dataset.id;
+                this.viewRecord(tipo, id);
+            });
+        });
     }
     
     getTypeConfig(tipo) {
