@@ -30,7 +30,7 @@ class Paciente(db.Model):
     receitas = relationship('Receita', back_populates='paciente', lazy=True)
     exames_lab = relationship('ExameLab', back_populates='paciente', lazy=True)
     exames_img = relationship('ExameImg', back_populates='paciente', lazy=True)
-    agendamentos = relationship('Agendamento', back_populates='paciente', lazy=True)
+    agendamentos = relationship('Agendamento', back_populates='paciente_obj', lazy=True)
     prontuarios = relationship('Prontuario', back_populates='paciente', lazy=True)
 
 class Receita(db.Model):

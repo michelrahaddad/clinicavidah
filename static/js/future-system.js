@@ -11,7 +11,6 @@ class NeuralSystem {
     init() {
         this.setupEventListeners();
         this.initializeAnimations();
-        this.setupFormValidation();
         this.setupCounters();
         this.setupNeuralEffects();
         this.setupLoadingStates();
