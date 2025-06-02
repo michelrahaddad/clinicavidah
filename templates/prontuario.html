@@ -1130,9 +1130,9 @@ class ProntuarioSearch {
     }
     
     openRecord(tipo, recordId) {
-        // Abre o registro específico em uma nova aba para visualização/edição
+        // Abre o registro específico para edição na mesma aba
         const url = tipo === 'receita' ? 'receita' : tipo === 'exame_lab' ? 'exames_lab' : 'exames_img';
-        window.open(`/${url}/refazer/${recordId}?print=1`, '_blank');
+        window.location.href = `/${url}/refazer/${recordId}`;
     }
     
     showNotification(message, type = 'info') {

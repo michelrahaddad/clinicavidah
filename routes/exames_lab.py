@@ -125,9 +125,12 @@ def gerar_pdf_reimprimir_exame_lab(exame):
         medico = Medico.query.get(session['usuario']['id'])
         data_atual = datetime.now().strftime('%d/%m/%Y')
         
+        # Ensure exames is a list
+        exames_list = exame.exames.split(',') if isinstance(exame.exames, str) else exame.exames
+        
         pdf_html = render_template('exames_lab_pdf.html',
                                  nome_paciente=exame.nome_paciente,
-                                 exames=exame.exames.split(','),
+                                 exames=exames_list,
                                  medico=medico.nome,
                                  crm=medico.crm,
                                  data=data_atual,
