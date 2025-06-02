@@ -359,6 +359,51 @@
 .clickable-badge:hover::after {
     opacity: 1;
 }
+
+/* Estilos para registros clicáveis */
+.clickable-record {
+    transition: all 0.3s ease !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.clickable-record:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15) !important;
+    border-color: rgba(0, 123, 255, 0.3) !important;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.05), 
+        rgba(0, 123, 255, 0.05)) !important;
+}
+
+.clickable-record:active {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2) !important;
+}
+
+.clickable-record .card-body {
+    position: relative;
+}
+
+.clickable-record:hover .card-body::after {
+    content: "👆 Clique para abrir";
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: rgba(0, 123, 255, 0.9);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.9;
+    z-index: 10;
+    animation: fadeInTooltip 0.2s ease-in;
+}
+
+@keyframes fadeInTooltip {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 0.9; transform: scale(1); }
+}
 </style>
 
 <script>
@@ -541,7 +586,9 @@ class ProntuarioSearch {
         records.forEach(record => {
             const typeConfig = this.getTypeConfig(record.tipo);
             html += `
-                <div class="record-item card" data-type="${record.tipo}">
+                <div class="record-item card clickable-record" data-type="${record.tipo}" 
+                     onclick="prontuarioSearch.openRecord('${record.tipo}', ${record.id})" 
+                     style="cursor: pointer; transition: all 0.2s ease;">
                     <div class="card-body">
                         <div class="row g-3 align-items-center">
                             <div class="col-md-2 text-center">
@@ -1080,6 +1127,12 @@ class ProntuarioSearch {
         const patientName = this.currentPatient ? this.currentPatient.nome : '';
         const url = tipo === 'receita' ? '/receita' : `/${tipo}`;
         window.location.href = `${url}?paciente=${encodeURIComponent(patientName)}`;
+    }
+    
+    openRecord(tipo, recordId) {
+        // Abre o registro específico em uma nova aba para visualização/edição
+        const url = tipo === 'receita' ? 'receita' : tipo === 'exame_lab' ? 'exames_lab' : 'exames_img';
+        window.open(`/${url}/refazer/${recordId}?print=1`, '_blank');
     }
     
     showNotification(message, type = 'info') {
