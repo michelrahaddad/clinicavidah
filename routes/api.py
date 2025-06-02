@@ -42,7 +42,7 @@ def buscar_pacientes():
 @api_bp.route('/prontuario_paciente/<int:paciente_id>')
 def prontuario_paciente(paciente_id):
     """Get patient medical records"""
-    if 'medico_id' not in session:
+    if 'usuario' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
@@ -130,7 +130,7 @@ def buscar_medicamentos():
 @api_bp.route('/record_details/<string:tipo>/<int:record_id>')
 def record_details(tipo, record_id):
     """Get detailed record information"""
-    if 'medico_id' not in session:
+    if 'usuario' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
