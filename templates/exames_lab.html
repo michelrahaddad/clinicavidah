@@ -352,6 +352,42 @@ document.addEventListener('DOMContentLoaded', function() {
         dateInput.value = formattedDate;
     }
     
+    // Force pre-selection of essential exams if not refazer mode
+    const urlParams = new URLSearchParams(window.location.search);
+    const isRefazer = urlParams.has('refazer') || window.location.pathname.includes('/refazer/');
+    
+    if (!isRefazer) {
+        const essentialExams = [
+            'Hemograma completo',
+            'Coagulograma (TAP/TTPA)',
+            'HbA1c (Hemoglobina glicada)',
+            'Glicemia de jejum',
+            'TGO (AST)',
+            'TGP (ALT)',
+            'Ureia',
+            'Creatinina',
+            'Ferritina',
+            'Colesterol total e frações',
+            'Triglicerídeos',
+            'Ácido úrico',
+            'Proteína C reativa (PCR)',
+            'T4 livre',
+            'TSH',
+            'Testosterona total',
+            'FSH',
+            'Exame de urina (EAS)',
+            'Urina 1',
+            'PSA'
+        ];
+        
+        essentialExams.forEach(examName => {
+            const checkbox = document.querySelector(`input[name="exames[]"][value="${examName}"]`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+    }
+    
     // Search functionality
     const searchInput = document.getElementById('examSearch');
     const checkboxes = document.querySelectorAll('input[type="checkbox"][name="exames[]"]');
