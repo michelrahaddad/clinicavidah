@@ -24,11 +24,26 @@
         .logo-section {
             text-align: center;
             margin-bottom: 40px;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 25px;
-            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-            padding: 20px;
-            border-radius: 8px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(17, 153, 142, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        .logo-content {
+            position: relative;
+            z-index: 2;
         }
         .clinic-address {
             font-size: 10pt;
@@ -115,15 +130,22 @@
 </head>
 <body>
     <div class="logo-section">
-        <div style="text-align: center; margin-bottom: 25px;">
-            <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 14pt; color: #666; margin-bottom: 8px; font-weight: 300;">Grupo</div>
-            <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 48pt; font-weight: 700; color: #1a1a1a; letter-spacing: 3px; line-height: 1;">
-                VIDAH
+        <div class="logo-content">
+            <div style="margin-bottom: 20px;">
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 16pt; color: rgba(255,255,255,0.9); margin-bottom: 8px; font-weight: 300; text-transform: uppercase; letter-spacing: 2px;">Grupo</div>
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 56pt; font-weight: 800; color: #ffffff; letter-spacing: 8px; line-height: 1; text-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+                    VIDAH
+                </div>
+                <div style="width: 80px; height: 3px; background: linear-gradient(90deg, #00d4ff, #ff6b6b); margin: 15px auto; border-radius: 2px;"></div>
             </div>
-        </div>
-        <div class="clinic-address" style="color: #666; font-size: 11pt; line-height: 1.4;">
-            Endereço: R. XV de Novembro, 594 - Centro, Ibitinga - SP, 14940-000<br>
-            Telefone: (16) 3342-4768
+            <div style="color: rgba(255,255,255,0.95); font-size: 11pt; line-height: 1.6; font-weight: 400;">
+                <div style="margin-bottom: 8px;">
+                    <span style="color: #00d4ff;">📍</span> R. XV de Novembro, 594 - Centro, Ibitinga - SP, 14940-000
+                </div>
+                <div>
+                    <span style="color: #00d4ff;">📞</span> (16) 3342-4768
+                </div>
+            </div>
         </div>
     </div>
     
