@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
-from models import Medico
+from models import Medico, Administrador
 from app import db
 from werkzeug.security import check_password_hash
 import logging
@@ -19,6 +19,30 @@ def login():
             return render_template('login.html')
         
         try:
+            # Primeiro, verificar se é administrador (usando nome como usuário)
+            admin = Administrador.query.filter_by(usuario=nome, ativo=True).first()
+            
+            if admin and check_password_hash(admin.senha, senha):
+                # Login como administrador
+                session['admin'] = {
+                    'id': admin.id,
+                    'usuario': admin.usuario,
+                    'nome': admin.nome
+                }
+                
+                # Update last access
+                admin.ultimo_acesso = db.session.query(db.func.now()).scalar()
+                db.session.commit()
+                
+                # Log admin login
+                from utils.security import log_admin_action
+                log_admin_action('login', admin.usuario, f'Login administrativo realizado', request.remote_addr)
+                
+                flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
+                logging.info(f'Admin login successful for: {nome}')
+                return redirect(url_for('admin.dashboard'))
+            
+            # Se não é admin, verificar se é médico
             medico = Medico.query.filter_by(nome=nome, crm=crm).first()
             
             if medico and medico.senha and check_password_hash(medico.senha, senha):

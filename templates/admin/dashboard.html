@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrador - Sistema VIDAH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-nav {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .stat-card {
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .admin-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            color: white;
+        }
+        
+        .neural-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .neural-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+            color: white;
+        }
+        
+        .backup-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .backup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .logs-card {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .log-login { border-left-color: #28a745; }
+        .log-backup { border-left-color: #007bff; }
+        .log-error { border-left-color: #dc3545; }
+        .log-update { border-left-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg admin-nav">
+        <div class="container-fluid">
+            <a class="navbar-brand text-light fw-bold" href="#">
+                <i class="fas fa-shield-alt me-2"></i>VIDAH Admin
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.estatisticas_neurais') }}">
+                    <i class="fas fa-chart-line me-1"></i>Estatísticas Neurais
+                </a>
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.backup_management') }}">
+                    <i class="fas fa-database me-1"></i>Backup
+                </a>
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.system_update') }}">
+                    <i class="fas fa-upload me-1"></i>Atualizações
+                </a>
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.system_logs') }}">
+                    <i class="fas fa-file-alt me-1"></i>Logs
+                </a>
+                <a class="nav-link text-light" href="{{ url_for('admin.admin_logout') }}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Sair
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="glass-card p-4">
+                    <h1 class="text-light mb-0">
+                        <i class="fas fa-tachometer-alt me-3"></i>Painel de Administração
+                    </h1>
+                    <p class="text-light opacity-75 mb-0">Sistema de gestão e monitoramento VIDAH</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card p-4 text-center text-light">
+                    <i class="fas fa-user-md fa-3x mb-3 text-info"></i>
+                    <h3 class="fw-bold">{{ stats.total_medicos }}</h3>
+                    <p class="mb-0">Médicos Cadastrados</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card p-4 text-center text-light">
+                    <i class="fas fa-users fa-3x mb-3 text-success"></i>
+                    <h3 class="fw-bold">{{ stats.total_pacientes }}</h3>
+                    <p class="mb-0">Pacientes Cadastrados</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card p-4 text-center text-light">
+                    <i class="fas fa-prescription-bottle-alt fa-3x mb-3 text-warning"></i>
+                    <h3 class="fw-bold">{{ stats.total_receitas }}</h3>
+                    <p class="mb-0">Receitas Emitidas</p>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card p-4 text-center text-light">
+                    <i class="fas fa-calendar-day fa-3x mb-3 text-danger"></i>
+                    <h3 class="fw-bold">{{ stats.receitas_hoje }}</h3>
+                    <p class="mb-0">Receitas Hoje</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Tools -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="glass-card p-4 text-center">
+                    <i class="fas fa-brain fa-4x text-info mb-3"></i>
+                    <h5 class="text-light mb-3">Estatísticas Neurais</h5>
+                    <p class="text-light opacity-75 mb-3">Análise avançada de prescrições e tendências médicas</p>
+                    <a href="{{ url_for('admin.estatisticas_neurais') }}" class="btn neural-btn">
+                        <i class="fas fa-chart-line me-2"></i>Ver Estatísticas
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="glass-card p-4 text-center">
+                    <i class="fas fa-database fa-4x text-primary mb-3"></i>
+                    <h5 class="text-light mb-3">Backup Automático</h5>
+                    <p class="text-light opacity-75 mb-3">Gerenciamento e configuração de backups do sistema</p>
+                    <a href="{{ url_for('admin.backup_management') }}" class="btn backup-btn">
+                        <i class="fas fa-cog me-2"></i>Gerenciar Backup
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="glass-card p-4 text-center">
+                    <i class="fas fa-upload fa-4x text-success mb-3"></i>
+                    <h5 class="text-light mb-3">Atualizações</h5>
+                    <p class="text-light opacity-75 mb-3">Upload e aplicação de patches do sistema</p>
+                    <a href="{{ url_for('admin.system_update') }}" class="btn admin-btn">
+                        <i class="fas fa-cloud-upload-alt me-2"></i>Atualizar Sistema
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status & Logs -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="glass-card p-4">
+                    <h5 class="text-light mb-3">
+                        <i class="fas fa-server me-2"></i>Status do Sistema
+                    </h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="text-center p-3">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <p class="text-light mb-0">Banco de Dados</p>
+                                <small class="text-success">Online</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-3">
+                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                <p class="text-light mb-0">Último Backup</p>
+                                <small class="text-warning">
+                                    {% if stats.backup_config and stats.backup_config.ultimo_backup %}
+                                        {{ stats.backup_config.ultimo_backup.strftime('%d/%m/%Y %H:%M') }}
+                                    {% else %}
+                                        Nunca
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+                <div class="glass-card p-4">
+                    <h5 class="text-light mb-3">
+                        <i class="fas fa-file-alt me-2"></i>Logs Recentes
+                    </h5>
+                    <div class="logs-card">
+                        {% for log in recent_logs %}
+                        <div class="log-item log-{{ log.tipo }}">
+                            <div class="d-flex justify-content-between">
+                                <strong class="text-light">{{ log.acao }}</strong>
+                                <small class="text-light opacity-75">{{ log.timestamp.strftime('%H:%M') }}</small>
+                            </div>
+                            <small class="text-light opacity-75">{{ log.usuario }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('admin.system_logs') }}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-eye me-1"></i>Ver Todos os Logs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto refresh every 30 seconds
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
