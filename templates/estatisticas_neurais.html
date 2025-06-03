@@ -2,220 +2,404 @@
 
 {% block head %}
 <style>
-    .detailed-stats-list {
-        max-height: 400px;
-        overflow-y: auto;
+    .stats-header {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(40, 167, 69, 0.1));
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 40px;
     }
 
-    .stat-item {
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
+    .stats-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0;
     }
 
-    .stat-item:last-child {
-        border-bottom: none;
-    }
-
-    .stat-item:hover {
+    .chart-card {
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 5px;
-        padding-left: 15px;
-        padding-right: 15px;
-    }
-
-    .detailed-stats-list::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .detailed-stats-list::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 3px;
-    }
-
-    .detailed-stats-list::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 3px;
-    }
-
-    .detailed-stats-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 25px;
+        margin-bottom: 30px;
+        backdrop-filter: blur(10px);
     }
 
     .chart-container {
         position: relative;
-        height: 400px;
-        margin-bottom: 30px;
+        height: 350px;
+        margin: 20px 0;
+    }
+
+    .stats-grid {
+        gap: 25px;
     }
 
     .stats-card {
-        min-height: 500px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        min-height: 450px;
+        transition: all 0.3s ease;
+        overflow: hidden;
     }
 
-    .badge-large {
-        font-size: 0.9rem;
-        padding: 8px 12px;
+    .stats-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .stats-card-header {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        padding: 20px 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stats-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .stats-card-body {
+        padding: 0;
+        height: calc(450px - 80px);
+        overflow: hidden;
+    }
+
+    .stats-list {
+        height: 100%;
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    .stats-item {
+        padding: 18px 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .stats-item:last-child {
+        border-bottom: none;
+    }
+
+    .stats-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .stats-item-content {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .stats-item-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .stats-item-name {
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: #ffffff;
+        margin: 0 0 4px 0;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .stats-item-position {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.6);
+        margin: 0;
+    }
+
+    .stats-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        min-width: 45px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .stats-badge-success {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .stats-badge-info {
+        background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+    }
+
+    .stats-badge-warning {
+        background: linear-gradient(135deg, #ffc107, #fd7e14);
+        box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    }
+
+    .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        text-align: center;
+        padding: 40px 20px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+
+    .empty-state h6 {
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 8px;
+    }
+
+    .empty-state small {
+        color: rgba(255, 255, 255, 0.4);
+        line-height: 1.4;
+    }
+
+    .action-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 24px;
+        color: white;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-outline-custom {
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-custom:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .stats-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .stats-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .stats-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+    }
+
+    .stats-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .chart-toggle-btn {
+        background: rgba(40, 167, 69, 0.2);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        color: #28a745;
+        border-radius: 10px;
+        padding: 8px 16px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+
+    .chart-toggle-btn:hover {
+        background: rgba(40, 167, 69, 0.3);
+        border-color: rgba(40, 167, 69, 0.5);
+        color: #28a745;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Header with navigation -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light me-3 neural-btn">
-                        <i class="fas fa-arrow-left me-2"></i>Dashboard
-                    </a>
-                    <h1 class="mb-0 page-title">
-                        <i class="fas fa-brain me-3 text-primary"></i>
-                        <span class="gradient-text">Estatísticas Neurais</span>
-                    </h1>
-                </div>
+<div class="container-fluid px-4 py-3">
+    <!-- Header Section -->
+    <div class="stats-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-custom me-4">
+                    <i class="fas fa-arrow-left me-2"></i>Dashboard
+                </a>
                 <div>
-                    <a href="{{ url_for('relatorios.relatorio_estatisticas_pdf') }}" 
-                       class="btn btn-primary neural-btn px-4 py-2" target="_blank">
-                        <i class="fas fa-file-pdf me-2"></i>Exportar PDF
-                    </a>
+                    <h1 class="stats-title">
+                        <i class="fas fa-brain me-3"></i>Estatísticas Neurais
+                    </h1>
+                    <p class="text-light mb-0 opacity-75">Análise detalhada dos dados médicos</p>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Main Statistics Chart -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card glass-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 text-light">
-                        <i class="fas fa-chart-bar me-2 text-primary"></i>
-                        Visão Geral das Estatísticas
-                    </h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-success me-2" onclick="toggleChart()">
-                            <i class="fas fa-exchange-alt me-1"></i>
-                            <span id="chartToggleText">Evolução Mensal</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="statsChart"></canvas>
-                        <canvas id="evolutionChart" style="display: none;"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Statistics -->
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card glass-card stats-card">
-                <div class="card-header">
-                    <h5 class="mb-0 text-light">
-                        <i class="fas fa-pills me-2 text-success"></i>
-                        Medicamentos Mais Prescritos
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="detailed-stats-list">
-                        {% if detailed_stats.medicamentos %}
-                            {% for med in detailed_stats.medicamentos %}
-                            <div class="stat-item d-flex justify-content-between align-items-center">
-                                <div class="flex-grow-1">
-                                    <h6 class="text-light mb-1">{{ med.nome[:40] }}{% if med.nome|length > 40 %}...{% endif %}</h6>
-                                    <small class="text-muted">Posição {{ loop.index }}º</small>
-                                </div>
-                                <span class="badge bg-success badge-large">{{ med.quantidade }}</span>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="text-center text-muted py-5">
-                                <i class="fas fa-pills fa-3x mb-3 opacity-50"></i>
-                                <p class="mb-0">Nenhum medicamento prescrito ainda</p>
-                                <small>Comece prescrevendo receitas para ver as estatísticas</small>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card glass-card stats-card">
-                <div class="card-header">
-                    <h5 class="mb-0 text-light">
-                        <i class="fas fa-vials me-2 text-info"></i>
-                        Exames Laboratoriais Mais Solicitados
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="detailed-stats-list">
-                        {% if detailed_stats.exames_lab %}
-                            {% for exam in detailed_stats.exames_lab %}
-                            <div class="stat-item d-flex justify-content-between align-items-center">
-                                <div class="flex-grow-1">
-                                    <h6 class="text-light mb-1">{{ exam.nome[:40] }}{% if exam.nome|length > 40 %}...{% endif %}</h6>
-                                    <small class="text-muted">Posição {{ loop.index }}º</small>
-                                </div>
-                                <span class="badge bg-info badge-large">{{ exam.quantidade }}</span>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="text-center text-muted py-5">
-                                <i class="fas fa-vials fa-3x mb-3 opacity-50"></i>
-                                <p class="mb-0">Nenhum exame laboratorial solicitado ainda</p>
-                                <small>Comece solicitando exames para ver as estatísticas</small>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-            <div class="card glass-card stats-card">
-                <div class="card-header">
-                    <h5 class="mb-0 text-light">
-                        <i class="fas fa-x-ray me-2 text-warning"></i>
-                        Exames de Imagem Mais Solicitados
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="detailed-stats-list">
-                        {% if detailed_stats.exames_img %}
-                            {% for exam in detailed_stats.exames_img %}
-                            <div class="stat-item d-flex justify-content-between align-items-center">
-                                <div class="flex-grow-1">
-                                    <h6 class="text-light mb-1">{{ exam.nome[:40] }}{% if exam.nome|length > 40 %}...{% endif %}</h6>
-                                    <small class="text-muted">Posição {{ loop.index }}º</small>
-                                </div>
-                                <span class="badge bg-warning badge-large">{{ exam.quantidade }}</span>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <div class="text-center text-muted py-5">
-                                <i class="fas fa-x-ray fa-3x mb-3 opacity-50"></i>
-                                <p class="mb-0">Nenhum exame de imagem solicitado ainda</p>
-                                <small>Comece solicitando exames para ver as estatísticas</small>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Back to Dashboard Button -->
-    <div class="row mt-4">
-        <div class="col-12 text-center">
-            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light neural-btn px-5 py-3">
-                <i class="fas fa-tachometer-alt me-2"></i>Voltar ao Dashboard
+            <a href="{{ url_for('relatorios.relatorio_estatisticas_pdf') }}" 
+               class="action-btn" target="_blank">
+                <i class="fas fa-file-pdf me-2"></i>Exportar PDF
             </a>
         </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="chart-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="text-light mb-0">
+                <i class="fas fa-chart-line me-2 text-primary"></i>
+                Visão Geral das Estatísticas
+            </h5>
+            <button class="chart-toggle-btn" onclick="toggleChart()">
+                <i class="fas fa-exchange-alt me-1"></i>
+                <span id="chartToggleText">Evolução Mensal</span>
+            </button>
+        </div>
+        <div class="chart-container">
+            <canvas id="statsChart"></canvas>
+            <canvas id="evolutionChart" style="display: none;"></canvas>
+        </div>
+    </div>
+
+    <!-- Statistics Grid -->
+    <div class="row stats-grid">
+        <!-- Medicamentos Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h6 class="stats-card-title text-light">
+                        <i class="fas fa-pills me-2" style="color: #28a745;"></i>
+                        Medicamentos Mais Prescritos
+                    </h6>
+                </div>
+                <div class="stats-card-body">
+                    {% if detailed_stats.medicamentos %}
+                    <div class="stats-list">
+                        {% for med in detailed_stats.medicamentos %}
+                        <div class="stats-item">
+                            <div class="stats-item-content">
+                                <div class="stats-item-info">
+                                    <h6 class="stats-item-name" title="{{ med.nome }}">{{ med.nome }}</h6>
+                                    <p class="stats-item-position">{{ loop.index }}º lugar</p>
+                                </div>
+                                <span class="stats-badge stats-badge-success">{{ med.quantidade }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-pills"></i>
+                        <h6>Nenhum medicamento prescrito</h6>
+                        <small>Comece prescrevendo receitas para ver as estatísticas aqui</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Exames Laboratoriais Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h6 class="stats-card-title text-light">
+                        <i class="fas fa-vials me-2" style="color: #17a2b8;"></i>
+                        Exames Laboratoriais
+                    </h6>
+                </div>
+                <div class="stats-card-body">
+                    {% if detailed_stats.exames_lab %}
+                    <div class="stats-list">
+                        {% for exam in detailed_stats.exames_lab %}
+                        <div class="stats-item">
+                            <div class="stats-item-content">
+                                <div class="stats-item-info">
+                                    <h6 class="stats-item-name" title="{{ exam.nome }}">{{ exam.nome }}</h6>
+                                    <p class="stats-item-position">{{ loop.index }}º lugar</p>
+                                </div>
+                                <span class="stats-badge stats-badge-info">{{ exam.quantidade }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-vials"></i>
+                        <h6>Nenhum exame laboratorial</h6>
+                        <small>Comece solicitando exames laboratoriais para visualizar dados</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Exames de Imagem Card -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-card-header">
+                    <h6 class="stats-card-title text-light">
+                        <i class="fas fa-x-ray me-2" style="color: #ffc107;"></i>
+                        Exames de Imagem
+                    </h6>
+                </div>
+                <div class="stats-card-body">
+                    {% if detailed_stats.exames_img %}
+                    <div class="stats-list">
+                        {% for exam in detailed_stats.exames_img %}
+                        <div class="stats-item">
+                            <div class="stats-item-content">
+                                <div class="stats-item-info">
+                                    <h6 class="stats-item-name" title="{{ exam.nome }}">{{ exam.nome }}</h6>
+                                    <p class="stats-item-position">{{ loop.index }}º lugar</p>
+                                </div>
+                                <span class="stats-badge stats-badge-warning">{{ exam.quantidade }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-x-ray"></i>
+                        <h6>Nenhum exame de imagem</h6>
+                        <small>Comece solicitando exames de imagem para visualizar dados</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Footer -->
+    <div class="text-center mt-5 mb-4">
+        <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-custom px-5 py-3">
+            <i class="fas fa-tachometer-alt me-2"></i>Voltar ao Dashboard
+        </a>
     </div>
 </div>
 {% endblock %}
