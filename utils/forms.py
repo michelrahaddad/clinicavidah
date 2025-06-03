@@ -71,6 +71,34 @@ def validar_data(data_str):
     except ValueError:
         return False
 
+def validar_email(email):
+    """Validate email format"""
+    if not email:
+        return True  # Email is optional
+    
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validar_telefone(telefone):
+    """Validate phone number format"""
+    if not telefone:
+        return True  # Phone is optional
+    
+    # Remove non-numeric characters
+    telefone = re.sub(r'[^0-9]', '', telefone)
+    
+    # Brazilian phone format: 10 or 11 digits
+    return len(telefone) in [10, 11]
+
+def validar_crm(crm):
+    """Validate CRM format"""
+    if not crm:
+        return False
+    
+    # CRM should have at least 4 digits and letters for state
+    pattern = r'^\d{4,6}\/[A-Z]{2}$'
+    return re.match(pattern, crm.upper()) is not None
+
 def validar_medicamentos(medicamentos, posologias, duracoes, vias):
     """Validate medication fields"""
     if not medicamentos or len(medicamentos) == 0:
