@@ -13,9 +13,11 @@
                     <p class="text-muted mb-0">Bem-vindo ao sistema médico VIDAH, {{ usuario.nome }}!</p>
                 </div>
                 <div>
-                    <button id="logoutBtn" class="btn btn-outline-danger neural-btn" onclick="performLogout()">
-                        <i class="fas fa-sign-out-alt me-2"></i>
-                        Sair do Sistema
+                    <button id="logoutBtn" class="btn btn-sm btn-outline-light neural-btn px-3 py-2" 
+                            onclick="performLogout()" 
+                            style="border-radius: 25px; font-size: 0.85rem; opacity: 0.8; transition: all 0.3s ease;">
+                        <i class="fas fa-sign-out-alt me-1"></i>
+                        Sair
                     </button>
                 </div>
             </div>
@@ -210,6 +212,21 @@
                 }
             }
         }
+    });
+
+    // Estilo hover para o botão de logout
+    document.getElementById('logoutBtn').addEventListener('mouseenter', function() {
+        this.style.opacity = '1';
+        this.style.borderColor = '#dc3545';
+        this.style.color = '#dc3545';
+        this.style.transform = 'translateY(-1px)';
+    });
+    
+    document.getElementById('logoutBtn').addEventListener('mouseleave', function() {
+        this.style.opacity = '0.8';
+        this.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+        this.style.color = 'rgba(255, 255, 255, 0.9)';
+        this.style.transform = 'translateY(0)';
     });
 
     // Função de logout com salvamento automático de dados
