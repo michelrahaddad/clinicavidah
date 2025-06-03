@@ -16,6 +16,8 @@ def novo_paciente():
     if request.method == 'POST':
         try:
             nome_paciente = request.form.get('nome_paciente', '').strip()
+            email_paciente = request.form.get('email_paciente', '').strip()
+            telefone_paciente = request.form.get('telefone_paciente', '').strip()
             
             if not nome_paciente:
                 flash('Nome do paciente é obrigatório.', 'error')
@@ -27,11 +29,18 @@ def novo_paciente():
                 flash(f'Paciente "{nome_paciente}" já está cadastrado no sistema.', 'warning')
                 return render_template('novo_paciente.html', nome_paciente=nome_paciente)
             
-            # Insert new patient
-            paciente_id = insert_patient_if_not_exists(nome_paciente)
+            # Create new patient with all fields
+            novo_paciente = Paciente(
+                nome=nome_paciente,
+                email=email_paciente if email_paciente else None,
+                telefone=telefone_paciente if telefone_paciente else None
+            )
+            
+            db.session.add(novo_paciente)
+            db.session.commit()
             
             flash(f'Paciente "{nome_paciente}" cadastrado com sucesso!', 'success')
-            logging.info(f'New patient registered: {nome_paciente}')
+            logging.info(f'New patient registered: {nome_paciente} (Email: {email_paciente}, Tel: {telefone_paciente})')
             
             # Redirect to prontuario with patient name
             return redirect(url_for('prontuario.prontuario', paciente=nome_paciente))

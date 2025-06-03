@@ -25,6 +25,8 @@ class Paciente(db.Model):
     
     id = Column(Integer, primary_key=True)
     nome = Column(String(200), nullable=False)
+    email = Column(String(255), nullable=True)
+    telefone = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Relationships

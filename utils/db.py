@@ -14,11 +14,15 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def insert_patient_if_not_exists(nome_paciente):
+def insert_patient_if_not_exists(nome_paciente, email=None, telefone=None):
     """Insert patient if not exists and return patient ID"""
     paciente = Paciente.query.filter_by(nome=nome_paciente).first()
     if not paciente:
-        paciente = Paciente(nome=nome_paciente)
+        paciente = Paciente(
+            nome=nome_paciente,
+            email=email,
+            telefone=telefone
+        )
         db.session.add(paciente)
         db.session.flush()
     return paciente.id

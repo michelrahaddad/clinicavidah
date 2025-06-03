@@ -28,13 +28,17 @@
                             <label for="nome_paciente" class="form-label text-light">
                                 <i class="fas fa-user me-2"></i>Nome do Paciente *
                             </label>
-                            <input type="text" 
-                                   name="nome_paciente" 
-                                   id="nome_paciente"
-                                   class="form-control glass-input" 
-                                   placeholder="Digite o nome completo do paciente"
-                                   value="{{ receita.nome_paciente if refazer and receita else request.args.get('paciente', '') }}"
-                                   required>
+                            <div class="position-relative">
+                                <input type="text" 
+                                       name="nome_paciente" 
+                                       id="nome_paciente"
+                                       class="form-control glass-input" 
+                                       placeholder="Digite o nome do paciente para buscar..."
+                                       value="{{ receita.nome_paciente if refazer and receita else request.args.get('paciente', '') }}"
+                                       autocomplete="off"
+                                       required>
+                                <div id="paciente-suggestions" class="suggestions-dropdown"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
