@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, make_response
 from models import AtestadoMedico, Medico, Paciente, Cid10
 from app import db
+from sqlalchemy import text
 from utils.forms import sanitizar_entrada
 from datetime import datetime, timedelta
 import logging
@@ -59,20 +60,31 @@ def salvar_atestado_medico():
         from utils.db import insert_patient_if_not_exists
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
-        # Create medical certificate
-        atestado = AtestadoMedico()
-        atestado.nome_paciente = nome_paciente
-        atestado.cid_codigo = cid_codigo
-        atestado.cid_descricao = cid_descricao
-        atestado.dias_afastamento = dias_afastamento
-        atestado.data_inicio = data_inicio
-        atestado.data_fim = data_fim
-        atestado.medico_nome = medico.nome
-        atestado.data = data
-        atestado.id_paciente = paciente_id
-        atestado.id_medico = medico.id
+        # Create medical certificate using SQL insert
+        db.session.execute(
+            text("""
+            INSERT INTO atestados_medicos 
+            (nome_paciente, cid_codigo, cid_descricao, dias_afastamento, data_inicio, data_fim, medico_nome, data, id_paciente, id_medico, created_at)
+            VALUES (:nome_paciente, :cid_codigo, :cid_descricao, :dias_afastamento, :data_inicio, :data_fim, :medico_nome, :data, :id_paciente, :id_medico, :created_at)
+            """),
+            {
+                'nome_paciente': nome_paciente,
+                'cid_codigo': cid_codigo,
+                'cid_descricao': cid_descricao,
+                'dias_afastamento': dias_afastamento,
+                'data_inicio': data_inicio,
+                'data_fim': data_fim,
+                'medico_nome': medico.nome,
+                'data': data,
+                'id_paciente': paciente_id,
+                'id_medico': medico.id,
+                'created_at': datetime.now()
+            }
+        )
         
-        db.session.add(atestado)
+        # Get the ID of the inserted record
+        result = db.session.execute(text("SELECT lastval()"))
+        atestado_id = result.scalar()
         db.session.commit()
         
         # Generate PDF

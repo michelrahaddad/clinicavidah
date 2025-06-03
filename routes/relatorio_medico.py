@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, make_response
 from models import RelatorioMedico, Medico, Paciente, Cid10
 from app import db
+from sqlalchemy import text
 from utils.forms import sanitizar_entrada
 from datetime import datetime
 import logging
@@ -48,18 +49,29 @@ def salvar_relatorio_medico():
         from utils.db import insert_patient_if_not_exists
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
-        # Create medical report
-        relatorio = RelatorioMedico()
-        relatorio.nome_paciente = nome_paciente
-        relatorio.cid_codigo = cid_codigo
-        relatorio.cid_descricao = cid_descricao
-        relatorio.relatorio_texto = relatorio_texto
-        relatorio.medico_nome = medico.nome
-        relatorio.data = data
-        relatorio.id_paciente = paciente_id
-        relatorio.id_medico = medico.id
+        # Create medical report using SQL insert
+        db.session.execute(
+            text("""
+            INSERT INTO relatorios_medicos 
+            (nome_paciente, cid_codigo, cid_descricao, relatorio_texto, medico_nome, data, id_paciente, id_medico, created_at)
+            VALUES (:nome_paciente, :cid_codigo, :cid_descricao, :relatorio_texto, :medico_nome, :data, :id_paciente, :id_medico, :created_at)
+            """),
+            {
+                'nome_paciente': nome_paciente,
+                'cid_codigo': cid_codigo,
+                'cid_descricao': cid_descricao,
+                'relatorio_texto': relatorio_texto,
+                'medico_nome': medico.nome,
+                'data': data,
+                'id_paciente': paciente_id,
+                'id_medico': medico.id,
+                'created_at': datetime.now()
+            }
+        )
         
-        db.session.add(relatorio)
+        # Get the ID of the inserted record
+        result = db.session.execute(text("SELECT lastval()"))
+        relatorio_id = result.scalar()
         db.session.commit()
         
         # Generate PDF
