@@ -60,18 +60,17 @@ def salvar_atestado_medico():
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
         # Create medical certificate
-        atestado = AtestadoMedico(
-            nome_paciente=nome_paciente,
-            cid_codigo=cid_codigo,
-            cid_descricao=cid_descricao,
-            dias_afastamento=dias_afastamento,
-            data_inicio=data_inicio,
-            data_fim=data_fim,
-            medico_nome=medico.nome,
-            data=data,
-            id_paciente=paciente_id,
-            id_medico=medico.id
-        )
+        atestado = AtestadoMedico()
+        atestado.nome_paciente = nome_paciente
+        atestado.cid_codigo = cid_codigo
+        atestado.cid_descricao = cid_descricao
+        atestado.dias_afastamento = dias_afastamento
+        atestado.data_inicio = data_inicio
+        atestado.data_fim = data_fim
+        atestado.medico_nome = medico.nome
+        atestado.data = data
+        atestado.id_paciente = paciente_id
+        atestado.id_medico = medico.id
         
         db.session.add(atestado)
         db.session.commit()

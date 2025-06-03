@@ -49,16 +49,15 @@ def salvar_relatorio_medico():
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
         # Create medical report
-        relatorio = RelatorioMedico(
-            nome_paciente=nome_paciente,
-            cid_codigo=cid_codigo,
-            cid_descricao=cid_descricao,
-            relatorio_texto=relatorio_texto,
-            medico_nome=medico.nome,
-            data=data,
-            id_paciente=paciente_id,
-            id_medico=medico.id
-        )
+        relatorio = RelatorioMedico()
+        relatorio.nome_paciente = nome_paciente
+        relatorio.cid_codigo = cid_codigo
+        relatorio.cid_descricao = cid_descricao
+        relatorio.relatorio_texto = relatorio_texto
+        relatorio.medico_nome = medico.nome
+        relatorio.data = data
+        relatorio.id_paciente = paciente_id
+        relatorio.id_medico = medico.id
         
         db.session.add(relatorio)
         db.session.commit()

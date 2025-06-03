@@ -60,27 +60,26 @@ def salvar_formulario_alto_custo():
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
         # Create high-cost form
-        formulario = FormularioAltoCusto(
-            cnes=cnes,
-            estabelecimento=estabelecimento,
-            nome_paciente=nome_paciente,
-            nome_mae=nome_mae,
-            peso=peso,
-            altura=altura,
-            medicamento=medicamento,
-            quantidade=quantidade,
-            cid_codigo=cid_codigo,
-            cid_descricao=cid_descricao,
-            anamnese=anamnese,
-            tratamento_previo=tratamento_previo,
-            incapaz=incapaz,
-            responsavel_nome=responsavel_nome,
-            medico_nome=medico.nome,
-            medico_cns=medico_cns,
-            data=data,
-            id_paciente=paciente_id,
-            id_medico=medico.id
-        )
+        formulario = FormularioAltoCusto()
+        formulario.cnes = cnes
+        formulario.estabelecimento = estabelecimento
+        formulario.nome_paciente = nome_paciente
+        formulario.nome_mae = nome_mae
+        formulario.peso = peso
+        formulario.altura = altura
+        formulario.medicamento = medicamento
+        formulario.quantidade = quantidade
+        formulario.cid_codigo = cid_codigo
+        formulario.cid_descricao = cid_descricao
+        formulario.anamnese = anamnese
+        formulario.tratamento_previo = tratamento_previo
+        formulario.incapaz = incapaz
+        formulario.responsavel_nome = responsavel_nome
+        formulario.medico_nome = medico.nome
+        formulario.medico_cns = medico_cns
+        formulario.data = data
+        formulario.id_paciente = paciente_id
+        formulario.id_medico = medico.id
         
         db.session.add(formulario)
         db.session.commit()
