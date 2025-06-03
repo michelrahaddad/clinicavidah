@@ -65,14 +65,12 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light me-3 neural-btn">
-                        <i class="fas fa-arrow-left me-2"></i>Dashboard
-                    </a>
+                <div>
                     <h1 class="mb-0 page-title">
                         <i class="fas fa-brain me-3 text-primary"></i>
                         <span class="gradient-text">Estatísticas Neurais</span>
                     </h1>
+                    <p class="text-muted mb-0 mt-2">Análise detalhada dos dados médicos por categoria</p>
                 </div>
                 <div>
                     <a href="{{ url_for('relatorios.relatorio_estatisticas_pdf') }}" 
@@ -90,15 +88,13 @@
             <div class="card glass-card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 text-light">
-                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        <i class="fas fa-chart-line me-2 text-primary"></i>
                         Visão Geral das Estatísticas
                     </h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-success me-2" onclick="toggleChart()">
-                            <i class="fas fa-exchange-alt me-1"></i>
-                            <span id="chartToggleText">Evolução Mensal</span>
-                        </button>
-                    </div>
+                    <button class="btn btn-sm btn-outline-success" onclick="toggleChart()">
+                        <i class="fas fa-exchange-alt me-1"></i>
+                        <span id="chartToggleText">Evolução Mensal</span>
+                    </button>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -115,10 +111,10 @@
         <div class="col-md-4 mb-4">
             <div class="card glass-card stats-card">
                 <div class="card-header">
-                    <h5 class="mb-0 text-light">
+                    <h6 class="mb-0 text-light">
                         <i class="fas fa-pills me-2 text-success"></i>
-                        Medicamentos Mais Prescritos
-                    </h5>
+                        Top Medicamentos Prescritos
+                    </h6>
                 </div>
                 <div class="card-body">
                     <div class="detailed-stats-list">
@@ -126,8 +122,10 @@
                             {% for med in detailed_stats.medicamentos %}
                             <div class="stat-item d-flex justify-content-between align-items-center">
                                 <div class="flex-grow-1">
-                                    <h6 class="text-light mb-1">{{ med.nome[:40] }}{% if med.nome|length > 40 %}...{% endif %}</h6>
-                                    <small class="text-muted">Posição {{ loop.index }}º</small>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="badge bg-secondary me-2" style="font-size: 0.7rem;">{{ loop.index }}º</span>
+                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ med.nome[:35] }}{% if med.nome|length > 35 %}...{% endif %}</h6>
+                                    </div>
                                 </div>
                                 <span class="badge bg-success badge-large">{{ med.quantidade }}</span>
                             </div>
@@ -147,10 +145,10 @@
         <div class="col-md-4 mb-4">
             <div class="card glass-card stats-card">
                 <div class="card-header">
-                    <h5 class="mb-0 text-light">
+                    <h6 class="mb-0 text-light">
                         <i class="fas fa-vials me-2 text-info"></i>
-                        Exames Laboratoriais Mais Solicitados
-                    </h5>
+                        Top Exames Laboratoriais
+                    </h6>
                 </div>
                 <div class="card-body">
                     <div class="detailed-stats-list">
@@ -158,8 +156,10 @@
                             {% for exam in detailed_stats.exames_lab %}
                             <div class="stat-item d-flex justify-content-between align-items-center">
                                 <div class="flex-grow-1">
-                                    <h6 class="text-light mb-1">{{ exam.nome[:40] }}{% if exam.nome|length > 40 %}...{% endif %}</h6>
-                                    <small class="text-muted">Posição {{ loop.index }}º</small>
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="badge bg-secondary me-2" style="font-size: 0.7rem;">{{ loop.index }}º</span>
+                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ exam.nome[:35] }}{% if exam.nome|length > 35 %}...{% endif %}</h6>
+                                    </div>
                                 </div>
                                 <span class="badge bg-info badge-large">{{ exam.quantidade }}</span>
                             </div>
@@ -179,10 +179,10 @@
         <div class="col-md-4 mb-4">
             <div class="card glass-card stats-card">
                 <div class="card-header">
-                    <h5 class="mb-0 text-light">
+                    <h6 class="mb-0 text-light">
                         <i class="fas fa-x-ray me-2 text-warning"></i>
-                        Exames de Imagem Mais Solicitados
-                    </h5>
+                        Top Exames de Imagem
+                    </h6>
                 </div>
                 <div class="card-body">
                     <div class="detailed-stats-list">
