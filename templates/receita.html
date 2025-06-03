@@ -123,7 +123,10 @@
             </div>
         </div>
         
-        <div class="mt-4 text-center">
+        <div class="mt-4 d-flex justify-content-between">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary neural-btn">
+                <i class="fas fa-arrow-left me-2"></i>Voltar
+            </a>
             <button type="submit" class="btn btn-success btn-lg neural-btn px-5 py-3" onclick="showLoading(this)" 
                     style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
                 <i class="fas fa-file-pdf me-2"></i>GERAR PDF

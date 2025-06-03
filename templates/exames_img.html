@@ -141,7 +141,10 @@
             </div>
         </div>
         
-        <div class="mt-4 text-center">
+        <div class="mt-4 d-flex justify-content-between">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-secondary neural-btn">
+                <i class="fas fa-arrow-left me-2"></i>Voltar
+            </a>
             <button type="submit" class="btn btn-info btn-lg neural-btn">
                 <i class="fas fa-save me-2"></i>Salvar Exames e Gerar PDF
             </button>
