@@ -6,13 +6,20 @@
     <style>
         @page {
             size: A4;
-            margin: 2cm;
+            margin: 2.5cm 2cm;
+            @bottom-center {
+                content: "Sistema Médico VIDAH - " attr(data-date);
+                font-size: 10pt;
+                color: #666;
+            }
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 12pt;
-            line-height: 1.4;
+            font-size: 11pt;
+            line-height: 1.5;
             color: #333;
+            margin: 0;
+            padding: 0;
         }
         .header {
             text-align: center;
@@ -58,14 +65,22 @@
             color: #666;
         }
         .signature {
-            margin-top: 50px;
+            margin-top: 60px;
+            page-break-inside: avoid;
             text-align: center;
         }
         .signature-line {
             border-top: 1px solid #333;
-            width: 300px;
-            margin: 0 auto;
+            width: 280px;
+            margin: 20px auto 0;
             padding-top: 10px;
+        }
+        .title {
+            color: #28a745;
+            font-size: 14pt;
+            font-weight: bold;
+            margin: 25px 0 20px 0;
+            text-align: center;
         }
     </style>
 </head>
@@ -83,9 +98,9 @@
         <strong>Paciente:</strong> {{ nome_paciente }}
     </div>
     
-    <h3 style="color: #28a745; margin-bottom: 20px;">SOLICITAÇÃO DE EXAMES LABORATORIAIS</h3>
+    <div class="title">SOLICITAÇÃO DE EXAMES LABORATORIAIS</div>
     
-    <p>Solicito a realização dos seguintes exames laboratoriais:</p>
+    <p style="margin-bottom: 15px;">Solicito a realização dos seguintes exames laboratoriais:</p>
     
     <ul class="exams-list">
         {% for exame in exames %}
@@ -96,7 +111,7 @@
     <div class="signature">
         {% if assinatura %}
         <div style="margin-bottom: 10px;">
-            <img src="data:image/png;base64,{{ assinatura }}" alt="Assinatura" style="max-width: 200px; max-height: 80px;">
+            <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 80px; border: 1px solid #ddd;">
         </div>
         {% endif %}
         <div class="signature-line">
