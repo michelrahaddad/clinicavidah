@@ -143,10 +143,11 @@ def backup_management():
                 if file.endswith('.sql') or file.endswith('.gz'):
                     file_path = os.path.join(backup_dir, file)
                     stat = os.stat(file_path)
+                    from datetime import datetime
                     backups.append({
                         'name': file,
                         'size': stat.st_size,
-                        'date': stat.st_mtime
+                        'date': datetime.fromtimestamp(stat.st_mtime)
                     })
         
         return render_template('admin/backup.html', config=config, backups=backups)

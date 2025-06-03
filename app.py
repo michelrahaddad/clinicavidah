@@ -72,6 +72,7 @@ def create_app():
     from routes.relatorios import relatorios_bp
     from routes.estatisticas_neurais import estatisticas_neurais_bp
     from routes.admin import admin_bp
+    from routes.monitoring import monitoring_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -91,6 +92,7 @@ def create_app():
     app.register_blueprint(relatorios_bp)
     app.register_blueprint(estatisticas_neurais_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(monitoring_bp)
     
     # Create tables
     with app.app_context():
