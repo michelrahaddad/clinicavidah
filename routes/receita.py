@@ -76,6 +76,7 @@ def salvar_receita():
         db.session.commit()
         
         # Generate PDF
+        logging.info(f'Starting PDF generation for prescription: {nome_paciente}')
         pdf_html = render_template('receita_pdf.html',
                                  nome_paciente=nome_paciente,
                                  medicamentos=medicamentos,
@@ -88,7 +89,9 @@ def salvar_receita():
                                  data=data,
                                  zip=zip)
         
+        logging.info('HTML template rendered successfully')
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        logging.info('PDF file generated successfully')
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
