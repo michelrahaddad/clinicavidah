@@ -91,10 +91,14 @@ def prontuario_paciente(paciente_id):
         logging.error(f'Error loading patient records: {e}')
         return jsonify([]), 500
 
-@api_bp.route('/medicamentos')
+@api_bp.route('/medicamentos', methods=['GET', 'POST'])
 def buscar_medicamentos():
     """Search medications from database"""
-    query = request.args.get('q', '').strip()
+    if request.method == 'POST':
+        data = request.get_json()
+        query = data.get('termo', '').strip() if data else ''
+    else:
+        query = request.args.get('q', '').strip()
     
     if len(query) < 2:
         return jsonify([])
