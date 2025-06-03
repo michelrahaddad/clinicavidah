@@ -12,7 +12,7 @@ def dashboard():
     
     try:
         stats = get_dashboard_stats()
-        user_name = session['usuario']['nome']
+        user_name = session['usuario'] if isinstance(session['usuario'], str) else session['usuario']['nome']
         
         logging.info(f'Dashboard accessed by: {user_name}')
         
