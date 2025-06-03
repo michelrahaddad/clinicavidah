@@ -118,25 +118,20 @@
         </div>
     </div>
     
-    <div class="header">
-        <div class="doctor-info">
-            <strong>{{ medico }}</strong><br>
-            CRM: {{ crm }}
-        </div>
-        <div>{{ data }}</div>
+    <div class="document-header">
+        <h2 style="margin: 0; color: #6f42c1; font-size: 18pt;">EXAMES DE IMAGEM</h2>
+        <p style="margin: 5px 0 0 0; color: #666; font-size: 10pt;">Data: {{ data }}</p>
     </div>
     
-    <div class="patient-info">
+    <div class="patient-section">
         <strong>Paciente:</strong> {{ nome_paciente }}
     </div>
-    
-    <h3 style="color: #17a2b8; margin-bottom: 20px;">SOLICITAÇÃO DE EXAMES DE IMAGEM</h3>
     
     <p>Solicito a realização dos seguintes exames de imagem:</p>
     
     <ul class="exams-list">
         {% for exame in exames %}
-        <li>{{ exame }}</li>
+        <li class="exam-item">{{ exame }}</li>
         {% endfor %}
     </ul>
     

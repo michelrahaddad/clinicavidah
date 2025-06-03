@@ -150,5 +150,17 @@
             </button>
         </div>
     </form>
+    
+    <!-- Navigation Icons -->
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary glass-button" 
+           style="border-radius: 15px; padding: 12px 20px;">
+            <i class="fas fa-prescription me-2"></i>Nova Receita
+        </a>
+        <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success glass-button"
+           style="border-radius: 15px; padding: 12px 20px;">
+            <i class="fas fa-vials me-2"></i>Exames Lab
+        </a>
+    </div>
 </div>
 {% endblock %}
