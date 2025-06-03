@@ -40,11 +40,16 @@
         </div>
         
         <div class="card glass-card mt-4">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 text-light">
                     <i class="fas fa-x-ray me-2"></i>
                     Exames de Imagem
                 </h5>
+                <button type="button" class="btn btn-outline-info neural-btn" 
+                        onclick="abrirModalExamesPersonalizados()" 
+                        title="Gerenciar Exames Personalizados">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -165,6 +170,22 @@
                             {% endfor %}
                         </div>
                     </div>
+                    
+                    <!-- Exames Personalizados -->
+                    <div class="col-12 mb-4">
+                        <div class="card glass-card" style="border: 1px solid rgba(255, 193, 7, 0.3);">
+                            <div class="card-header" style="background: rgba(255, 193, 7, 0.1);">
+                                <h6 class="text-warning mb-0">
+                                    <i class="fas fa-user-cog me-2"></i>Exames Personalizados
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="examesPersonalizadosContainer" class="row">
+                                    <!-- Exames personalizados serão carregados aqui via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -201,4 +222,154 @@
         </a>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load custom exams on page load
+    carregarExamesPersonalizados();
+});
+
+// Functions for custom exams management
+function carregarExamesPersonalizados() {
+    fetch('/api/listar_exames_personalizados/imagem')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.exames.length > 0) {
+                const container = document.getElementById('examesPersonalizadosContainer');
+                container.innerHTML = '';
+                
+                data.exames.forEach(exame => {
+                    const examDiv = document.createElement('div');
+                    examDiv.className = 'col-md-6 mb-2';
+                    examDiv.innerHTML = `
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                   value="${exame.nome}" id="exame_custom_${exame.id}">
+                            <label class="form-check-label text-light" for="exame_custom_${exame.id}">
+                                ${exame.nome}
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-2" 
+                                    onclick="removerExamePersonalizado(${exame.id})" 
+                                    title="Remover exame">
+                                <i class="fas fa-trash fa-xs"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(examDiv);
+                });
+            }
+        })
+        .catch(error => console.error('Erro ao carregar exames personalizados:', error));
+}
+
+function abrirModalExamesPersonalizados() {
+    const modal = new bootstrap.Modal(document.getElementById('modalExamesPersonalizados'));
+    modal.show();
+}
+
+function adicionarExamePersonalizado() {
+    const nomeExame = document.getElementById('nomeNovoExame').value.trim();
+    const categoria = document.getElementById('categoriaNovoExame').value.trim();
+    
+    if (!nomeExame) {
+        alert('Por favor, digite o nome do exame.');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('nome_exame', nomeExame);
+    formData.append('tipo_exame', 'imagem');
+    formData.append('categoria', categoria);
+    
+    fetch('/api/adicionar_exame_personalizado', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('nomeNovoExame').value = '';
+            document.getElementById('categoriaNovoExame').value = '';
+            carregarExamesPersonalizados();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
+            modal.hide();
+        } else {
+            alert(data.message || 'Erro ao adicionar exame');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao adicionar exame');
+    });
+}
+
+function removerExamePersonalizado(exameId) {
+    if (confirm('Tem certeza que deseja remover este exame?')) {
+        fetch(`/api/remover_exame_personalizado/${exameId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                carregarExamesPersonalizados();
+            } else {
+                alert(data.message || 'Erro ao remover exame');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao remover exame');
+        });
+    }
+}
+</script>
+
+<!-- Modal para Gerenciar Exames Personalizados -->
+<div class="modal fade" id="modalExamesPersonalizados" tabindex="-1" aria-labelledby="modalExamesPersonalizadosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title text-light" id="modalExamesPersonalizadosLabel">
+                    <i class="fas fa-user-cog me-2"></i>Gerenciar Exames de Imagem Personalizados
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6 class="text-primary mb-3">Adicionar Novo Exame</h6>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="nomeNovoExame" class="form-label text-light">Nome do Exame</label>
+                                <input type="text" class="form-control glass-input" id="nomeNovoExame" 
+                                       placeholder="Ex: Ressonância específica customizada">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="categoriaNovoExame" class="form-label text-light">Categoria (Opcional)</label>
+                                <input type="text" class="form-control glass-input" id="categoriaNovoExame" 
+                                       placeholder="Ex: Neurológico">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-success neural-btn" onclick="adicionarExamePersonalizado()">
+                            <i class="fas fa-plus me-2"></i>Adicionar Exame
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <h6 class="text-info mb-3">Exames Personalizados Existentes</h6>
+                        <div id="listaExamesPersonalizadosModal">
+                            <!-- Lista será carregada via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-secondary">
+                <button type="button" class="btn btn-secondary neural-btn" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
