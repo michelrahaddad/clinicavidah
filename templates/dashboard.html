@@ -173,31 +173,50 @@
     const chart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Pacientes', 'Receitas', 'Exames Lab', 'Exames Imagem', 'Agendamentos'],
+            labels: ['Pacientes', 'Receitas', 'Exames Lab', 'Exames Imagem'],
             datasets: [{
-                label: 'Quantidade',
+                label: 'Meus Dados',
                 data: [
                     {{ total_pacientes }},
                     {{ total_receitas }},
                     {{ total_exames_lab }},
-                    {{ total_exames_img }},
-                    {{ total_agendamentos }}
+                    {{ total_exames_img }}
                 ],
                 backgroundColor: [
-                    'rgba(0, 150, 255, 0.8)',
-                    'rgba(40, 200, 120, 0.8)',
-                    'rgba(0, 200, 255, 0.8)',
-                    'rgba(255, 170, 0, 0.8)',
-                    'rgba(220, 53, 69, 0.8)'
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(23, 162, 184, 0.8)',
+                    'rgba(255, 193, 7, 0.8)'
                 ],
                 borderColor: [
-                    'rgba(0, 150, 255, 1)',
-                    'rgba(40, 200, 120, 1)',
-                    'rgba(0, 200, 255, 1)',
-                    'rgba(255, 170, 0, 1)',
-                    'rgba(220, 53, 69, 1)'
+                    'rgba(102, 126, 234, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(23, 162, 184, 1)',
+                    'rgba(255, 193, 7, 1)'
                 ],
                 borderWidth: 2,
+                borderRadius: 8
+            }, {
+                label: 'Total Sistema',
+                data: [
+                    {{ total_geral_pacientes }},
+                    {{ total_geral_receitas }},
+                    {{ total_geral_exames_lab }},
+                    {{ total_geral_exames_img }}
+                ],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.3)',
+                    'rgba(40, 167, 69, 0.3)',
+                    'rgba(23, 162, 184, 0.3)',
+                    'rgba(255, 193, 7, 0.3)'
+                ],
+                borderColor: [
+                    'rgba(102, 126, 234, 0.6)',
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(23, 162, 184, 0.6)',
+                    'rgba(255, 193, 7, 0.6)'
+                ],
+                borderWidth: 1,
                 borderRadius: 8
             }]
         },
