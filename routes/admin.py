@@ -86,9 +86,46 @@ def dashboard():
 @require_admin
 def estatisticas_neurais():
     """Neural statistics for admin"""
-    from routes.estatisticas_neurais import get_neural_statistics
-    stats = get_neural_statistics()
-    return render_template('admin/estatisticas_neurais.html', **stats)
+    # Import neural statistics function
+    try:
+        from sqlalchemy import func, text
+        
+        # Get neural statistics data
+        top_medicamentos = db.session.execute(text("""
+            SELECT medicamentos, COUNT(*) as count 
+            FROM receitas 
+            GROUP BY medicamentos 
+            ORDER BY count DESC 
+            LIMIT 10
+        """)).fetchall()
+        
+        top_exames_lab = db.session.execute(text("""
+            SELECT exames, COUNT(*) as count 
+            FROM exames_lab 
+            GROUP BY exames 
+            ORDER BY count DESC 
+            LIMIT 10
+        """)).fetchall()
+        
+        top_exames_img = db.session.execute(text("""
+            SELECT exames, COUNT(*) as count 
+            FROM exames_img 
+            GROUP BY exames 
+            ORDER BY count DESC 
+            LIMIT 10
+        """)).fetchall()
+        
+        stats = {
+            'top_medicamentos': top_medicamentos,
+            'top_exames_lab': top_exames_lab,
+            'top_exames_img': top_exames_img
+        }
+        
+        return render_template('admin/estatisticas_neurais.html', **stats)
+    except Exception as e:
+        logging.error(f'Error getting neural statistics: {e}')
+        flash('Erro ao carregar estatísticas neurais.', 'error')
+        return redirect(url_for('admin.dashboard'))
 
 @admin_bp.route('/backup')
 @require_admin
