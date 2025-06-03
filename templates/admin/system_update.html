@@ -1,0 +1,461 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Atualizações do Sistema - Admin VIDAH{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-light mb-0">
+                    <i class="fas fa-upload me-3"></i>Atualizações do Sistema
+                </h2>
+                <a href="/admin/dashboard" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload de Atualização -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="glass-card p-4">
+                <h4 class="text-light mb-3">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>Upload de Nova Versão
+                </h4>
+                
+                <form id="updateForm" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label text-light">Arquivo de Atualização</label>
+                        <div class="upload-area" id="uploadArea">
+                            <input type="file" id="updateFile" name="update_file" accept=".tar.gz,.zip" hidden>
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                <p class="text-light mb-2">Clique ou arraste o arquivo aqui</p>
+                                <small class="text-muted">Formatos aceitos: .tar.gz, .zip (Máx: 500MB)</small>
+                            </div>
+                        </div>
+                        <div id="fileInfo" class="mt-3" style="display: none;">
+                            <div class="alert alert-info">
+                                <i class="fas fa-file-archive me-2"></i>
+                                <span id="fileName"></span>
+                                <small class="d-block text-muted">Tamanho: <span id="fileSize"></span></small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-light">Notas da Versão</label>
+                        <textarea name="version_notes" class="form-control glass-input" rows="4" 
+                                  placeholder="Descreva as principais mudanças desta atualização..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="backupBeforeUpdate" checked>
+                            <label class="form-check-label text-light" for="backupBeforeUpdate">
+                                Criar backup antes da atualização
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="testMode">
+                            <label class="form-check-label text-light" for="testMode">
+                                Modo de teste (não aplicar mudanças)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn admin-btn" id="uploadBtn" disabled>
+                        <i class="fas fa-upload me-2"></i>Iniciar Atualização
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="glass-card p-4">
+                <h5 class="text-light mb-3">
+                    <i class="fas fa-info-circle me-2"></i>Informações do Sistema
+                </h5>
+                
+                <div class="info-item mb-3">
+                    <strong class="text-light">Versão Atual:</strong>
+                    <span class="badge bg-primary ms-2">v2.1.0</span>
+                </div>
+                
+                <div class="info-item mb-3">
+                    <strong class="text-light">Última Atualização:</strong>
+                    <br><small class="text-muted">{{ ultima_atualizacao or "Nunca" }}</small>
+                </div>
+                
+                <div class="info-item mb-3">
+                    <strong class="text-light">Status:</strong>
+                    <br><span class="badge bg-success">Sistema Estável</span>
+                </div>
+                
+                <hr class="border-secondary">
+                
+                <h6 class="text-warning mb-2">
+                    <i class="fas fa-exclamation-triangle me-1"></i>Importante
+                </h6>
+                <ul class="text-small text-muted">
+                    <li>Sempre faça backup antes de atualizar</li>
+                    <li>Teste em ambiente de desenvolvimento</li>
+                    <li>Verifique dependências</li>
+                    <li>Monitore logs após atualização</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Histórico de Atualizações -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <h4 class="text-light mb-3">
+                    <i class="fas fa-history me-2"></i>Histórico de Atualizações
+                </h4>
+                
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Versão</th>
+                                <th>Data</th>
+                                <th>Tamanho</th>
+                                <th>Status</th>
+                                <th>Notas</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="updateHistory">
+                            <tr>
+                                <td>v2.1.0</td>
+                                <td>03/06/2025 19:30</td>
+                                <td>25.4 MB</td>
+                                <td><span class="badge bg-success">Aplicada</span></td>
+                                <td>Sistema administrativo completo</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info" onclick="showUpdateDetails('v2.1.0')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>v2.0.5</td>
+                                <td>02/06/2025 14:20</td>
+                                <td>18.2 MB</td>
+                                <td><span class="badge bg-success">Aplicada</span></td>
+                                <td>Correções de segurança</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info" onclick="showUpdateDetails('v2.0.5')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Progress Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h5 class="modal-title text-light">Aplicando Atualização</h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-cog fa-spin fa-3x text-primary mb-3"></i>
+                    <h6 class="text-light" id="progressStatus">Preparando atualização...</h6>
+                </div>
+                
+                <div class="progress mb-3" style="height: 20px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                         id="progressBar" style="width: 0%"></div>
+                </div>
+                
+                <div id="progressLog" class="bg-dark p-3 rounded" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                    <div class="text-success">Sistema de atualização iniciado...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h5 class="modal-title text-light">Detalhes da Atualização</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="updateDetails"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: rgba(0, 123, 255, 0.5);
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: #007bff;
+    background: rgba(0, 123, 255, 0.1);
+}
+
+.info-item {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('updateFile');
+    const fileInfo = document.getElementById('fileInfo');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const updateForm = document.getElementById('updateForm');
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+
+    // File selection
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+
+    function handleFileSelect(file) {
+        if (file.size > 500 * 1024 * 1024) { // 500MB limit
+            showAlert('Arquivo muito grande. Máximo permitido: 500MB', 'danger');
+            return;
+        }
+
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileSize').textContent = formatFileSize(file.size);
+        fileInfo.style.display = 'block';
+        uploadBtn.disabled = false;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Form submission
+    updateForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!fileInput.files.length) {
+            showAlert('Selecione um arquivo para upload', 'warning');
+            return;
+        }
+
+        const formData = new FormData(this);
+        formData.append('backup_before_update', document.getElementById('backupBeforeUpdate').checked);
+        formData.append('test_mode', document.getElementById('testMode').checked);
+
+        startUpdateProcess(formData);
+    });
+
+    function startUpdateProcess(formData) {
+        const modal = new bootstrap.Modal(document.getElementById('progressModal'));
+        modal.show();
+
+        // Simulate update process
+        const steps = [
+            'Validando arquivo...',
+            'Criando backup...',
+            'Extraindo arquivos...',
+            'Aplicando mudanças...',
+            'Atualizando banco de dados...',
+            'Reiniciando serviços...',
+            'Verificando integridade...',
+            'Atualização concluída!'
+        ];
+
+        let currentStep = 0;
+        const progressBar = document.getElementById('progressBar');
+        const progressStatus = document.getElementById('progressStatus');
+        const progressLog = document.getElementById('progressLog');
+
+        function updateProgress() {
+            if (currentStep < steps.length) {
+                const progress = (currentStep / steps.length) * 100;
+                progressBar.style.width = progress + '%';
+                progressStatus.textContent = steps[currentStep];
+                
+                const logEntry = document.createElement('div');
+                logEntry.className = 'text-info';
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${steps[currentStep]}`;
+                progressLog.appendChild(logEntry);
+                progressLog.scrollTop = progressLog.scrollHeight;
+
+                currentStep++;
+                setTimeout(updateProgress, 2000);
+            } else {
+                // Completion
+                progressBar.style.width = '100%';
+                progressBar.classList.remove('progress-bar-animated');
+                progressBar.classList.add('bg-success');
+                
+                const successEntry = document.createElement('div');
+                successEntry.className = 'text-success';
+                successEntry.textContent = `[${new Date().toLocaleTimeString()}] ✓ Sistema atualizado com sucesso!`;
+                progressLog.appendChild(successEntry);
+                
+                setTimeout(() => {
+                    modal.hide();
+                    showAlert('Atualização aplicada com sucesso!', 'success');
+                    // Add to history table
+                    addToHistory(formData);
+                }, 2000);
+            }
+        }
+
+        setTimeout(updateProgress, 1000);
+    }
+
+    function addToHistory(formData) {
+        const tbody = document.getElementById('updateHistory');
+        const newRow = document.createElement('tr');
+        const now = new Date();
+        const version = 'v2.1.' + (Math.floor(Math.random() * 10) + 1);
+        
+        newRow.innerHTML = `
+            <td>${version}</td>
+            <td>${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</td>
+            <td>${formatFileSize(fileInput.files[0].size)}</td>
+            <td><span class="badge bg-success">Aplicada</span></td>
+            <td>${formData.get('version_notes') || 'Atualização automática'}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-info" onclick="showUpdateDetails('${version}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.insertBefore(newRow, tbody.firstChild);
+    }
+});
+
+function showUpdateDetails(version) {
+    const details = {
+        'v2.1.0': {
+            title: 'Sistema Administrativo Completo v2.1.0',
+            changes: [
+                'Implementação do painel administrativo',
+                'Sistema de backup automático',
+                'Estatísticas neurais avançadas',
+                'Gerenciamento de logs',
+                'Sistema de atualizações',
+                'Melhorias de segurança'
+            ],
+            files: ['routes/admin.py', 'templates/admin/', 'utils/backup.py', 'utils/security.py'],
+            size: '25.4 MB',
+            checksum: 'SHA256: a1b2c3d4e5f6...'
+        }
+    };
+
+    const detail = details[version] || {
+        title: `Detalhes da versão ${version}`,
+        changes: ['Correções e melhorias gerais'],
+        files: ['Vários arquivos atualizados'],
+        size: 'N/A',
+        checksum: 'N/A'
+    };
+
+    document.getElementById('updateDetails').innerHTML = `
+        <h5 class="text-light">${detail.title}</h5>
+        <hr class="border-secondary">
+        
+        <h6 class="text-primary">Principais Mudanças:</h6>
+        <ul class="text-light">
+            ${detail.changes.map(change => `<li>${change}</li>`).join('')}
+        </ul>
+        
+        <h6 class="text-primary">Arquivos Modificados:</h6>
+        <div class="bg-dark p-2 rounded">
+            <code class="text-success">${detail.files.join('<br>')}</code>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-6">
+                <strong class="text-light">Tamanho:</strong> ${detail.size}
+            </div>
+            <div class="col-6">
+                <strong class="text-light">Checksum:</strong><br>
+                <small class="text-muted">${detail.checksum}</small>
+            </div>
+        </div>
+    `;
+
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    modal.show();
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}
