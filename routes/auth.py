@@ -22,7 +22,8 @@ def login():
             medico = Medico.query.filter_by(nome=nome, crm=crm).first()
             
             if medico and medico.senha and check_password_hash(medico.senha, senha):
-                session['usuario'] = {
+                session['usuario'] = medico.nome
+                session['medico_data'] = {
                     'id': medico.id,
                     'nome': medico.nome,
                     'crm': medico.crm
@@ -43,7 +44,7 @@ def login():
 @auth_bp.route('/logout')
 def logout():
     """Handle user logout"""
-    user_name = session.get('usuario', {}).get('nome', 'Unknown')
+    user_name = session.get('usuario', 'Unknown')
     session.clear()
     flash('Logout realizado com sucesso.', 'info')
     logging.info(f'User logged out: {user_name}')

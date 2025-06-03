@@ -70,8 +70,8 @@
                     
                     <div class="mb-3 user-info">
                         <small class="text-muted">Logado como:</small>
-                        <div class="fw-bold text-light">{{ session.usuario.nome }}</div>
-                        <small class="text-muted">CRM: {{ session.usuario.crm }}</small>
+                        <div class="fw-bold text-light">{{ session.medico_data.nome }}</div>
+                        <small class="text-muted">CRM: {{ session.medico_data.crm }}</small>
                     </div>
                     
                     <ul class="nav flex-column">
@@ -109,6 +109,24 @@
                             <a class="nav-link" href="{{ url_for('pacientes.novo_paciente') }}">
                                 <i class="fas fa-user-plus me-2"></i>
                                 Novo Paciente
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('relatorio_medico.relatorio_medico') }}">
+                                <i class="fas fa-file-medical-alt me-2"></i>
+                                Relatório Médico
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('atestado_medico.atestado_medico') }}">
+                                <i class="fas fa-certificate me-2"></i>
+                                Atestado Médico
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('formulario_alto_custo.formulario_alto_custo') }}">
+                                <i class="fas fa-dollar-sign me-2"></i>
+                                Formulário Alto Custo
                             </a>
                         </li>
                         <li class="nav-item mt-3">
