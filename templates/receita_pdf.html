@@ -78,27 +78,9 @@
         }
         .logo-section {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 30px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .logo-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            opacity: 0.3;
-        }
-        .logo-content {
-            position: relative;
-            z-index: 2;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid #000;
         }
         .clinic-address {
             font-size: 10pt;
@@ -107,11 +89,11 @@
             line-height: 1.4;
         }
         .document-header {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: #f8f9fa;
             padding: 15px;
-            border-radius: 8px;
+            border: 1px solid #ddd;
             margin: 20px 0;
-            border-left: 4px solid #28a745;
+            border-left: 4px solid #000;
         }
         .patient-section {
             background: #f8f9fa;
@@ -132,28 +114,21 @@
 </head>
 <body>
     <div class="logo-section">
-        <div class="logo-content">
-            <div style="margin-bottom: 20px;">
-                <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 16pt; color: rgba(255,255,255,0.9); margin-bottom: 8px; font-weight: 300; text-transform: uppercase; letter-spacing: 2px;">Grupo</div>
-                <div style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 56pt; font-weight: 800; color: #ffffff; letter-spacing: 8px; line-height: 1; text-shadow: 0 4px 8px rgba(0,0,0,0.3);">
-                    VIDAH
-                </div>
-                <div style="width: 80px; height: 3px; background: linear-gradient(90deg, #00d4ff, #ff6b6b); margin: 15px auto; border-radius: 2px;"></div>
+        <div style="margin-bottom: 15px;">
+            <div style="font-family: 'Arial', sans-serif; font-size: 12pt; color: #333; margin-bottom: 5px; font-weight: normal; letter-spacing: 1px;">Grupo</div>
+            <div style="font-family: 'Arial', sans-serif; font-size: 36pt; font-weight: bold; color: #000; letter-spacing: 4px; line-height: 1;">
+                VIDAH
             </div>
-            <div style="color: rgba(255,255,255,0.95); font-size: 11pt; line-height: 1.6; font-weight: 400;">
-                <div style="margin-bottom: 8px;">
-                    <span style="color: #00d4ff;">📍</span> R. XV de Novembro, 594 - Centro, Ibitinga - SP, 14940-000
-                </div>
-                <div>
-                    <span style="color: #00d4ff;">📞</span> (16) 3342-4768
-                </div>
-            </div>
+        </div>
+        <div style="color: #333; font-size: 10pt; line-height: 1.4;">
+            <div>R. XV de Novembro, 594 - Centro, Ibitinga - SP, 14940-000</div>
+            <div>Telefone: (16) 3342-4768</div>
         </div>
     </div>
     
     <div class="document-header">
-        <h2 style="margin: 0; color: #28a745; font-size: 18pt;">RECEITUÁRIO MÉDICO</h2>
-        <p style="margin: 5px 0 0 0; color: #666; font-size: 10pt;">Data: {{ data }}</p>
+        <h2 style="margin: 0; color: #000; font-size: 16pt; font-weight: bold;">RECEITUÁRIO MÉDICO</h2>
+        <p style="margin: 5px 0 0 0; color: #333; font-size: 10pt;">Data: {{ data }}</p>
     </div>
     
     <div class="patient-section">
