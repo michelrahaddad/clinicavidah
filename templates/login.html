@@ -70,11 +70,20 @@
                             </div>
                         </div>
                         
-                        <button type="submit" class="btn btn-gradient btn-lg w-100 mb-4 neural-btn py-3" 
+                        <button type="submit" class="btn btn-gradient btn-lg w-100 mb-3 neural-btn py-3" 
                                 style="background: linear-gradient(45deg, #007bff, #17a2b8); border: none; color: white; font-weight: 600; border-radius: 25px; box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);">
                             <i class="fas fa-sign-in-alt me-2"></i>
                             Acessar Sistema
                         </button>
+                        
+                        <div class="text-center mb-4">
+                            <a href="{{ url_for('password_recovery.forgot_password') }}" 
+                               class="text-decoration-none text-light-emphasis" 
+                               style="font-size: 0.9rem;">
+                                <i class="fas fa-key me-1"></i>
+                                Esqueci minha senha
+                            </a>
+                        </div>
                     </form>
         
                     <div class="text-center pb-4">

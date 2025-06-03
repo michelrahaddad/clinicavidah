@@ -47,6 +47,7 @@ def create_app():
     from routes.medicos import medicos_bp
     from routes.api import api_bp
     from routes.pacientes import pacientes_bp
+    from routes.password_recovery import password_recovery_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -58,6 +59,7 @@ def create_app():
     app.register_blueprint(medicos_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(pacientes_bp)
+    app.register_blueprint(password_recovery_bp)
     
     # Create tables
     with app.app_context():
