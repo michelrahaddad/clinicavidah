@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response
 from utils.db import get_db_connection, insert_patient_if_not_exists
 from utils.forms import validar_medicamentos, sanitizar_entrada
-from models import Medico, Receita, Prontuario
+from models import Medico, Receita, Prontuario, Paciente
 from app import db
 from datetime import datetime
 import logging
@@ -164,8 +164,15 @@ def gerar_pdf_reimprimir_receita(receita_obj):
         medico = Medico.query.get(session['usuario']['id'])
         data_atual = datetime.now().strftime('%d/%m/%Y')
         
+        # Get complete patient data
+        paciente = Paciente.query.get(receita_obj.id_paciente)
+        
         pdf_html = render_template('receita_pdf.html',
                                  nome_paciente=receita_obj.nome_paciente,
+                                 cpf_paciente=paciente.cpf if paciente else None,
+                                 idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
+                                 endereco_paciente=paciente.endereco if paciente else None,
+                                 cidade_uf_paciente=paciente.cidade_uf if paciente else None,
                                  medicamentos=receita_obj.medicamentos.split(','),
                                  posologias=receita_obj.posologias.split(','),
                                  duracoes=receita_obj.duracoes.split(','),
