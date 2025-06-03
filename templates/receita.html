@@ -46,84 +46,114 @@
         </div>
         
         <div class="card glass-card mt-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 text-light">
-                    <i class="fas fa-pills me-2"></i>
-                    Medicamentos
-                </h5>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-sm btn-outline-warning neural-btn" onclick="limparReceita()">
-                        <i class="fas fa-broom me-2"></i>Limpar Receita
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-primary neural-btn" onclick="adicionarMedicamento()">
-                        <i class="fas fa-plus me-2"></i>Adicionar Medicamento
-                    </button>
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-pills me-2 text-info"></i>
+                        Medicamentos Prescritos
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-warning neural-btn px-3 py-1" onclick="limparReceita()" style="border-radius: 12px; font-size: 0.8rem;">
+                            <i class="fas fa-broom me-1"></i>Limpar
+                        </button>
+                        <button type="button" class="btn btn-sm btn-info neural-btn px-3 py-1" onclick="adicionarMedicamento()" style="border-radius: 12px; font-size: 0.8rem;">
+                            <i class="fas fa-plus me-1"></i>Adicionar
+                        </button>
+                    </div>
                 </div>
+                <p class="text-muted mb-0 small">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Preencha todos os campos obrigatórios para cada medicamento
+                </p>
             </div>
             <div class="card-body">
                 <div id="medicamentos-container">
                     {% if refazer and receita and receita.medicamentos %}
                         {% for med in receita.medicamentos %}
-                        <div class="medicamento-row mb-3 glass-card p-3">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label text-light">Medicamento *</label>
-                                    <input type="text" name="medicamento[]" class="form-control glass-input" 
-                                           placeholder="Nome do medicamento" value="{{ med.nome }}" required>
+                        <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-info mb-0 fw-bold">
+                                    <i class="fas fa-capsules me-2"></i>Medicamento {{ loop.index }}
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-outline-danger neural-btn" onclick="removerMedicamento(this)" style="border-radius: 10px; padding: 4px 8px;">
+                                    <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
+                                </button>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-pills me-1 text-success"></i>Medicamento *
+                                    </label>
+                                    <input type="text" name="medicamento[]" class="form-control glass-input form-control-lg" 
+                                           placeholder="Nome do medicamento" value="{{ med.nome }}" required
+                                           style="font-size: 1rem; font-weight: 500;">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-light">Posologia *</label>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-prescription me-1 text-warning"></i>Posologia *
+                                    </label>
                                     <input type="text" name="posologia[]" class="form-control glass-input" 
                                            placeholder="Ex: 1 comprimido" value="{{ med.posologia }}" required>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label text-light">Duração *</label>
+                                <div class="col-lg-2 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-clock me-1 text-info"></i>Duração *
+                                    </label>
                                     <input type="text" name="duracao[]" class="form-control glass-input" 
                                            placeholder="Ex: 7 dias" value="{{ med.duracao }}" required>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-light">Via *</label>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-route me-1 text-primary"></i>Via *
+                                    </label>
                                     <input type="text" name="via[]" class="form-control glass-input" 
                                            placeholder="Ex: Oral" value="{{ med.via }}" required>
-                                </div>
-                                <div class="col-md-1 d-flex align-items-end">
-                                    <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="medicamento-row mb-3 glass-card p-3">
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label class="form-label text-light">Medicamento *</label>
+                        <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="text-info mb-0 fw-bold">
+                                    <i class="fas fa-capsules me-2"></i>Medicamento 1
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-outline-danger neural-btn" onclick="removerMedicamento(this)" style="border-radius: 10px; padding: 4px 8px;">
+                                    <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
+                                </button>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-lg-4 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-pills me-1 text-success"></i>Medicamento *
+                                    </label>
                                     <div class="position-relative">
-                                        <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
-                                               placeholder="Digite para buscar medicamento..." required autocomplete="off">
+                                        <input type="text" name="medicamento[]" class="form-control glass-input form-control-lg medicamento-autocomplete" 
+                                               placeholder="Digite para buscar medicamento..." required autocomplete="off"
+                                               style="font-size: 1rem; font-weight: 500;">
                                         <div class="medicamento-suggestions"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-light">Posologia *</label>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-prescription me-1 text-warning"></i>Posologia *
+                                    </label>
                                     <input type="text" name="posologia[]" class="form-control glass-input" 
                                            placeholder="Ex: 1 comprimido" required>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label text-light">Duração *</label>
+                                <div class="col-lg-2 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-clock me-1 text-info"></i>Duração *
+                                    </label>
                                     <input type="text" name="duracao[]" class="form-control glass-input" 
                                            placeholder="Ex: 7 dias" required>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label text-light">Via *</label>
+                                <div class="col-lg-3 col-md-6">
+                                    <label class="form-label text-light fw-semibold">
+                                        <i class="fas fa-route me-1 text-primary"></i>Via *
+                                    </label>
                                     <input type="text" name="via[]" class="form-control glass-input" 
                                            placeholder="Ex: Oral" required>
-                                </div>
-                                <div class="col-md-1 d-flex align-items-end">
-                                    <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -147,37 +177,51 @@
 <script>
 function adicionarMedicamento() {
     const container = document.getElementById('medicamentos-container');
+    const medicamentoCount = container.children.length + 1;
     const div = document.createElement('div');
-    div.className = 'medicamento-row mb-3 glass-card p-3';
+    div.className = 'medicamento-row mb-4 p-4';
+    div.style.cssText = 'background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);';
     div.innerHTML = `
-        <div class="row">
-            <div class="col-md-3">
-                <label class="form-label text-light">Medicamento *</label>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="text-info mb-0 fw-bold">
+                <i class="fas fa-capsules me-2"></i>Medicamento ${medicamentoCount}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger neural-btn" onclick="removerMedicamento(this)" style="border-radius: 10px; padding: 4px 8px;">
+                <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
+            </button>
+        </div>
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <label class="form-label text-light fw-semibold">
+                    <i class="fas fa-pills me-1 text-success"></i>Medicamento *
+                </label>
                 <div class="position-relative">
-                    <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
-                           placeholder="Digite para buscar medicamento..." required autocomplete="off">
+                    <input type="text" name="medicamento[]" class="form-control glass-input form-control-lg medicamento-autocomplete" 
+                           placeholder="Digite para buscar medicamento..." required autocomplete="off"
+                           style="font-size: 1rem; font-weight: 500;">
                     <div class="medicamento-suggestions"></div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <label class="form-label text-light">Posologia *</label>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-light fw-semibold">
+                    <i class="fas fa-prescription me-1 text-warning"></i>Posologia *
+                </label>
                 <input type="text" name="posologia[]" class="form-control glass-input" 
                        placeholder="Ex: 1 comprimido" required>
             </div>
-            <div class="col-md-2">
-                <label class="form-label text-light">Duração *</label>
+            <div class="col-lg-2 col-md-6">
+                <label class="form-label text-light fw-semibold">
+                    <i class="fas fa-clock me-1 text-info"></i>Duração *
+                </label>
                 <input type="text" name="duracao[]" class="form-control glass-input" 
                        placeholder="Ex: 7 dias" required>
             </div>
-            <div class="col-md-3">
-                <label class="form-label text-light">Via *</label>
+            <div class="col-lg-3 col-md-6">
+                <label class="form-label text-light fw-semibold">
+                    <i class="fas fa-route me-1 text-primary"></i>Via *
+                </label>
                 <input type="text" name="via[]" class="form-control glass-input" 
                        placeholder="Ex: Oral" required>
-            </div>
-            <div class="col-md-1 d-flex align-items-end">
-                <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
-                    <i class="fas fa-trash"></i>
-                </button>
             </div>
         </div>
     `;
