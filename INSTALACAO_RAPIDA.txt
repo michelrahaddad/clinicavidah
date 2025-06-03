@@ -1,0 +1,58 @@
+======================================
+  SISTEMA MÉDICO VIDAH - INSTALAÇÃO
+======================================
+
+🔹 COMO BAIXAR O SISTEMA COMPLETO:
+
+No Replit:
+1. Clique nos 3 pontinhos (...) no painel de arquivos
+2. Selecione "Download as zip"
+3. Extraia o arquivo ZIP em seu computador
+
+🔹 INSTALAÇÃO EM 3 PASSOS:
+
+WINDOWS:
+--------
+1. Instale Python: https://python.org
+2. Abra PowerShell na pasta extraída
+3. Execute:
+   python -m venv venv
+   venv\Scripts\activate
+   pip install Flask Flask-SQLAlchemy Flask-WTF WeasyPrint
+   python main.py
+
+MACOS:
+------
+1. Instale Python: brew install python
+2. Abra Terminal na pasta extraída
+3. Execute:
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install Flask Flask-SQLAlchemy Flask-WTF WeasyPrint
+   python main.py
+
+LINUX:
+------
+1. Instale: sudo apt install python3 python3-pip python3-venv
+2. Na pasta extraída execute:
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install Flask Flask-SQLAlchemy Flask-WTF WeasyPrint
+   python3 main.py
+
+🔹 ACESSO:
+- Abra navegador: http://localhost:5000
+- Login: Michel Raineri HAddad
+- CRM: 123456-SP
+- Senha: 123456
+
+🔹 FUNCIONALIDADES:
+✓ Login seguro com recuperação de senha
+✓ Receitas com 200 medicamentos
+✓ Exames laboratoriais e de imagem
+✓ Seção cardiológica especializada
+✓ Prontuário eletrônico
+✓ Agenda de consultas
+✓ PDFs profissionais para impressão A4
+
+======================================
