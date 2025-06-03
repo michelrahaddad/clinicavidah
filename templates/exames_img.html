@@ -50,6 +50,34 @@
                 <div class="row">
                     {% set exames_selecionados = exame.exames if refazer and exame else [] %}
                     
+                    <!-- Exames Cardiológicos - Destaque Principal -->
+                    <div class="col-12 mb-4">
+                        <div class="card glass-card" style="border: 2px solid #dc3545; background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);">
+                            <div class="card-header" style="background: rgba(220, 53, 69, 0.1); border-bottom: 1px solid #dc3545;">
+                                <h5 class="text-danger mb-0">
+                                    <i class="fas fa-heartbeat me-2"></i>Exames Cardiológicos
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    {% for exame_nome in ['Ecocardiograma', 'Holter 24h', 'MAPA', 'Eletrocardiograma (ECG)', 'Monitor cardíaco', 'Espirometria', 'Polissonografia', 'Telemetria', 'Tilt Test', 'Angiotomografia de coronárias', 'Estudo eletrofisiológico', 'Cateterismo cardíaco'] %}
+                                    <div class="col-md-4 col-sm-6 mb-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="exames[]" 
+                                                   value="{{ exame_nome }}" 
+                                                   id="exame_cardio_{{ loop.index }}"
+                                                   {{ 'checked' if exame_nome in exames_selecionados else '' }}>
+                                            <label class="form-check-label text-light" for="exame_cardio_{{ loop.index }}">
+                                                {{ exame_nome }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Radiologia Simples -->
                     <div class="col-md-6 mb-4">
                         <h6 class="text-primary mb-3">
@@ -78,7 +106,7 @@
                             <i class="fas fa-circle-notch me-2"></i>Tomografia
                         </h6>
                         <div class="row">
-                            {% for exame_nome in ['TC Crânio', 'TC Tórax', 'TC Abdome', 'TC Pelve', 'TC Coluna', 'TC com Contraste'] %}
+                            {% for exame_nome in ['TC Crânio', 'TC Tórax', 'TC Abdome', 'TC Pelve', 'TC Coluna'] %}
                             <div class="col-12 mb-2">
                                 <div class="form-check">
                                     <input class="form-check-input" type="checkbox" name="exames[]" 
