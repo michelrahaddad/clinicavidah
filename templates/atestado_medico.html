@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}Atestado Médico - Sistema VIDAH{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-certificate text-danger me-3" style="font-size: 2rem;"></i>
+                    <div>
+                        <h2 class="mb-0 text-light">Atestado Médico</h2>
+                        <p class="text-muted mb-0">Emita atestados para afastamento de atividades</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light neural-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+
+            <form method="POST" action="{{ url_for('atestado_medico.salvar_atestado_medico') }}" class="needs-validation" novalidate>
+                <!-- Informações do Paciente -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-user me-2 text-danger"></i>
+                            Informações do Paciente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="nome_paciente" class="form-label text-light">
+                                    <i class="fas fa-user me-2"></i>Nome do Paciente *
+                                </label>
+                                <div class="position-relative">
+                                    <input type="text" 
+                                           name="nome_paciente" 
+                                           id="nome_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="Digite o nome do paciente..."
+                                           value="{{ nome_paciente }}"
+                                           autocomplete="off"
+                                           required>
+                                    <div id="paciente-suggestions" class="suggestions-dropdown"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cid_search" class="form-label text-light">
+                                    <i class="fas fa-search me-2"></i>CID-10 (Opcional)
+                                </label>
+                                <div class="position-relative">
+                                    <input type="text" 
+                                           id="cid_search"
+                                           class="form-control glass-input" 
+                                           placeholder="Digite para buscar CID-10..."
+                                           value=""
+                                           autocomplete="off">
+                                    <input type="hidden" name="cid_codigo" id="cid_codigo" value="">
+                                    <input type="hidden" name="cid_descricao" id="cid_descricao" value="">
+                                    <div id="cid-suggestions" class="suggestions-dropdown"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações do Afastamento -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-calendar-times me-2 text-danger"></i>
+                            Informações do Afastamento
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="dias_afastamento" class="form-label text-light">
+                                    <i class="fas fa-calendar me-2"></i>Dias de Afastamento *
+                                </label>
+                                <input type="number" 
+                                       name="dias_afastamento" 
+                                       id="dias_afastamento"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: 3"
+                                       min="1"
+                                       max="365"
+                                       value="1"
+                                       required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="data_inicio" class="form-label text-light">
+                                    <i class="fas fa-calendar-check me-2"></i>Data de Início *
+                                </label>
+                                <input type="date" 
+                                       name="data_inicio" 
+                                       id="data_inicio"
+                                       class="form-control glass-input" 
+                                       value="{{ data_atual.split('/')[2] }}-{{ data_atual.split('/')[1] }}-{{ data_atual.split('/')[0] }}"
+                                       required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="data_fim" class="form-label text-light">
+                                    <i class="fas fa-calendar-times me-2"></i>Data de Fim
+                                </label>
+                                <input type="date" 
+                                       id="data_fim"
+                                       class="form-control glass-input" 
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            A data de fim será calculada automaticamente com base nos dias de afastamento
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="d-flex justify-content-between mb-4">
+                    <button type="button" class="btn btn-outline-warning neural-btn" onclick="limparFormulario()">
+                        <i class="fas fa-broom me-2"></i>Limpar
+                    </button>
+                    <button type="submit" class="btn btn-danger neural-btn">
+                        <i class="fas fa-certificate me-2"></i>Gerar Atestado
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-complete for patients
+document.getElementById('nome_paciente').addEventListener('input', function() {
+    const query = this.value;
+    if (query.length >= 2) {
+        fetch(`/api/buscar_pacientes?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const suggestions = document.getElementById('paciente-suggestions');
+                suggestions.innerHTML = '';
+                
+                if (data.length > 0) {
+                    suggestions.style.display = 'block';
+                    data.forEach(patient => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = patient.nome;
+                        div.addEventListener('click', () => {
+                            document.getElementById('nome_paciente').value = patient.nome;
+                            suggestions.style.display = 'none';
+                        });
+                        suggestions.appendChild(div);
+                    });
+                }
+            });
+    }
+});
+
+// Auto-complete for CID-10
+document.getElementById('cid_search').addEventListener('input', function() {
+    const query = this.value;
+    if (query.length >= 2) {
+        fetch(`/api/buscar_cid10?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const suggestions = document.getElementById('cid-suggestions');
+                suggestions.innerHTML = '';
+                
+                if (data.length > 0) {
+                    suggestions.style.display = 'block';
+                    data.forEach(cid => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.innerHTML = `<strong>${cid.codigo}</strong> - ${cid.descricao}`;
+                        div.addEventListener('click', () => {
+                            document.getElementById('cid_search').value = `${cid.codigo} - ${cid.descricao}`;
+                            document.getElementById('cid_codigo').value = cid.codigo;
+                            document.getElementById('cid_descricao').value = cid.descricao;
+                            suggestions.style.display = 'none';
+                        });
+                        suggestions.appendChild(div);
+                    });
+                }
+            });
+    }
+});
+
+// Calculate end date automatically
+function calcularDataFim() {
+    const diasAfastamento = parseInt(document.getElementById('dias_afastamento').value) || 1;
+    const dataInicio = document.getElementById('data_inicio').value;
+    
+    if (dataInicio) {
+        const inicio = new Date(dataInicio);
+        const fim = new Date(inicio);
+        fim.setDate(inicio.getDate() + diasAfastamento - 1);
+        
+        document.getElementById('data_fim').value = fim.toISOString().split('T')[0];
+    }
+}
+
+// Add event listeners for date calculation
+document.getElementById('dias_afastamento').addEventListener('input', calcularDataFim);
+document.getElementById('data_inicio').addEventListener('change', calcularDataFim);
+
+// Initial calculation
+calcularDataFim();
+
+// Clear form function
+function limparFormulario() {
+    if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+        document.getElementById('dias_afastamento').value = '1';
+        document.getElementById('cid_search').value = '';
+        document.getElementById('cid_codigo').value = '';
+        document.getElementById('cid_descricao').value = '';
+        calcularDataFim();
+    }
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.position-relative')) {
+        document.getElementById('paciente-suggestions').style.display = 'none';
+        document.getElementById('cid-suggestions').style.display = 'none';
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        document.querySelector('form').submit();
+    }
+});
+</script>
+{% endblock %}
