@@ -6,8 +6,7 @@
     <style>
         @page {
             size: A4;
-            margin: 2.5cm 2cm;
-
+            margin: 1.5cm 2cm;
         }
         body {
             font-family: Arial, sans-serif;
@@ -69,14 +68,15 @@
             padding: 0;
         }
         .exams-list li {
-            padding: 12px 15px;
+            padding: 8px 12px;
             border: 2px solid #333;
             background-color: #f8f9fa;
-            margin: 10px 0;
-            border-radius: 5px;
+            margin: 5px 0;
+            border-radius: 3px;
             font-weight: bold;
-            font-size: 14pt;
+            font-size: 12pt;
             color: #000;
+            page-break-inside: avoid;
         }
         .exams-list li:before {
             content: "✓ ";
@@ -93,7 +93,7 @@
             color: #666;
         }
         .signature {
-            margin-top: 60px;
+            margin-top: 30px;
             page-break-inside: avoid;
             text-align: center;
         }
@@ -107,7 +107,7 @@
             color: #28a745;
             font-size: 14pt;
             font-weight: bold;
-            margin: 25px 0 20px 0;
+            margin: 15px 0 15px 0;
             text-align: center;
         }
     </style>
