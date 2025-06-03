@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    .detailed-stats-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .stat-item {
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 5px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 3px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        margin-bottom: 30px;
+    }
+
+    .stats-card {
+        min-height: 500px;
+    }
+
+    .badge-large {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header with navigation -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light me-3 neural-btn">
+                        <i class="fas fa-arrow-left me-2"></i>Dashboard
+                    </a>
+                    <h1 class="mb-0 page-title">
+                        <i class="fas fa-brain me-3 text-primary"></i>
+                        <span class="gradient-text">Estatísticas Neurais</span>
+                    </h1>
+                </div>
+                <div>
+                    <a href="{{ url_for('relatorios.relatorio_estatisticas_pdf') }}" 
+                       class="btn btn-primary neural-btn px-4 py-2" target="_blank">
+                        <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Statistics Chart -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card glass-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-chart-bar me-2 text-primary"></i>
+                        Visão Geral das Estatísticas
+                    </h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-success me-2" onclick="toggleChart()">
+                            <i class="fas fa-exchange-alt me-1"></i>
+                            <span id="chartToggleText">Evolução Mensal</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="statsChart"></canvas>
+                        <canvas id="evolutionChart" style="display: none;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Statistics -->
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card glass-card stats-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-pills me-2 text-success"></i>
+                        Medicamentos Mais Prescritos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="detailed-stats-list">
+                        {% if detailed_stats.medicamentos %}
+                            {% for med in detailed_stats.medicamentos %}
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-light mb-1">{{ med.nome[:40] }}{% if med.nome|length > 40 %}...{% endif %}</h6>
+                                    <small class="text-muted">Posição {{ loop.index }}º</small>
+                                </div>
+                                <span class="badge bg-success badge-large">{{ med.quantidade }}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-pills fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Nenhum medicamento prescrito ainda</p>
+                                <small>Comece prescrevendo receitas para ver as estatísticas</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card glass-card stats-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-vials me-2 text-info"></i>
+                        Exames Laboratoriais Mais Solicitados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="detailed-stats-list">
+                        {% if detailed_stats.exames_lab %}
+                            {% for exam in detailed_stats.exames_lab %}
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-light mb-1">{{ exam.nome[:40] }}{% if exam.nome|length > 40 %}...{% endif %}</h6>
+                                    <small class="text-muted">Posição {{ loop.index }}º</small>
+                                </div>
+                                <span class="badge bg-info badge-large">{{ exam.quantidade }}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-vials fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Nenhum exame laboratorial solicitado ainda</p>
+                                <small>Comece solicitando exames para ver as estatísticas</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card glass-card stats-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-x-ray me-2 text-warning"></i>
+                        Exames de Imagem Mais Solicitados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="detailed-stats-list">
+                        {% if detailed_stats.exames_img %}
+                            {% for exam in detailed_stats.exames_img %}
+                            <div class="stat-item d-flex justify-content-between align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-light mb-1">{{ exam.nome[:40] }}{% if exam.nome|length > 40 %}...{% endif %}</h6>
+                                    <small class="text-muted">Posição {{ loop.index }}º</small>
+                                </div>
+                                <span class="badge bg-warning badge-large">{{ exam.quantidade }}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="fas fa-x-ray fa-3x mb-3 opacity-50"></i>
+                                <p class="mb-0">Nenhum exame de imagem solicitado ainda</p>
+                                <small>Comece solicitando exames para ver as estatísticas</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard Button -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light neural-btn px-5 py-3">
+                <i class="fas fa-tachometer-alt me-2"></i>Voltar ao Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Main Statistics Chart (Bar Chart)
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Pacientes', 'Receitas', 'Exames Lab', 'Exames Imagem'],
+            datasets: [{
+                label: 'Meus Dados',
+                data: [
+                    {{ total_pacientes }},
+                    {{ total_receitas }},
+                    {{ total_exames_lab }},
+                    {{ total_exames_img }}
+                ],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.8)',
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(23, 162, 184, 0.8)',
+                    'rgba(255, 193, 7, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(102, 126, 234, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(23, 162, 184, 1)',
+                    'rgba(255, 193, 7, 1)'
+                ],
+                borderWidth: 2,
+                borderRadius: 8
+            }, {
+                label: 'Total Sistema',
+                data: [
+                    {{ total_geral_pacientes }},
+                    {{ total_geral_receitas }},
+                    {{ total_geral_exames_lab }},
+                    {{ total_geral_exames_img }}
+                ],
+                backgroundColor: [
+                    'rgba(102, 126, 234, 0.3)',
+                    'rgba(40, 167, 69, 0.3)',
+                    'rgba(23, 162, 184, 0.3)',
+                    'rgba(255, 193, 7, 0.3)'
+                ],
+                borderColor: [
+                    'rgba(102, 126, 234, 0.6)',
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(23, 162, 184, 0.6)',
+                    'rgba(255, 193, 7, 0.6)'
+                ],
+                borderWidth: 1,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#ffffff'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Evolution Chart (Line Chart)
+    const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
+    const evolutionChart = new Chart(evolutionCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_evolution.months | tojson }},
+            datasets: [{
+                label: 'Receitas',
+                data: {{ monthly_evolution.receitas | tojson }},
+                borderColor: 'rgba(102, 126, 234, 1)',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Exames Lab',
+                data: {{ monthly_evolution.exames_lab | tojson }},
+                borderColor: 'rgba(23, 162, 184, 1)',
+                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Exames Imagem',
+                data: {{ monthly_evolution.exames_img | tojson }},
+                borderColor: 'rgba(255, 193, 7, 1)',
+                backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#ffffff'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#ffffff'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#ffffff'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Chart toggle functionality
+    let currentChart = 'stats';
+    
+    window.toggleChart = function() {
+        const statsChart = document.getElementById('statsChart');
+        const evolutionChart = document.getElementById('evolutionChart');
+        const toggleText = document.getElementById('chartToggleText');
+        
+        if (currentChart === 'stats') {
+            statsChart.style.display = 'none';
+            evolutionChart.style.display = 'block';
+            toggleText.textContent = 'Estatísticas Gerais';
+            currentChart = 'evolution';
+        } else {
+            statsChart.style.display = 'block';
+            evolutionChart.style.display = 'none';
+            toggleText.textContent = 'Evolução Mensal';
+            currentChart = 'stats';
+        }
+    };
+</script>
+{% endblock %}

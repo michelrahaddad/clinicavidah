@@ -194,106 +194,20 @@
     <div class="row">
         <div class="col-12">
             <div class="card glass-card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="mb-0 text-light">
                         <i class="fas fa-chart-bar me-2 text-primary"></i>
                         Estatísticas Neurais
                     </h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-success me-2" onclick="toggleChart()">
-                            <i class="fas fa-exchange-alt me-1"></i>
-                            <span id="chartToggleText">Evolução</span>
-                        </button>
-                        <a href="{{ url_for('relatorios.relatorio_estatisticas_pdf') }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                            <i class="fas fa-file-pdf me-1"></i>Exportar PDF
-                        </a>
-                    </div>
                 </div>
                 <div class="card-body">
                     <canvas id="statsChart" height="100"></canvas>
-                    <canvas id="evolutionChart" height="100" style="display: none;"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Detailed Statistics -->
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card glass-card">
-                <div class="card-header">
-                    <h6 class="mb-0 text-light">
-                        <i class="fas fa-pills me-2 text-success"></i>
-                        Top Medicamentos Prescritos
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="detailed-stats-list">
-                        {% if detailed_stats.medicamentos %}
-                            {% for med in detailed_stats.medicamentos %}
-                            <div class="stat-item d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-light small">{{ med.nome[:30] }}{% if med.nome|length > 30 %}...{% endif %}</span>
-                                <span class="badge bg-success">{{ med.quantidade }}</span>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-muted small mb-0">Nenhum medicamento prescrito ainda</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card glass-card">
-                <div class="card-header">
-                    <h6 class="mb-0 text-light">
-                        <i class="fas fa-vials me-2 text-info"></i>
-                        Top Exames Laboratoriais
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="detailed-stats-list">
-                        {% if detailed_stats.exames_lab %}
-                            {% for exam in detailed_stats.exames_lab %}
-                            <div class="stat-item d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-light small">{{ exam.nome[:30] }}{% if exam.nome|length > 30 %}...{% endif %}</span>
-                                <span class="badge bg-info">{{ exam.quantidade }}</span>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-muted small mb-0">Nenhum exame laboratorial solicitado ainda</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card glass-card">
-                <div class="card-header">
-                    <h6 class="mb-0 text-light">
-                        <i class="fas fa-x-ray me-2 text-warning"></i>
-                        Top Exames de Imagem
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="detailed-stats-list">
-                        {% if detailed_stats.exames_img %}
-                            {% for exam in detailed_stats.exames_img %}
-                            <div class="stat-item d-flex justify-content-between align-items-center mb-2">
-                                <span class="text-light small">{{ exam.nome[:30] }}{% if exam.nome|length > 30 %}...{% endif %}</span>
-                                <span class="badge bg-warning">{{ exam.quantidade }}</span>
-                            </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-muted small mb-0">Nenhum exame de imagem solicitado ainda</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 {% endblock %}
 
@@ -386,88 +300,7 @@
         }
     });
 
-    // Evolution Chart (Line Chart)
-    const evolutionCtx = document.getElementById('evolutionChart').getContext('2d');
-    const evolutionChart = new Chart(evolutionCtx, {
-        type: 'line',
-        data: {
-            labels: {{ monthly_evolution.months | tojson }},
-            datasets: [{
-                label: 'Receitas',
-                data: {{ monthly_evolution.receitas | tojson }},
-                borderColor: 'rgba(102, 126, 234, 1)',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                tension: 0.4,
-                fill: true
-            }, {
-                label: 'Exames Lab',
-                data: {{ monthly_evolution.exames_lab | tojson }},
-                borderColor: 'rgba(23, 162, 184, 1)',
-                backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                tension: 0.4,
-                fill: true
-            }, {
-                label: 'Exames Imagem',
-                data: {{ monthly_evolution.exames_img | tojson }},
-                borderColor: 'rgba(255, 193, 7, 1)',
-                backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        color: '#ffffff'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        color: '#ffffff'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                },
-                x: {
-                    ticks: {
-                        color: '#ffffff'
-                    },
-                    grid: {
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                }
-            }
-        }
-    });
 
-    // Chart toggle functionality
-    let currentChart = 'stats';
-    
-    window.toggleChart = function() {
-        const statsChart = document.getElementById('statsChart');
-        const evolutionChart = document.getElementById('evolutionChart');
-        const toggleText = document.getElementById('chartToggleText');
-        
-        if (currentChart === 'stats') {
-            statsChart.style.display = 'none';
-            evolutionChart.style.display = 'block';
-            toggleText.textContent = 'Estatísticas';
-            currentChart = 'evolution';
-        } else {
-            statsChart.style.display = 'block';
-            evolutionChart.style.display = 'none';
-            toggleText.textContent = 'Evolução';
-            currentChart = 'stats';
-        }
-    };
 
     // Estilo hover para o botão de logout
     document.getElementById('logoutBtn').addEventListener('mouseenter', function() {
