@@ -4,10 +4,13 @@ from app import db
 from sqlalchemy import func, or_
 import csv
 import logging
+from utils.security import rate_limit, require_auth, audit_log
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 @api_bp.route('/buscar_pacientes')
+@rate_limit(max_requests=50, per_minutes=5)
+@require_auth
 def buscar_pacientes():
     """Search patients by name"""
     query = request.args.get('q', '').strip()

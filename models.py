@@ -25,6 +25,7 @@ class Paciente(db.Model):
     
     id = Column(Integer, primary_key=True)
     nome = Column(String(200), nullable=False)
+    cpf = Column(String(14), nullable=True)  # Format: 000.000.000-00
     email = Column(String(255), nullable=True)
     telefone = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

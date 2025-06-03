@@ -34,8 +34,24 @@ def create_app():
     }
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     
+    # Security configurations
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_HTTPONLY"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = 'Lax'
+    
     # Initialize extensions
     db.init_app(app)
+    
+    # Security headers
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; font-src 'self' cdn.jsdelivr.net; img-src 'self' data:;"
+        return response
     
     # Register blueprints
     from routes.auth import auth_bp
@@ -70,6 +86,10 @@ def create_app():
         # Initialize database with sample data if needed
         from utils.db import init_database
         init_database()
+        
+        # Start automatic backup scheduler
+        from utils.backup import schedule_backups
+        schedule_backups()
     
     # Root redirect
     @app.route('/')
