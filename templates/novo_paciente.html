@@ -53,6 +53,76 @@
                             </div>
                         </div>
                         
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           name="cpf_paciente" 
+                                           id="cpf_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="000.000.000-00"
+                                           value="{{ cpf_paciente if cpf_paciente else '' }}"
+                                           required
+                                           maxlength="14"
+                                           pattern="[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}"
+                                           autocomplete="off">
+                                    <label for="cpf_paciente" class="text-light">
+                                        <i class="fas fa-id-card me-2 text-warning"></i>CPF *
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-floating">
+                                    <input type="number" 
+                                           name="idade_paciente" 
+                                           id="idade_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="Ex: 35"
+                                           value="{{ idade_paciente if idade_paciente else '' }}"
+                                           required
+                                           min="0"
+                                           max="120"
+                                           autocomplete="off">
+                                    <label for="idade_paciente" class="text-light">
+                                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Idade *
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-8 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           name="endereco_paciente" 
+                                           id="endereco_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="Ex: Rua das Flores, 123, Centro"
+                                           value="{{ endereco_paciente if endereco_paciente else '' }}"
+                                           required
+                                           autocomplete="street-address">
+                                    <label for="endereco_paciente" class="text-light">
+                                        <i class="fas fa-map-marker-alt me-2 text-danger"></i>Endereço *
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           name="cidade_uf_paciente" 
+                                           id="cidade_uf_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="Ex: São Paulo/SP"
+                                           value="{{ cidade_uf_paciente if cidade_uf_paciente else '' }}"
+                                           required
+                                           autocomplete="address-level2">
+                                    <label for="cidade_uf_paciente" class="text-light">
+                                        <i class="fas fa-city me-2 text-info"></i>Cidade/UF *
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row mb-5">
                             <div class="col-md-6 mb-4 mb-md-0">
                                 <div class="form-floating">
@@ -61,6 +131,7 @@
                                            id="email_paciente"
                                            class="form-control glass-input" 
                                            placeholder="exemplo@email.com"
+                                           value="{{ email_paciente if email_paciente else '' }}"
                                            autocomplete="email">
                                     <label for="email_paciente" class="text-light">
                                         <i class="fas fa-envelope me-2 text-success"></i>Email do Paciente
@@ -185,6 +256,40 @@ document.addEventListener('DOMContentLoaded', function() {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>CADASTRANDO...';
         submitBtn.disabled = true;
     });
+});
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // CPF formatting
+    const cpfInput = document.getElementById('cpf_paciente');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+    }
+    
+    // Phone formatting
+    const phoneInput = document.getElementById('telefone_paciente');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 11) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length >= 6) {
+                value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length >= 2) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            }
+            e.target.value = value;
+        });
+    }
 });
 </script>
 {% endblock %}

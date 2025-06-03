@@ -29,7 +29,10 @@ class Paciente(db.Model):
     
     id = Column(Integer, primary_key=True)
     nome = Column(String(200), nullable=False)
-    cpf = Column(String(14), nullable=True)  # Format: 000.000.000-00
+    cpf = Column(String(14), nullable=False)  # Format: 000.000.000-00
+    idade = Column(Integer, nullable=False)
+    endereco = Column(String(500), nullable=False)
+    cidade_uf = Column(String(100), nullable=False)
     email = Column(String(255), nullable=True)
     telefone = Column(String(20), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
