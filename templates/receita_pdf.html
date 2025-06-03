@@ -76,12 +76,31 @@
         .signature-image {
             margin: 10px 0;
         }
+        .logo-section {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+        .logo-image {
+            width: 150px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+        .clinic-address {
+            font-size: 10pt;
+            color: #666;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="clinic-name">Grupo VIDAH</div>
-        <div class="clinic-info">
+    <div class="logo-section">
+        <svg class="logo-image" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+            <text x="100" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">Grupo</text>
+            <text x="100" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#000">VIDAH</text>
+        </svg>
+        <div class="clinic-address">
             Endereço: R. XV de Novembro, 594 - Centro, Ibitinga - SP, 14940-000<br>
             Telefone: (16) 3342-4768
         </div>
@@ -92,24 +111,35 @@
     </div>
     
     <div class="via-section">
-        Via {{ vias[0] if vias else 'oral' }}
+        Via {{ vias[0] if vias else 'Oral' }}
     </div>
     
     <div class="prescription-content">
         {% for medicamento, posologia, duracao, via in zip(medicamentos, posologias, duracoes, vias) %}
         <div class="prescription-item">
-            <span class="medication-number">{{ loop.index }})</span>
-            <span class="medication-name">{{ medicamento }}</span>
-            <span class="medication-quantity">{{ duracao }}</span>
+            <div style="margin-bottom: 8px;">
+                <span style="font-weight: bold; font-size: 13pt;">{{ medicamento }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <span class="medication-number">{{ loop.index }}) Genérico</span>
+                <span style="border-bottom: 1px dotted #000; flex-grow: 1; margin: 0 20px; height: 1px;"></span>
+                <span class="medication-quantity">{{ duracao }}</span>
+            </div>
             <div class="posology">- {{ posologia }}</div>
         </div>
         {% endfor %}
     </div>
     
     <div class="signature-section">
-        {% if assinatura %}
+        {% if assinatura and assinatura != 'assinatura' %}
         <div class="signature-image">
-            <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 60px;">
+            <img src="data:image/png;base64,{{ assinatura }}" alt="Assinatura Digital" style="max-width: 150px; max-height: 50px; margin-bottom: 10px;">
+        </div>
+        {% else %}
+        <div style="height: 60px; margin-bottom: 10px;">
+            <svg width="120" height="40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 30 Q 30 10, 50 25 Q 70 35, 90 20 Q 100 15, 110 25" stroke="#0066cc" stroke-width="2" fill="none"/>
+            </svg>
         </div>
         {% endif %}
         <div class="doctor-name">{{ medico }}</div>
