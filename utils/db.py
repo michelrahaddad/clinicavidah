@@ -66,6 +66,9 @@ def get_dashboard_stats(medico_id=None):
         # Get monthly evolution data
         monthly_data = get_monthly_evolution(medico_id)
         
+        # Get detailed statistics
+        detailed_stats = get_detailed_statistics(medico_id)
+        
         return {
             'total_pacientes': total_pacientes,
             'total_receitas': total_receitas,
@@ -75,7 +78,8 @@ def get_dashboard_stats(medico_id=None):
             'total_geral_receitas': total_geral_receitas,
             'total_geral_exames_lab': total_geral_exames_lab,
             'total_geral_exames_img': total_geral_exames_img,
-            'monthly_evolution': monthly_data
+            'monthly_evolution': monthly_data,
+            'detailed_stats': detailed_stats
         }
     except Exception as e:
         logging.error(f'Dashboard stats error: {e}')
@@ -88,7 +92,8 @@ def get_dashboard_stats(medico_id=None):
             'total_geral_receitas': 0,
             'total_geral_exames_lab': 0,
             'total_geral_exames_img': 0,
-            'monthly_evolution': {'months': [], 'receitas': [], 'exames_lab': [], 'exames_img': []}
+            'monthly_evolution': {'months': [], 'receitas': [], 'exames_lab': [], 'exames_img': []},
+            'detailed_stats': {'medicamentos': [], 'exames_lab': [], 'exames_img': []}
         }
 
 def get_monthly_evolution(medico_id=None):
@@ -166,6 +171,95 @@ def get_monthly_evolution(medico_id=None):
         return {
             'months': [],
             'receitas': [],
+            'exames_lab': [],
+            'exames_img': []
+        }
+
+def get_detailed_statistics(medico_id=None):
+    """Get detailed statistics by medication, lab exams, and imaging exams"""
+    try:
+        from sqlalchemy import func, text
+        
+        # Analyze medications from prescriptions
+        medicamentos_stats = []
+        exames_lab_stats = []
+        exames_img_stats = []
+        
+        if medico_id:
+            # Get medication frequency
+            receitas = db.session.query(Receita).filter(Receita.id_medico == medico_id).all()
+            
+            # Count medications
+            medicamentos_count = {}
+            for receita in receitas:
+                try:
+                    medicamentos_list = receita.medicamentos.split('\n')
+                    for med in medicamentos_list:
+                        med = med.strip()
+                        if med and len(med) > 2:
+                            # Clean medication name
+                            med_clean = med.split('(')[0].strip()
+                            if med_clean:
+                                medicamentos_count[med_clean] = medicamentos_count.get(med_clean, 0) + 1
+                except:
+                    continue
+            
+            # Get top 10 medications
+            medicamentos_sorted = sorted(medicamentos_count.items(), key=lambda x: x[1], reverse=True)[:10]
+            medicamentos_stats = [{'nome': med[0], 'quantidade': med[1]} for med in medicamentos_sorted]
+            
+            # Get lab exams frequency
+            exames_lab = db.session.query(ExameLab).filter(ExameLab.id_medico == medico_id).all()
+            
+            exames_lab_count = {}
+            for exame in exames_lab:
+                try:
+                    exames_list = exame.exames.split('\n')
+                    for exam in exames_list:
+                        exam = exam.strip()
+                        if exam and len(exam) > 2:
+                            # Clean exam name
+                            exam_clean = exam.split('(')[0].strip()
+                            if exam_clean:
+                                exames_lab_count[exam_clean] = exames_lab_count.get(exam_clean, 0) + 1
+                except:
+                    continue
+            
+            # Get top 10 lab exams
+            exames_lab_sorted = sorted(exames_lab_count.items(), key=lambda x: x[1], reverse=True)[:10]
+            exames_lab_stats = [{'nome': exam[0], 'quantidade': exam[1]} for exam in exames_lab_sorted]
+            
+            # Get imaging exams frequency
+            exames_img = db.session.query(ExameImg).filter(ExameImg.id_medico == medico_id).all()
+            
+            exames_img_count = {}
+            for exame in exames_img:
+                try:
+                    exames_list = exame.exames.split('\n')
+                    for exam in exames_list:
+                        exam = exam.strip()
+                        if exam and len(exam) > 2:
+                            # Clean exam name
+                            exam_clean = exam.split('(')[0].strip()
+                            if exam_clean:
+                                exames_img_count[exam_clean] = exames_img_count.get(exam_clean, 0) + 1
+                except:
+                    continue
+            
+            # Get top 10 imaging exams
+            exames_img_sorted = sorted(exames_img_count.items(), key=lambda x: x[1], reverse=True)[:10]
+            exames_img_stats = [{'nome': exam[0], 'quantidade': exam[1]} for exam in exames_img_sorted]
+        
+        return {
+            'medicamentos': medicamentos_stats,
+            'exames_lab': exames_lab_stats,
+            'exames_img': exames_img_stats
+        }
+        
+    except Exception as e:
+        logging.error(f'Detailed statistics error: {e}')
+        return {
+            'medicamentos': [],
             'exames_lab': [],
             'exames_img': []
         }
