@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request, session
-from models import Paciente, Receita, ExameLab, ExameImg, Prontuario, Cid10
+from models import Paciente, Receita, ExameLab, ExameImg, Prontuario, Cid10, ExamePersonalizado
 from app import db
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, text
 import csv
 import logging
 from utils.security import rate_limit, require_auth, audit_log
+from utils.forms import sanitizar_entrada
+from datetime import datetime
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -425,3 +427,123 @@ def buscar_cid10():
     except Exception as e:
         logging.error(f'Error searching CID-10: {e}')
         return jsonify([]), 500
+
+@api_bp.route('/adicionar_exame_personalizado', methods=['POST'])
+def adicionar_exame_personalizado():
+    """Add custom exam"""
+    try:
+        if 'usuario' not in session:
+            return jsonify({'success': False, 'message': 'Usuário não autenticado'}), 401
+        
+        nome_exame = sanitizar_entrada(request.form.get('nome_exame', ''))
+        tipo_exame = sanitizar_entrada(request.form.get('tipo_exame', ''))  # 'laboratorial' ou 'imagem'
+        categoria = sanitizar_entrada(request.form.get('categoria', ''))
+        
+        if not nome_exame or not tipo_exame:
+            return jsonify({'success': False, 'message': 'Nome do exame e tipo são obrigatórios'}), 400
+        
+        if tipo_exame not in ['laboratorial', 'imagem']:
+            return jsonify({'success': False, 'message': 'Tipo de exame inválido'}), 400
+        
+        # Check if exam already exists for this doctor
+        medico_id = session['usuario']['id']
+        exame_existente = db.session.execute(
+            text("SELECT id FROM exames_personalizados WHERE nome = :nome AND tipo = :tipo AND id_medico = :medico_id"),
+            {'nome': nome_exame, 'tipo': tipo_exame, 'medico_id': medico_id}
+        ).fetchone()
+        
+        if exame_existente:
+            return jsonify({'success': False, 'message': 'Exame já existe'}), 400
+        
+        # Insert new custom exam
+        db.session.execute(
+            text("""
+                INSERT INTO exames_personalizados (nome, tipo, categoria, id_medico, ativo, created_at)
+                VALUES (:nome, :tipo, :categoria, :medico_id, true, :created_at)
+            """),
+            {
+                'nome': nome_exame,
+                'tipo': tipo_exame,
+                'categoria': categoria,
+                'medico_id': medico_id,
+                'created_at': datetime.utcnow()
+            }
+        )
+        db.session.commit()
+        
+        logging.info(f'Custom exam added: {nome_exame} by doctor {medico_id}')
+        return jsonify({'success': True, 'message': 'Exame adicionado com sucesso'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error adding custom exam: {e}')
+        return jsonify({'success': False, 'message': 'Erro interno do servidor'}), 500
+
+@api_bp.route('/listar_exames_personalizados/<tipo>')
+def listar_exames_personalizados(tipo):
+    """List custom exams by type"""
+    try:
+        if 'usuario' not in session:
+            return jsonify({'success': False, 'message': 'Usuário não autenticado'}), 401
+        
+        if tipo not in ['laboratorial', 'imagem']:
+            return jsonify({'success': False, 'message': 'Tipo de exame inválido'}), 400
+        
+        medico_id = session['usuario']['id']
+        
+        exames = db.session.execute(
+            text("""
+                SELECT id, nome, categoria 
+                FROM exames_personalizados 
+                WHERE tipo = :tipo AND id_medico = :medico_id AND ativo = true
+                ORDER BY nome ASC
+            """),
+            {'tipo': tipo, 'medico_id': medico_id}
+        ).fetchall()
+        
+        exames_list = []
+        for exame in exames:
+            exames_list.append({
+                'id': exame.id,
+                'nome': exame.nome,
+                'categoria': exame.categoria
+            })
+        
+        return jsonify({'success': True, 'exames': exames_list})
+        
+    except Exception as e:
+        logging.error(f'Error listing custom exams: {e}')
+        return jsonify({'success': False, 'message': 'Erro interno do servidor'}), 500
+
+@api_bp.route('/remover_exame_personalizado/<int:exame_id>', methods=['DELETE'])
+def remover_exame_personalizado(exame_id):
+    """Remove custom exam (soft delete)"""
+    try:
+        if 'usuario' not in session:
+            return jsonify({'success': False, 'message': 'Usuário não autenticado'}), 401
+        
+        medico_id = session['usuario']['id']
+        
+        # Verify if exam belongs to this doctor
+        exame_exists = db.session.execute(
+            text("SELECT id FROM exames_personalizados WHERE id = :exame_id AND id_medico = :medico_id"),
+            {'exame_id': exame_id, 'medico_id': medico_id}
+        ).fetchone()
+        
+        if not exame_exists:
+            return jsonify({'success': False, 'message': 'Exame não encontrado'}), 404
+        
+        # Soft delete (set ativo = false)
+        result = db.session.execute(
+            text("UPDATE exames_personalizados SET ativo = false WHERE id = :exame_id AND id_medico = :medico_id"),
+            {'exame_id': exame_id, 'medico_id': medico_id}
+        )
+        db.session.commit()
+        
+        logging.info(f'Custom exam removed: {exame_id} by doctor {medico_id}')
+        return jsonify({'success': True, 'message': 'Exame removido com sucesso'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Error removing custom exam: {e}')
+        return jsonify({'success': False, 'message': 'Erro interno do servidor'}), 500
