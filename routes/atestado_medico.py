@@ -51,7 +51,7 @@ def salvar_atestado_medico():
         data_fim = fim.strftime('%Y-%m-%d')
         
         # Get doctor info
-        medico = Medico.query.filter_by(nome=session['usuario']).first()
+        medico = Medico.query.filter_by(id=session['usuario']['id']).first()
         if not medico:
             flash('Médico não encontrado.', 'error')
             return redirect(url_for('atestado_medico.atestado_medico'))

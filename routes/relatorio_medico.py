@@ -40,7 +40,7 @@ def salvar_relatorio_medico():
             return redirect(url_for('relatorio_medico.relatorio_medico'))
         
         # Get doctor info
-        medico = Medico.query.filter_by(nome=session['usuario']).first()
+        medico = Medico.query.filter_by(id=session['usuario']['id']).first()
         if not medico:
             flash('Médico não encontrado.', 'error')
             return redirect(url_for('relatorio_medico.relatorio_medico'))

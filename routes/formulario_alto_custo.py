@@ -51,7 +51,7 @@ def salvar_formulario_alto_custo():
             return redirect(url_for('formulario_alto_custo.formulario_alto_custo'))
         
         # Get doctor info
-        medico = Medico.query.filter_by(nome=session['usuario']).first()
+        medico = Medico.query.filter_by(id=session['usuario']['id']).first()
         if not medico:
             flash('Médico não encontrado.', 'error')
             return redirect(url_for('formulario_alto_custo.formulario_alto_custo'))
