@@ -82,7 +82,7 @@
                             <p class="text-light mb-0">Último Backup</p>
                             <small class="text-primary">
                                 {% if config and config.ultimo_backup %}
-                                    {{ moment(config.ultimo_backup).format('DD/MM/YYYY HH:mm') }}
+                                    {{ config.ultimo_backup.strftime('%d/%m/%Y %H:%M') }} - Brasília
                                 {% else %}
                                     Nunca
                                 {% endif %}
@@ -95,7 +95,7 @@
                             <p class="text-light mb-0">Próximo Backup</p>
                             <small class="text-success">
                                 {% if config and config.proximo_backup %}
-                                    {{ config.proximo_backup.strftime('%d/%m/%Y %H:%M') }}
+                                    {{ config.proximo_backup.strftime('%d/%m/%Y %H:%M') }} - Brasília
                                 {% else %}
                                     Não programado
                                 {% endif %}
