@@ -50,9 +50,19 @@
     {% if request.endpoint != 'dashboard.dashboard' and session.usuario %}
     <div class="position-fixed" style="top: 20px; right: 20px; z-index: 1050;">
         <a href="{{ url_for('dashboard.dashboard') }}" 
-           class="btn btn-primary neural-btn rounded-circle p-3 dashboard-btn" 
-           title="Voltar ao Dashboard">
-            <i class="fas fa-home fa-lg"></i>
+           class="btn neural-btn rounded-circle p-3 dashboard-btn" 
+           title="Voltar ao Dashboard"
+           style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="3" y="3" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                <rect x="14" y="3" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                <rect x="3" y="14" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                <rect x="14" y="14" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                <circle cx="6.5" cy="6.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                <circle cx="17.5" cy="6.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                <circle cx="6.5" cy="17.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                <circle cx="17.5" cy="17.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+            </svg>
         </a>
     </div>
     {% endif %}
