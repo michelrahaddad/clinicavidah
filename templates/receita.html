@@ -42,6 +42,56 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Dados adicionais do paciente -->
+                <div class="row" id="dados-paciente" style="display: none;">
+                    <div class="col-md-6 mb-3">
+                        <label for="cpf_paciente" class="form-label text-light">
+                            <i class="fas fa-id-card me-2 text-warning"></i>CPF
+                        </label>
+                        <input type="text" 
+                               id="cpf_paciente"
+                               class="form-control glass-input" 
+                               placeholder="000.000.000-00"
+                               readonly
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="idade_paciente" class="form-label text-light">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>Idade
+                        </label>
+                        <input type="text" 
+                               id="idade_paciente"
+                               class="form-control glass-input" 
+                               placeholder="--"
+                               readonly
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                </div>
+                <div class="row" id="endereco-paciente" style="display: none;">
+                    <div class="col-md-8 mb-3">
+                        <label for="endereco_completo" class="form-label text-light">
+                            <i class="fas fa-map-marker-alt me-2 text-danger"></i>Endereço
+                        </label>
+                        <input type="text" 
+                               id="endereco_completo"
+                               class="form-control glass-input" 
+                               placeholder="Endereço não informado"
+                               readonly
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="cidade_uf_completo" class="form-label text-light">
+                            <i class="fas fa-city me-2 text-info"></i>Cidade/UF
+                        </label>
+                        <input type="text" 
+                               id="cidade_uf_completo"
+                               class="form-control glass-input" 
+                               placeholder="Cidade/UF"
+                               readonly
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                </div>
             </div>
         </div>
         
