@@ -47,9 +47,14 @@
                     <i class="fas fa-pills me-2"></i>
                     Medicamentos
                 </h5>
-                <button type="button" class="btn btn-sm btn-outline-primary neural-btn" onclick="adicionarMedicamento()">
-                    <i class="fas fa-plus me-2"></i>Adicionar Medicamento
-                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-warning neural-btn" onclick="limparReceita()">
+                        <i class="fas fa-broom me-2"></i>Limpar Receita
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-primary neural-btn" onclick="adicionarMedicamento()">
+                        <i class="fas fa-plus me-2"></i>Adicionar Medicamento
+                    </button>
+                </div>
             </div>
             <div class="card-body">
                 <div id="medicamentos-container">
@@ -194,6 +199,53 @@ function removerMedicamento(button) {
         setTimeout(() => row.remove(), 300);
     } else {
         alert('É necessário pelo menos um medicamento.');
+    }
+}
+
+function limparReceita() {
+    if (confirm('Tem certeza que deseja limpar toda a receita? Esta ação não pode ser desfeita.')) {
+        // Clear patient name
+        document.getElementById('nome_paciente').value = '';
+        
+        // Clear all medications and keep only one empty row
+        const container = document.getElementById('medicamentos-container');
+        container.innerHTML = `
+            <div class="medicamento-row mb-3 glass-card p-3">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label text-light">Medicamento *</label>
+                        <div class="position-relative">
+                            <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
+                                   placeholder="Digite para buscar medicamento..." required autocomplete="off">
+                            <div class="medicamento-suggestions"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-light">Posologia *</label>
+                        <input type="text" name="posologia[]" class="form-control glass-input" 
+                               placeholder="Ex: 1 comprimido" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label text-light">Duração *</label>
+                        <input type="text" name="duracao[]" class="form-control glass-input" 
+                               placeholder="Ex: 7 dias" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label text-light">Via *</label>
+                        <input type="text" name="via[]" class="form-control glass-input" 
+                               placeholder="Ex: Oral" required>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-end">
+                        <button type="button" class="btn btn-outline-danger neural-btn" onclick="removerMedicamento(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Show success message
+        alert('Receita limpa com sucesso!');
     }
 }
 
