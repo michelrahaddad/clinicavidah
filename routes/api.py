@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from models import Paciente, Receita, ExameLab, ExameImg, Prontuario
+from models import Paciente, Receita, ExameLab, ExameImg, Prontuario, Cid10
 from app import db
 from sqlalchemy import func, or_
 import csv
@@ -392,3 +392,36 @@ def update_record_date():
         logging.error(f'Error updating record date: {e}')
         db.session.rollback()
         return jsonify({'error': 'Internal server error'}), 500
+
+@api_bp.route('/buscar_cid10')
+@require_auth
+@rate_limit(50)
+def buscar_cid10():
+    """Search CID-10 codes by code or description"""
+    query = request.args.get('q', '').strip()
+    
+    if len(query) < 2:
+        return jsonify([])
+    
+    try:
+        # Search by code or description
+        results = Cid10.query.filter(
+            or_(
+                Cid10.codigo.ilike(f'%{query}%'),
+                Cid10.descricao.ilike(f'%{query}%')
+            )
+        ).limit(10).all()
+        
+        cid_list = []
+        for cid in results:
+            cid_list.append({
+                'codigo': cid.codigo,
+                'descricao': cid.descricao,
+                'categoria': cid.categoria
+            })
+        
+        return jsonify(cid_list)
+        
+    except Exception as e:
+        logging.error(f'Error searching CID-10: {e}')
+        return jsonify([]), 500
