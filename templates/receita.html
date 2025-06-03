@@ -43,8 +43,8 @@
                     </div>
                 </div>
                 
-                <!-- Dados adicionais do paciente -->
-                <div class="row" id="dados-paciente" style="display: none;">
+                <!-- Dados adicionais do paciente - sempre visíveis -->
+                <div class="row mt-3" id="dados-paciente">
                     <div class="col-md-6 mb-3">
                         <label for="cpf_paciente" class="form-label text-light">
                             <i class="fas fa-id-card me-2 text-warning"></i>CPF
@@ -68,7 +68,7 @@
                                style="background: rgba(255, 255, 255, 0.05);">
                     </div>
                 </div>
-                <div class="row" id="endereco-paciente" style="display: none;">
+                <div class="row" id="endereco-paciente">
                     <div class="col-md-8 mb-3">
                         <label for="endereco_completo" class="form-label text-light">
                             <i class="fas fa-map-marker-alt me-2 text-danger"></i>Endereço
@@ -565,44 +565,32 @@ class PatientAutocomplete {
 }
 
 window.selectPatient = function(nome, cpf, idade, endereco, cidade_uf, email, telefone) {
-    console.log('selectPatient called with:', { nome, cpf, idade, endereco, cidade_uf, email, telefone });
+    console.log('selectPatient called with:', arguments);
     
     // Fill patient name
     document.getElementById('nome_paciente').value = nome;
     
-    // Fill additional patient data
-    const cpfElement = document.getElementById('cpf_paciente');
-    const idadeElement = document.getElementById('idade_paciente');
-    const enderecoElement = document.getElementById('endereco_completo');
-    const cidadeElement = document.getElementById('cidade_uf_completo');
-    
-    if (cpfElement) cpfElement.value = cpf || 'Não informado';
-    if (idadeElement) idadeElement.value = idade ? `${idade} anos` : 'Não informado';
-    if (enderecoElement) enderecoElement.value = endereco || 'Não informado';
-    if (cidadeElement) cidadeElement.value = cidade_uf || 'Não informado';
-    
-    // Show patient data sections with animation
-    const dadosPaciente = document.getElementById('dados-paciente');
-    const enderecoPaciente = document.getElementById('endereco-paciente');
-    
-    if (dadosPaciente) {
-        dadosPaciente.style.display = 'flex';
-        dadosPaciente.style.opacity = '1';
-    }
-    if (enderecoPaciente) {
-        enderecoPaciente.style.display = 'flex';
-        enderecoPaciente.style.opacity = '1';
-    }
+    // Fill additional patient data - force values
+    document.getElementById('cpf_paciente').value = cpf || 'Não informado';
+    document.getElementById('idade_paciente').value = idade ? idade + ' anos' : 'Não informado';
+    document.getElementById('endereco_completo').value = endereco || 'Não informado';
+    document.getElementById('cidade_uf_completo').value = cidade_uf || 'Não informado';
     
     // Hide suggestions
     document.getElementById('paciente-suggestions').style.display = 'none';
     
     // Store complete patient data for PDF generation
     window.currentPatientData = { 
-        nome, cpf, idade, endereco, cidade_uf, email, telefone 
+        nome: nome, 
+        cpf: cpf, 
+        idade: idade, 
+        endereco: endereco, 
+        cidade_uf: cidade_uf, 
+        email: email, 
+        telefone: telefone 
     };
     
-    console.log('Patient data filled successfully');
+    console.log('Patient data filled:', window.currentPatientData);
 };
 
 // Initialize autocomplete systems
