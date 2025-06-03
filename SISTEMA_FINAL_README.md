@@ -1,7 +1,7 @@
-# Sistema Médico VIDAH - Versão Final
+# Sistema Médico VIDAH - Versão Final Atualizada
 
 ## Visão Geral
-Sistema médico completo desenvolvido em Flask para gestão hospitalar, receitas, exames e prontuários eletrônicos.
+Sistema médico completo desenvolvido em Flask para gestão hospitalar, receitas, exames e prontuários eletrônicos com as mais recentes atualizações implementadas.
 
 ## Funcionalidades Implementadas
 
@@ -17,26 +17,32 @@ Sistema médico completo desenvolvido em Flask para gestão hospitalar, receitas
 - Cadastro com validação de CPF
 - Busca inteligente por nome
 - Histórico médico completo
+- Auto-preenchimento do último paciente cadastrado
 - Dados protegidos conforme LGPD
 
 ### Prescrições Médicas
 - Autocomplete com 200 medicamentos
 - Posologia personalizada
 - Via de administração
+- Assinatura digital automática do médico
 - Geração de PDF otimizado A4
 
 ### Exames Médicos
 - Exames laboratoriais completos
 - Exames de imagem especializados
 - Seção cardiológica (12 exames)
-- PDFs profissionais para impressão
+- Assinatura digital automática do médico
+- PDFs profissionais para impressão em uma folha A4
+- Exames destacados com bordas e fundo colorido
 
 ### Sistema de PDFs
 - Design minimalista para impressão em preto
 - Logo VIDAH integrado
-- Watermark de segurança
+- Assinatura digital do médico integrada
 - Data destacada em todos os documentos
-- Otimizado para folha A4
+- Layout otimizado para uma única folha A4
+- Sem duplicação de conteúdo
+- Exames destacados visualmente
 
 ### Recursos Avançados
 - Backup automático do banco de dados
@@ -45,6 +51,7 @@ Sistema médico completo desenvolvido em Flask para gestão hospitalar, receitas
 - Atalhos de teclado (Ctrl+S para salvar)
 - Validação em tempo real
 - Notificações visuais
+- Integração de assinatura digital
 
 ## Arquivos de Instalação
 
@@ -104,5 +111,28 @@ waitress-serve --host=0.0.0.0 --port=5000 main:app
 - Backup automático a cada 24h
 - Logs de auditoria detalhados
 
+## Últimas Atualizações (Junho 2025)
+
+### Assinatura Digital Integrada
+- Campo de assinatura no cadastro de médicos
+- Assinatura automática em todos PDFs gerados
+- Validação de formato base64 para imagens
+- Design profissional com linha de assinatura
+
+### Auto-preenchimento de Pacientes  
+- Sistema armazena último paciente cadastrado na sessão
+- Nome aparece automaticamente em receitas e exames
+- Facilita workflow médico para múltiplos documentos
+
+### Otimização de PDFs
+- Layout ajustado para uma única folha A4
+- Margens reduzidas para melhor aproveitamento
+- Exames destacados com bordas e fundo colorido
+- Eliminação de duplicação de conteúdo
+- Fonte otimizada para impressão
+
 ## Nota Final
 Sistema pronto para produção com nota 100/100, incluindo todas as correções de segurança, performance e usabilidade sugeridas. Arquitetura escalável e código limpo seguindo as melhores práticas do Flask.
+
+**Versão Atual:** 2.1.0 - Junho 2025
+**Status:** Completo e otimizado para uso profissional
