@@ -241,3 +241,41 @@ class ExamePersonalizado(db.Model):
     medico = relationship('Medico', back_populates='exames_personalizados')
 
 
+class Administrador(db.Model):
+    __tablename__ = 'administradores'
+    
+    id = Column(Integer, primary_key=True)
+    usuario = Column(String(100), unique=True, nullable=False)
+    senha = Column(String(256), nullable=False)
+    nome = Column(String(200), nullable=False)
+    email = Column(String(255), nullable=False)
+    ativo = Column(Boolean, default=True)
+    ultimo_acesso = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class LogSistema(db.Model):
+    __tablename__ = 'logs_sistema'
+    
+    id = Column(Integer, primary_key=True)
+    tipo = Column(String(50), nullable=False)  # 'login', 'backup', 'update', 'error'
+    usuario = Column(String(100), nullable=False)
+    acao = Column(Text, nullable=False)
+    ip_address = Column(String(45), nullable=True)
+    detalhes = Column(Text, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+
+class BackupConfig(db.Model):
+    __tablename__ = 'backup_config'
+    
+    id = Column(Integer, primary_key=True)
+    frequencia = Column(String(20), nullable=False)  # 'daily', 'weekly', 'monthly'
+    horario = Column(String(5), nullable=False)  # '02:00'
+    retencao_dias = Column(Integer, default=30)
+    ativo = Column(Boolean, default=True)
+    ultimo_backup = Column(DateTime, nullable=True)
+    proximo_backup = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
