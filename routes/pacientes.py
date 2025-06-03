@@ -42,6 +42,12 @@ def novo_paciente():
             flash(f'Paciente "{nome_paciente}" cadastrado com sucesso!', 'success')
             logging.info(f'New patient registered: {nome_paciente} (Email: {email_paciente}, Tel: {telefone_paciente})')
             
+            # Store last patient info in session for auto-fill
+            session['ultimo_paciente'] = {
+                'id': novo_paciente.id,
+                'nome': nome_paciente
+            }
+            
             # Redirect to prontuario with patient name
             return redirect(url_for('prontuario.prontuario', paciente=nome_paciente))
             

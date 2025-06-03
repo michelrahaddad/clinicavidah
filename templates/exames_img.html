@@ -31,7 +31,7 @@
                                    id="nome_paciente"
                                    class="form-control glass-input" 
                                    placeholder="Digite o nome completo do paciente"
-                                   value="{{ exame.nome_paciente if refazer and exame else request.args.get('paciente', '') }}"
+                                   value="{{ exame.nome_paciente if refazer and exame else (request.args.get('paciente', '') or nome_paciente) }}"
                                    required>
                         </div>
                     </div>

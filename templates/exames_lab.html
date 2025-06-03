@@ -30,7 +30,7 @@
                                 <label for="nome_paciente" class="form-label text-light">Nome do Paciente</label>
                                 <input type="text" class="form-control glass-input" 
                                        id="nome_paciente" name="nome_paciente" 
-                                       value="{{ request.args.get('paciente', '') if not refazer else exame.nome_paciente }}"
+                                       value="{{ exame.nome_paciente if refazer else (request.args.get('paciente', '') or nome_paciente) }}"
                                        placeholder="Digite o nome do paciente" required>
                             </div>
                             <div class="col-md-6">

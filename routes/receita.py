@@ -15,7 +15,11 @@ def receita():
     if 'usuario' not in session:
         return redirect(url_for('auth.login'))
     
-    return render_template('receita.html')
+    # Get last registered patient for auto-fill
+    ultimo_paciente = session.get('ultimo_paciente', {})
+    nome_paciente = ultimo_paciente.get('nome', '')
+    
+    return render_template('receita.html', nome_paciente=nome_paciente)
 
 @receita_bp.route('/salvar_receita', methods=['POST'])
 def salvar_receita():

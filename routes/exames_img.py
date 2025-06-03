@@ -15,7 +15,11 @@ def exames_img():
     if 'usuario' not in session:
         return redirect(url_for('auth.login'))
     
-    return render_template('exames_img.html')
+    # Get last registered patient for auto-fill
+    ultimo_paciente = session.get('ultimo_paciente', {})
+    nome_paciente = ultimo_paciente.get('nome', '')
+    
+    return render_template('exames_img.html', nome_paciente=nome_paciente)
 
 @exames_img_bp.route('/salvar_exames_img', methods=['POST'])
 def salvar_exames_img():

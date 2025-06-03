@@ -34,7 +34,7 @@
                                        id="nome_paciente"
                                        class="form-control glass-input" 
                                        placeholder="Digite o nome do paciente para buscar..."
-                                       value="{{ receita.nome_paciente if refazer and receita else request.args.get('paciente', '') }}"
+                                       value="{{ receita.nome_paciente if refazer and receita else (request.args.get('paciente', '') or nome_paciente) }}"
                                        autocomplete="off"
                                        required>
                                 <div id="paciente-suggestions" class="suggestions-dropdown"></div>

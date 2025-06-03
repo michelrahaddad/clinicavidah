@@ -15,7 +15,11 @@ def exames_lab():
     if 'usuario' not in session:
         return redirect(url_for('auth.login'))
     
-    return render_template('exames_lab.html')
+    # Get last registered patient for auto-fill
+    ultimo_paciente = session.get('ultimo_paciente', {})
+    nome_paciente = ultimo_paciente.get('nome', '')
+    
+    return render_template('exames_lab.html', nome_paciente=nome_paciente)
 
 @exames_lab_bp.route('/salvar_exames_lab', methods=['POST'])
 def salvar_exames_lab():
