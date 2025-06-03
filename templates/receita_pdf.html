@@ -132,7 +132,19 @@
     </div>
     
     <div class="patient-section">
-        <strong>Paciente:</strong> {{ nome_paciente }}
+        <div style="margin-bottom: 8px;"><strong>Paciente:</strong> {{ nome_paciente }}</div>
+        {% if cpf_paciente and cpf_paciente != 'Não informado' %}
+        <div style="margin-bottom: 5px; font-size: 11pt;"><strong>CPF:</strong> {{ cpf_paciente }}</div>
+        {% endif %}
+        {% if idade_paciente and idade_paciente != 'Não informado' %}
+        <div style="margin-bottom: 5px; font-size: 11pt;"><strong>Idade:</strong> {{ idade_paciente }}</div>
+        {% endif %}
+        {% if endereco_paciente and endereco_paciente != 'Não informado' %}
+        <div style="margin-bottom: 5px; font-size: 11pt;"><strong>Endereço:</strong> {{ endereco_paciente }}</div>
+        {% endif %}
+        {% if cidade_uf_paciente and cidade_uf_paciente != 'Não informado' %}
+        <div style="margin-bottom: 5px; font-size: 11pt;"><strong>Cidade/UF:</strong> {{ cidade_uf_paciente }}</div>
+        {% endif %}
     </div>
     
     <div class="via-section">

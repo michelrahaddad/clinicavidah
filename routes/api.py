@@ -25,18 +25,29 @@ def buscar_pacientes():
         pacientes = db.session.query(
             Paciente.id,
             Paciente.nome,
+            Paciente.cpf,
+            Paciente.idade,
+            Paciente.endereco,
+            Paciente.cidade_uf,
             Paciente.email,
             Paciente.telefone,
             func.count(Prontuario.id).label('total_registros')
         ).outerjoin(Prontuario).filter(
             Paciente.nome.ilike(f'%{query}%')
-        ).group_by(Paciente.id, Paciente.nome, Paciente.email, Paciente.telefone).limit(10).all()
+        ).group_by(
+            Paciente.id, Paciente.nome, Paciente.cpf, Paciente.idade, 
+            Paciente.endereco, Paciente.cidade_uf, Paciente.email, Paciente.telefone
+        ).limit(10).all()
         
         result = []
         for paciente in pacientes:
             result.append({
                 'id': paciente.id,
                 'nome': paciente.nome,
+                'cpf': paciente.cpf,
+                'idade': paciente.idade,
+                'endereco': paciente.endereco,
+                'cidade_uf': paciente.cidade_uf,
                 'email': paciente.email,
                 'telefone': paciente.telefone,
                 'total_registros': paciente.total_registros or 0

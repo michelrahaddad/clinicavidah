@@ -49,6 +49,9 @@ def salvar_receita():
         # Insert patient if not exists
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
+        # Get complete patient data for PDF
+        paciente = Paciente.query.get(paciente_id)
+        
         # Save prescription
         medico = Medico.query.get(session['usuario']['id'])
         
@@ -84,6 +87,10 @@ def salvar_receita():
             logging.info(f'Starting PDF generation for prescription: {nome_paciente}')
             pdf_html = render_template('receita_pdf.html',
                                      nome_paciente=nome_paciente,
+                                     cpf_paciente=paciente.cpf if paciente else None,
+                                     idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
+                                     endereco_paciente=paciente.endereco if paciente else None,
+                                     cidade_uf_paciente=paciente.cidade_uf if paciente else None,
                                      medicamentos=medicamentos,
                                      posologias=posologias,
                                      duracoes=duracoes,
