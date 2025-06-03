@@ -94,7 +94,10 @@ def neural_stats():
         for i in range(24):
             valor = int(20 * (1 + 0.5 * (i - 14)**2 / 100))
             atividade_por_hora[i] = valor if valor > 0 else 0
-        max_atividade = max(atividade_por_hora.values()) if atividade_por_hora and atividade_por_hora.values() else 1
+        try:
+            max_atividade = max(atividade_por_hora.values()) if atividade_por_hora and len(atividade_por_hora) > 0 else 1
+        except (ValueError, TypeError):
+            max_atividade = 1
         uso_mensal = [total_receitas//6, total_receitas//4, total_receitas//3, total_receitas//2, int(total_receitas//1.5), total_receitas]
         
         stats = {
