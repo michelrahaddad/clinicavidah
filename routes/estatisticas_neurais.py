@@ -4,7 +4,7 @@ import logging
 
 estatisticas_neurais_bp = Blueprint('estatisticas_neurais', __name__)
 
-@estatisticas_neurais_bp.route('/estatisticas-neurais')
+@estatisticas_neurais_bp.route('/estatisticas_neurais')
 def estatisticas_neurais():
     """Display detailed neural statistics page"""
     if 'usuario' not in session:

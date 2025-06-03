@@ -8,9 +8,10 @@
     }
 
     .stat-item {
-        padding: 12px 0;
+        padding: 10px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
+        margin: 0 -10px;
     }
 
     .stat-item:last-child {
@@ -19,9 +20,24 @@
 
     .stat-item:hover {
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 5px;
-        padding-left: 15px;
-        padding-right: 15px;
+        border-radius: 8px;
+    }
+
+    .stat-item .flex-grow-1 {
+        min-width: 0;
+        overflow: hidden;
+        margin-right: 10px;
+    }
+
+    .stat-item h6 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+    }
+
+    .stats-card .card-body {
+        padding: 15px;
     }
 
     .detailed-stats-list::-webkit-scrollbar {
@@ -130,7 +146,7 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
                                         <span class="badge bg-primary me-2" style="font-size: 0.75rem;">{{ ranking_pos }}º Lugar</span>
-                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ med.nome[:30] }}{% if med.nome|length > 30 %}...{% endif %}</h6>
+                                        <h6 class="text-light mb-0" style="font-size: 0.85rem;">{{ med.nome[:25] }}{% if med.nome|length > 25 %}...{% endif %}</h6>
                                     </div>
                                     <small class="text-muted">Prescrito {{ med.quantidade }} vez{% if med.quantidade != 1 %}es{% endif %}</small>
                                 </div>
