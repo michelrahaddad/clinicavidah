@@ -2,260 +2,428 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Formulário de Alto Custo SUS</title>
+    <title>LAUDO DE SOLICITAÇÃO, AVALIAÇÃO E AUTORIZAÇÃO DE MEDICAMENTO(S)</title>
     <style>
         @page {
             size: A4;
-            margin: 1cm 1.5cm;
+            margin: 0.8cm;
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10pt;
-            line-height: 1.3;
+            font-size: 9pt;
+            line-height: 1.2;
             color: #000;
             margin: 0;
             padding: 0;
         }
         .header {
+            text-align: right;
+            margin-bottom: 10px;
+            font-size: 8pt;
+            line-height: 1.1;
+        }
+        .title-section {
             text-align: center;
             margin-bottom: 15px;
-            border-bottom: 2px solid #000;
-            padding-bottom: 10px;
-        }
-        .section {
-            margin-bottom: 15px;
-            border: 1px solid #000;
+            border: 2px solid #000;
             padding: 8px;
         }
-        .section-title {
-            background-color: #f0f0f0;
+        .main-title {
             font-weight: bold;
-            margin: -8px -8px 8px -8px;
-            padding: 5px 8px;
-            border-bottom: 1px solid #000;
+            font-size: 11pt;
+            margin: 0;
         }
-        .field-row {
-            display: flex;
+        .sub-title {
+            font-weight: bold;
+            font-size: 10pt;
+            margin: 5px 0 0 0;
+        }
+        .section-header {
+            background-color: #e8e8e8;
+            font-weight: bold;
+            text-align: center;
+            padding: 4px;
+            margin: 10px 0 8px 0;
+            border: 1px solid #000;
+            font-size: 9pt;
+        }
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-bottom: 8px;
         }
-        .field {
-            margin-right: 15px;
-            flex: 1;
+        .form-table td {
+            border: 1px solid #000;
+            padding: 4px;
+            vertical-align: top;
+            font-size: 8pt;
         }
         .field-label {
             font-weight: bold;
-            margin-bottom: 2px;
+            font-size: 8pt;
         }
-        .field-value {
-            border-bottom: 1px solid #000;
-            min-height: 16px;
-            padding: 2px 0;
+        .field-number {
+            font-weight: bold;
+            margin-right: 3px;
         }
-        .textarea-field {
-            border: 1px solid #000;
-            min-height: 60px;
-            padding: 5px;
-            margin-top: 5px;
+        .asterisk {
+            color: red;
+            font-weight: bold;
+        }
+        .checkbox-row {
+            margin: 3px 0;
         }
         .checkbox {
+            width: 12px;
+            height: 12px;
+            border: 1px solid #000;
+            display: inline-block;
             margin-right: 5px;
+            text-align: center;
+            font-size: 10pt;
+            line-height: 10px;
         }
-        .signature-section {
-            margin-top: 30px;
-            page-break-inside: avoid;
+        .checked {
+            background-color: #000;
+        }
+        .medication-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 5px 0;
+        }
+        .medication-table th, .medication-table td {
+            border: 1px solid #000;
+            padding: 3px;
+            text-align: center;
+            font-size: 7pt;
+        }
+        .medication-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .large-field {
+            border: 1px solid #000;
+            min-height: 40px;
+            padding: 4px;
+            margin: 3px 0;
+        }
+        .signature-area {
+            border: 1px solid #000;
+            height: 60px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+        }
+        .bottom-section {
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            padding: 6px;
+            margin-top: 10px;
+            font-size: 8pt;
+        }
+        .footer {
+            text-align: center;
+            font-size: 7pt;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .underline {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            min-width: 100px;
+            padding-bottom: 1px;
         }
         .signature-box {
-            border: 1px solid #000;
-            min-height: 80px;
-            margin-top: 10px;
-            padding: 10px;
             text-align: center;
+            vertical-align: middle;
+        }
+        .signature-img {
+            max-width: 120px;
+            max-height: 30px;
+            margin-bottom: 5px;
         }
     </style>
 </head>
 <body>
+    <!-- Cabeçalho -->
     <div class="header">
-        <h2 style="margin: 0; font-size: 14pt;">FORMULÁRIO DE SOLICITAÇÃO DE MEDICAMENTO DE ALTO CUSTO</h2>
-        <p style="margin: 5px 0 0 0; font-size: 12pt;">SISTEMA ÚNICO DE SAÚDE - SUS</p>
+        Sistema Único de Saúde<br>
+        Ministério da Saúde<br>
+        Secretaria de Estado da Saúde
     </div>
 
-    <!-- Dados do Estabelecimento -->
-    <div class="section">
-        <div class="section-title">1. DADOS DO ESTABELECIMENTO</div>
-        <div class="field-row">
-            <div class="field">
-                <div class="field-label">CNES:</div>
-                <div class="field-value">{{ cnes or '' }}</div>
-            </div>
-            <div class="field" style="flex: 2;">
-                <div class="field-label">Nome do Estabelecimento:</div>
-                <div class="field-value">{{ estabelecimento or 'Grupo VIDAH' }}</div>
-            </div>
-        </div>
+    <!-- Título Principal -->
+    <div class="title-section">
+        <div class="main-title">COMPONENTE ESPECIALIZADO DA ASSISTÊNCIA FARMACÊUTICA</div>
+        <div class="sub-title">LAUDO DE SOLICITAÇÃO, AVALIAÇÃO E AUTORIZAÇÃO DE MEDICAMENTO(S)</div>
+        <div style="font-weight: bold; margin-top: 5px;">SOLICITAÇÃO DE MEDICAMENTO(S)</div>
     </div>
 
-    <!-- Dados do Paciente -->
-    <div class="section">
-        <div class="section-title">2. DADOS DO PACIENTE</div>
-        <div class="field-row">
-            <div class="field" style="flex: 2;">
-                <div class="field-label">Nome do Paciente:</div>
-                <div class="field-value">{{ nome_paciente }}</div>
-            </div>
-            <div class="field">
-                <div class="field-label">Data de Nascimento:</div>
-                <div class="field-value">___/___/______</div>
-            </div>
-        </div>
-        <div class="field-row">
-            <div class="field" style="flex: 2;">
-                <div class="field-label">Nome da Mãe:</div>
-                <div class="field-value">{{ nome_mae }}</div>
-            </div>
-            <div class="field">
-                <div class="field-label">CNS:</div>
-                <div class="field-value">_______________</div>
-            </div>
-        </div>
-        <div class="field-row">
-            <div class="field">
-                <div class="field-label">Peso (kg):</div>
-                <div class="field-value">{{ peso }}</div>
-            </div>
-            <div class="field">
-                <div class="field-label">Altura (m):</div>
-                <div class="field-value">{{ altura }}</div>
-            </div>
-            <div class="field">
-                <div class="field-label">Superfície Corporal:</div>
-                <div class="field-value">_______________</div>
-            </div>
-        </div>
-    </div>
+    <!-- Seção de preenchimento médico -->
+    <div class="section-header">CAMPOS DE PREENCHIMENTO EXCLUSIVO PELO MÉDICO SOLICITANTE</div>
 
-    <!-- Diagnóstico -->
-    <div class="section">
-        <div class="section-title">3. DIAGNÓSTICO</div>
-        <div class="field-row">
-            <div class="field">
-                <div class="field-label">CID-10:</div>
-                <div class="field-value">{{ cid_codigo }}</div>
-            </div>
-            <div class="field" style="flex: 3;">
-                <div class="field-label">Descrição:</div>
-                <div class="field-value">{{ cid_descricao }}</div>
-            </div>
-        </div>
-    </div>
+    <!-- Campos 1-2: CNES e Estabelecimento -->
+    <table class="form-table">
+        <tr>
+            <td style="width: 30%;">
+                <span class="field-number">1-</span><span class="field-label">Número do CNES</span> <span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ cnes or '' }}</div>
+            </td>
+            <td style="width: 70%;">
+                <span class="field-number">2-</span> <span class="field-label">Nome do estabelecimento de saúde solicitante</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ estabelecimento or '' }}</div>
+            </td>
+        </tr>
+    </table>
 
-    <!-- Medicamento Solicitado -->
-    <div class="section">
-        <div class="section-title">4. MEDICAMENTO SOLICITADO</div>
-        <div class="field-row">
-            <div class="field" style="flex: 3;">
-                <div class="field-label">Medicamento:</div>
-                <div class="field-value">{{ medicamento }}</div>
-            </div>
-            <div class="field">
-                <div class="field-label">Quantidade:</div>
-                <div class="field-value">{{ quantidade }}</div>
-            </div>
-        </div>
-    </div>
+    <!-- Campos 3-6: Dados do Paciente -->
+    <table class="form-table">
+        <tr>
+            <td style="width: 60%;">
+                <span class="field-number">3-</span><span class="field-label">Nome completo do Paciente</span> <span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ nome_paciente or '' }}</div>
+            </td>
+            <td style="width: 20%;">
+                <span class="field-number">5-</span><span class="field-label">Peso do paciente</span> <span class="asterisk">*</span><br>
+                <div style="text-align: center; margin-top: 8px; font-size: 10pt;">{{ peso or '' }}</div>
+                <div style="text-align: right; font-size: 8pt;">kg</div>
+            </td>
+            <td style="width: 20%;">
+                <span class="field-number">6-</span><span class="field-label">Altura do paciente</span><span class="asterisk">*</span><br>
+                <div style="text-align: center; margin-top: 8px; font-size: 10pt;">{{ altura or '' }}</div>
+                <div style="text-align: right; font-size: 8pt;">cm</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <span class="field-number">4-</span> <span class="field-label">Nome da Mãe do Paciente</span> <span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ nome_mae or '' }}</div>
+            </td>
+        </tr>
+    </table>
 
-    <!-- Informações Clínicas -->
-    <div class="section">
-        <div class="section-title">5. INFORMAÇÕES CLÍNICAS</div>
-        <div class="field">
-            <div class="field-label">Anamnese e Exame Físico:</div>
-            <div class="textarea-field">{{ anamnese }}</div>
-        </div>
-        {% if tratamento_previo %}
-        <div class="field" style="margin-top: 10px;">
-            <div class="field-label">Tratamentos Prévios:</div>
-            <div class="textarea-field">{{ tratamento_previo }}</div>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Dados do Médico -->
-    <div class="section">
-        <div class="section-title">6. DADOS DO MÉDICO PRESCRITOR</div>
-        <div class="field-row">
-            <div class="field" style="flex: 2;">
-                <div class="field-label">Nome do Médico:</div>
-                <div class="field-value">{{ medico }}</div>
-            </div>
-            <div class="field">
-                <div class="field-label">CRM:</div>
-                <div class="field-value">{{ crm }}</div>
-            </div>
-        </div>
-        {% if medico_cns %}
-        <div class="field-row">
-            <div class="field">
-                <div class="field-label">CNS do Médico:</div>
-                <div class="field-value">{{ medico_cns }}</div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Declaração do Paciente -->
-    <div class="section">
-        <div class="section-title">7. DECLARAÇÃO DO PACIENTE/RESPONSÁVEL</div>
-        <p style="margin: 0; text-align: justify; font-size: 9pt;">
-            Declaro ter sido informado(a) claramente sobre os benefícios, riscos e efeitos colaterais 
-            relacionados ao uso do medicamento prescrito, e que todas as minhas dúvidas foram esclarecidas. 
-            Declaro ainda estar ciente de que posso suspender este tratamento a qualquer momento, sem 
-            qualquer penalização ou prejuízo ao meu cuidado.
-        </p>
-        
-        <div style="margin-top: 15px;">
-            {% if incapaz %}
-            <input type="checkbox" class="checkbox" checked> Paciente incapaz de assinar
-            {% else %}
-            <input type="checkbox" class="checkbox"> Paciente incapaz de assinar
-            {% endif %}
-        </div>
-        
-        {% if incapaz and responsavel_nome %}
-        <div class="field-row" style="margin-top: 10px;">
-            <div class="field">
-                <div class="field-label">Nome do Responsável:</div>
-                <div class="field-value">{{ responsavel_nome }}</div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Assinaturas -->
-    <div class="signature-section">
-        <div style="display: flex; justify-content: space-between;">
-            <div style="width: 45%;">
-                <div class="signature-box">
-                    <div style="margin-bottom: 50px;">Assinatura do Paciente/Responsável</div>
-                    <div style="font-size: 8pt;">Data: {{ data }}</div>
+    <!-- Campo 7-8: Medicamentos -->
+    <table class="form-table">
+        <tr>
+            <td>
+                <div style="margin-bottom: 5px;">
+                    <span class="checkbox">☐</span> Digitar manualmente &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="checkbox">☐</span> Listar medicamentos
                 </div>
-            </div>
-            <div style="width: 45%;">
-                <div class="signature-box">
+                
+                <table class="medication-table">
+                    <tr>
+                        <th rowspan="2" style="width: 10%;">Item</th>
+                        <th rowspan="2" style="width: 50%;"><span class="field-number">7-</span> Medicamento(s)<span class="asterisk">*</span></th>
+                        <th colspan="6" style="width: 40%;"><span class="field-number">8-</span> Quantidade solicitada <span class="asterisk">*</span></th>
+                    </tr>
+                    <tr>
+                        <th>1º mês</th>
+                        <th>2º mês</th>
+                        <th>3º mês</th>
+                        <th>4º mês</th>
+                        <th>5º mês</th>
+                        <th>6º mês</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td style="text-align: left; padding: 4px;">{{ medicamento or '' }}</td>
+                        <td>{{ quantidade or '' }}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                    <tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Campos 9-10: CID e Diagnóstico -->
+    <table class="form-table">
+        <tr>
+            <td style="width: 25%;">
+                <span class="field-number">9-</span> <span class="field-label">CID-10</span> <span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ cid_codigo or '' }}</div>
+            </td>
+            <td style="width: 75%;">
+                <span class="field-number">10-</span> <span class="field-label">Diagnóstico</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ cid_descricao or '' }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Campo 11: Anamnese -->
+    <table class="form-table">
+        <tr>
+            <td>
+                <span class="field-number">11-</span> <span class="field-label">Anamnese</span> <span class="asterisk">*</span><br>
+                <div class="large-field" style="min-height: 50px;">{{ anamnese or '' }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Campo 12: Tratamento Prévio -->
+    <table class="form-table">
+        <tr>
+            <td>
+                <span class="field-number">12-</span> <span class="field-label">Paciente realizou tratamento prévio ou está em tratamento da doença?</span><span class="asterisk">*</span><br>
+                <div class="checkbox-row">
+                    {% if not tratamento_previo %}
+                    <span class="checkbox checked">☑</span> NÃO &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="checkbox">☐</span> SIM. Relatar:
+                    {% else %}
+                    <span class="checkbox">☐</span> NÃO &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="checkbox checked">☑</span> SIM. Relatar:
+                    {% endif %}
+                </div>
+                {% if tratamento_previo %}
+                <div class="large-field" style="margin-top: 5px;">{{ tratamento_previo }}</div>
+                {% else %}
+                <div class="large-field" style="margin-top: 5px;"></div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Campo 13: Atestado de Capacidade -->
+    <table class="form-table">
+        <tr>
+            <td>
+                <span class="field-number">13-</span> <span class="field-label">Atestado de capacidade</span><span class="asterisk">*</span><br>
+                <div style="font-size: 8pt; margin: 3px 0;">
+                    A solicitação do medicamento deverá ser realizada pelo paciente. Entretanto, fica dispensada a obrigatoriedade da presença física do paciente considerado incapaz de acordo com os artigos 3º e 4º do Código Civil. O paciente é considerado incapaz?
+                </div>
+                <div class="checkbox-row">
+                    {% if not incapaz %}
+                    <span class="checkbox checked">☑</span> NÃO &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="checkbox">☐</span> SIM. Indicar o nome do responsável pelo paciente, o qual poderá realizar a solicitação do medicamento
+                    {% else %}
+                    <span class="checkbox">☐</span> NÃO &nbsp;&nbsp;&nbsp;&nbsp;
+                    <span class="checkbox checked">☑</span> SIM. Indicar o nome do responsável pelo paciente, o qual poderá realizar a solicitação do medicamento
+                    {% endif %}
+                </div>
+                {% if incapaz and responsavel_nome %}
+                <div style="margin-top: 5px;">
+                    <span style="float: right; margin-right: 100px; font-size: 8pt;">Nome do responsável</span>
+                    <div class="underline" style="width: 200px;">{{ responsavel_nome }}</div>
+                </div>
+                {% else %}
+                <div style="margin-top: 5px;">
+                    <span style="float: right; margin-right: 100px; font-size: 8pt;">Nome do responsável</span>
+                    <div class="underline" style="width: 200px;"></div>
+                </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+
+    <!-- Campos 14-17: Dados do Médico e Assinatura -->
+    <table class="form-table">
+        <tr>
+            <td style="width: 40%;">
+                <span class="field-number">14-</span> <span class="field-label">Nome do médico solicitante</span> <span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ medico or '' }}</div>
+            </td>
+            <td style="width: 60%;">
+                <span class="field-number">17-</span> <span class="field-label">Assinatura e carimbo do médico</span> <span class="asterisk">*</span><br>
+                <div class="signature-area">
                     {% if assinatura and assinatura != 'assinatura' and assinatura.startswith('data:image') %}
-                    <div style="margin-bottom: 10px;">
-                        <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 150px; max-height: 40px;">
+                    <div class="signature-box">
+                        <img src="{{ assinatura }}" alt="Assinatura Digital" class="signature-img">
+                        <div style="font-weight: bold; font-size: 9pt;">Dr. {{ medico }}</div>
+                        <div style="font-size: 8pt;">CRM: {{ crm }}</div>
+                    </div>
+                    {% else %}
+                    <div class="signature-box">
+                        <div style="font-weight: bold; font-size: 9pt;">Dr. {{ medico }}</div>
+                        <div style="font-size: 8pt;">CRM: {{ crm }}</div>
                     </div>
                     {% endif %}
-                    <div style="font-weight: bold;">Dr. {{ medico }}</div>
-                    <div style="font-size: 9pt;">CRM: {{ crm }}</div>
-                    <div style="font-size: 8pt; margin-top: 5px;">Data: {{ data }}</div>
                 </div>
-            </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="field-number">15-</span> <span class="field-label">Número do Cartão Nacional de Saúde (CNS) do médico solicitante</span><span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ medico_cns or '' }}</div>
+            </td>
+            <td>
+                <span class="field-number">16-</span> <span class="field-label">Data da solicitação</span> <span class="asterisk">*</span><br>
+                <div style="margin-top: 8px; font-size: 10pt;">{{ data }}</div>
+                <div style="text-align: right; font-size: 8pt; margin-top: 5px;">Hoje</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Seção de preenchimento por terceiros -->
+    <div class="bottom-section">
+        <div style="font-weight: bold; margin-bottom: 8px;">
+            <span class="field-number">18 -</span> CAMPOS ABAIXO PREENCHIDOS POR <span class="asterisk">*</span>: 
+            <span class="checkbox">☐</span> Paciente &nbsp;&nbsp;
+            <span class="checkbox">☐</span> Mãe do paciente &nbsp;&nbsp;
+            <span class="checkbox">☐</span> Responsável (descrito no item 13) &nbsp;&nbsp;
+            <span class="checkbox">☐</span> Médico solicitante
+        </div>
+        <div style="margin-bottom: 5px;">
+            Outro, informar nome: <span class="underline" style="width: 300px;"></span> e CPF <span class="underline" style="width: 150px;"></span>
+        </div>
+
+        <!-- Campos 19-23 -->
+        <table style="width: 100%; margin-top: 10px;">
+            <tr>
+                <td style="width: 60%; vertical-align: top;">
+                    <span class="field-number">19-</span> <span class="field-label">Raça/Cor/Etnia informado pelo paciente ou responsável</span> <span class="asterisk">*</span><br>
+                    <div style="margin-top: 5px;">
+                        <span class="checkbox">☐</span> Branca &nbsp;&nbsp; <span class="checkbox">☐</span> Amarela<br>
+                        <span class="checkbox">☐</span> Preta &nbsp;&nbsp;&nbsp; <span class="checkbox">☐</span> Indígena. Informar Etnia: <span class="underline" style="width: 150px;"></span><br>
+                        <span class="checkbox">☐</span> Parda
+                    </div>
+                </td>
+                <td style="width: 40%; vertical-align: top;">
+                    <span class="field-number">20-</span> <span class="field-label">Telefone(s) para contato do paciente</span><br>
+                    <div style="border-bottom: 1px solid #000; margin-top: 15px; height: 20px;"></div>
+                </td>
+            </tr>
+        </table>
+
+        <table style="width: 100%; margin-top: 10px;">
+            <tr>
+                <td style="width: 50%;">
+                    <span class="field-number">21-</span> <span class="field-label">Número do documento do paciente</span><br>
+                    <span class="checkbox">☐</span> CPF ou <span class="checkbox">☐</span> CNS<br>
+                    <div style="border-bottom: 1px solid #000; margin-top: 5px; height: 15px;"></div>
+                </td>
+                <td style="width: 50%;">
+                    <span class="field-number">23-</span> <span class="field-label">Assinatura do responsável pelo preenchimento</span> <span class="asterisk">*</span><br>
+                    <div style="border: 1px solid #000; height: 40px; margin-top: 5px;"></div>
+                </td>
+            </tr>
+        </table>
+
+        <div style="margin-top: 8px;">
+            <span class="field-number">22-</span> <span class="field-label">Correio eletrônico do paciente</span><br>
+            <div style="border-bottom: 1px solid #000; margin-top: 5px; height: 15px;"></div>
         </div>
     </div>
 
     <!-- Rodapé -->
-    <div style="text-align: center; margin-top: 20px; font-size: 8pt; color: #666;">
-        <p>Este formulário deve ser preenchido em sua totalidade para análise da solicitação</p>
+    <div style="margin-top: 10px; font-size: 7pt;">
+        <span class="asterisk">*</span> CAMPOS DE PREENCHIMENTO OBRIGATÓRIO
     </div>
+    
+    <div class="footer">
+        Para suporte, entre em contato pelo: ceaf.daf@saude.gov.br
+    </div>
+
 </body>
 </html>
