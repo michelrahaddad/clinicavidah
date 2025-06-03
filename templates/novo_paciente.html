@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4 page-title">
+                <i class="fas fa-user-plus me-3 text-info"></i>
+                <span class="gradient-text">Novo Paciente</span>
+            </h1>
+            <p class="text-muted mb-4">Cadastre um novo paciente no sistema</p>
+        </div>
+    </div>
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card glass-card">
+                <div class="card-header">
+                    <h5 class="mb-0 text-light">
+                        <i class="fas fa-user me-2 text-info"></i>
+                        Dados do Paciente
+                    </h5>
+                </div>
+                
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('pacientes.novo_paciente') }}">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <label for="nome_paciente" class="form-label text-light">
+                                    <i class="fas fa-user me-2"></i>Nome Completo do Paciente *
+                                </label>
+                                <input type="text" 
+                                       name="nome_paciente" 
+                                       id="nome_paciente"
+                                       class="form-control glass-input" 
+                                       placeholder="Digite o nome completo do paciente"
+                                       value="{{ nome_paciente if nome_paciente else '' }}"
+                                       required
+                                       autocomplete="off">
+                                <small class="form-text text-muted mt-2">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Digite o nome completo do paciente para cadastrá-lo no sistema
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12 d-flex justify-content-between">
+                                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary neural-btn px-4 py-2" style="border-radius: 15px; font-weight: 600;">
+                                    <i class="fas fa-arrow-left me-2"></i>VOLTAR
+                                </a>
+                                <button type="submit" class="btn btn-info btn-lg neural-btn px-5 py-3" 
+                                        style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);">
+                                    <i class="fas fa-user-plus me-2"></i>CADASTRAR PACIENTE
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Recent Patients -->
+            <div class="card glass-card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0 text-light">
+                        <i class="fas fa-history me-2 text-secondary"></i>
+                        Pacientes Recentes
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="recent-patients">
+                        <div class="col-12 text-center text-muted">
+                            <i class="fas fa-users fa-2x mb-2"></i>
+                            <p>Os pacientes cadastrados recentemente aparecerão aqui</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focus on patient name input
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('nome_paciente').focus();
+    
+    // Add some visual feedback
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>CADASTRANDO...';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}
