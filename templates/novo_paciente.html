@@ -4,105 +4,158 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4 page-title">
-                <i class="fas fa-user-plus me-3 text-info"></i>
-                <span class="gradient-text">Novo Paciente</span>
-            </h1>
-            <p class="text-muted mb-4">Cadastre um novo paciente no sistema</p>
+            <div class="text-center mb-5">
+                <div class="icon-container mb-3">
+                    <i class="fas fa-user-plus fa-4x text-info"></i>
+                </div>
+                <h1 class="page-title mb-3">
+                    <span class="gradient-text">Novo Paciente</span>
+                </h1>
+                <p class="text-muted fs-5">Cadastre um novo paciente no sistema médico</p>
+            </div>
         </div>
     </div>
     
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card glass-card">
-                <div class="card-header">
-                    <h5 class="mb-0 text-light">
-                        <i class="fas fa-user me-2 text-info"></i>
-                        Dados do Paciente
-                    </h5>
+        <div class="col-lg-9 col-xl-8">
+            <div class="card glass-card shadow-lg">
+                <div class="card-header bg-transparent border-0 py-4">
+                    <div class="text-center">
+                        <h4 class="mb-0 text-light fw-bold">
+                            <i class="fas fa-clipboard-user me-3 text-info"></i>
+                            Informações do Paciente
+                        </h4>
+                        <small class="text-muted">Preencha os dados para cadastrar no sistema</small>
+                    </div>
                 </div>
                 
-                <div class="card-body">
+                <div class="card-body px-5 py-4">
                     <form method="POST" action="{{ url_for('pacientes.novo_paciente') }}">
-                        <div class="row mb-4">
+                        <div class="row mb-5">
                             <div class="col-12">
-                                <label for="nome_paciente" class="form-label text-light">
-                                    <i class="fas fa-user me-2"></i>Nome Completo do Paciente *
-                                </label>
-                                <input type="text" 
-                                       name="nome_paciente" 
-                                       id="nome_paciente"
-                                       class="form-control glass-input" 
-                                       placeholder="Digite o nome completo do paciente"
-                                       value="{{ nome_paciente if nome_paciente else '' }}"
-                                       required
-                                       autocomplete="off">
+                                <div class="form-floating mb-3">
+                                    <input type="text" 
+                                           name="nome_paciente" 
+                                           id="nome_paciente"
+                                           class="form-control glass-input form-control-lg" 
+                                           placeholder="Digite o nome completo do paciente"
+                                           value="{{ nome_paciente if nome_paciente else '' }}"
+                                           required
+                                           autocomplete="off">
+                                    <label for="nome_paciente" class="text-light">
+                                        <i class="fas fa-user me-2 text-info"></i>Nome Completo do Paciente *
+                                    </label>
+                                </div>
+                                <div class="alert alert-info border-0 bg-transparent">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Campo obrigatório:</strong> Digite o nome completo do paciente para cadastrá-lo no sistema
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-5">
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <div class="form-floating">
+                                    <input type="email" 
+                                           name="email_paciente" 
+                                           id="email_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="exemplo@email.com"
+                                           autocomplete="email">
+                                    <label for="email_paciente" class="text-light">
+                                        <i class="fas fa-envelope me-2 text-success"></i>Email do Paciente
+                                    </label>
+                                </div>
                                 <small class="form-text text-muted mt-2">
-                                    <i class="fas fa-info-circle me-1"></i>
-                                    Campo obrigatório - Digite o nome completo do paciente
-                                </small>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label for="email_paciente" class="form-label text-light">
-                                    <i class="fas fa-envelope me-2"></i>Email do Paciente
-                                </label>
-                                <input type="email" 
-                                       name="email_paciente" 
-                                       id="email_paciente"
-                                       class="form-control glass-input" 
-                                       placeholder="exemplo@email.com"
-                                       autocomplete="email">
-                                <small class="form-text text-muted mt-1">
+                                    <i class="fas fa-check-circle me-1 text-success"></i>
                                     Campo opcional
                                 </small>
                             </div>
                             <div class="col-md-6">
-                                <label for="telefone_paciente" class="form-label text-light">
-                                    <i class="fas fa-phone me-2"></i>Telefone do Paciente
-                                </label>
-                                <input type="tel" 
-                                       name="telefone_paciente" 
-                                       id="telefone_paciente"
-                                       class="form-control glass-input" 
-                                       placeholder="(11) 99999-9999"
-                                       autocomplete="tel">
-                                <small class="form-text text-muted mt-1">
+                                <div class="form-floating">
+                                    <input type="tel" 
+                                           name="telefone_paciente" 
+                                           id="telefone_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="(11) 99999-9999"
+                                           autocomplete="tel">
+                                    <label for="telefone_paciente" class="text-light">
+                                        <i class="fas fa-phone me-2 text-warning"></i>Telefone do Paciente
+                                    </label>
+                                </div>
+                                <small class="form-text text-muted mt-2">
+                                    <i class="fas fa-check-circle me-1 text-success"></i>
                                     Campo opcional
                                 </small>
                             </div>
                         </div>
                         
-                        <div class="row mt-4">
-                            <div class="col-12 d-flex justify-content-between">
-                                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-primary neural-btn px-4 py-2" style="border-radius: 15px; font-weight: 600;">
-                                    <i class="fas fa-arrow-left me-2"></i>VOLTAR
-                                </a>
-                                <button type="submit" class="btn btn-info btn-lg neural-btn px-5 py-3" 
-                                        style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);">
-                                    <i class="fas fa-user-plus me-2"></i>CADASTRAR PACIENTE
-                                </button>
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <div class="d-flex flex-column flex-md-row gap-3 justify-content-between align-items-center">
+                                    <a href="{{ url_for('dashboard.dashboard') }}" 
+                                       class="btn btn-outline-light neural-btn px-5 py-3 order-2 order-md-1" 
+                                       style="border-radius: 25px; font-weight: 600; min-width: 160px;">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        VOLTAR
+                                    </a>
+                                    
+                                    <button type="submit" 
+                                            class="btn btn-gradient neural-btn px-5 py-3 order-1 order-md-2" 
+                                            style="border-radius: 25px; font-weight: 600; min-width: 220px; background: linear-gradient(45deg, #17a2b8, #28a745); border: none; color: white; box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);">
+                                        <i class="fas fa-user-plus me-2"></i>
+                                        CADASTRAR PACIENTE
+                                    </button>
+                                </div>
+                                
+                                <div class="text-center mt-4">
+                                    <small class="text-muted">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        Dados protegidos conforme LGPD
+                                    </small>
+                                </div>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
             
-            <!-- Recent Patients -->
-            <div class="card glass-card mt-4">
-                <div class="card-header">
-                    <h6 class="mb-0 text-light">
-                        <i class="fas fa-history me-2 text-secondary"></i>
-                        Pacientes Recentes
-                    </h6>
+            <!-- Quick Actions Card -->
+            <div class="card glass-card mt-5 shadow-lg">
+                <div class="card-header bg-transparent border-0 py-3">
+                    <div class="text-center">
+                        <h5 class="mb-0 text-light fw-bold">
+                            <i class="fas fa-rocket me-2 text-warning"></i>
+                            Ações Rápidas
+                        </h5>
+                        <small class="text-muted">Acesse rapidamente outras funcionalidades</small>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row" id="recent-patients">
-                        <div class="col-12 text-center text-muted">
-                            <i class="fas fa-users fa-2x mb-2"></i>
-                            <p>Os pacientes cadastrados recentemente aparecerão aqui</p>
+                <div class="card-body py-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="{{ url_for('receita.receita') }}" 
+                               class="btn btn-outline-info w-100 py-3 neural-btn" 
+                               style="border-radius: 15px; min-height: 80px;">
+                                <i class="fas fa-prescription-bottle-alt fa-2x mb-2 d-block"></i>
+                                <small class="fw-bold">Nova Receita</small>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('exames_lab.exames_lab') }}" 
+                               class="btn btn-outline-success w-100 py-3 neural-btn" 
+                               style="border-radius: 15px; min-height: 80px;">
+                                <i class="fas fa-flask fa-2x mb-2 d-block"></i>
+                                <small class="fw-bold">Exames Lab</small>
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="{{ url_for('prontuario.prontuario') }}" 
+                               class="btn btn-outline-warning w-100 py-3 neural-btn" 
+                               style="border-radius: 15px; min-height: 80px;">
+                                <i class="fas fa-file-medical fa-2x mb-2 d-block"></i>
+                                <small class="fw-bold">Prontuário</small>
+                            </a>
                         </div>
                     </div>
                 </div>
