@@ -6,7 +6,7 @@
         <div class="col-12">
             <h2 class="mb-4 page-title">
                 <i class="fas fa-prescription-bottle-alt me-3 text-primary"></i>
-                <span class="gradient-text">Prescrição Neural</span>
+                <span class="gradient-text">Receita Médica</span>
             </h2>
         </div>
     </div>
@@ -124,8 +124,9 @@
         </div>
         
         <div class="mt-4 text-center">
-            <button type="submit" class="btn btn-primary btn-lg neural-btn" onclick="showLoading(this)">
-                <i class="fas fa-save me-2"></i>Salvar Receita e Gerar PDF
+            <button type="submit" class="btn btn-success btn-lg neural-btn px-5 py-3" onclick="showLoading(this)" 
+                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+                <i class="fas fa-file-pdf me-2"></i>GERAR PDF
             </button>
         </div>
     </form>
@@ -315,6 +316,31 @@ class MedicationAutocomplete {
 // Initialize autocomplete system
 document.addEventListener('DOMContentLoaded', function() {
     new MedicationAutocomplete();
+    
+    // Melhorar disposição dos botões lixo
+    const trashButtons = document.querySelectorAll('.btn-outline-danger');
+    trashButtons.forEach(btn => {
+        if (btn.querySelector('.fas.fa-trash')) {
+            btn.style.borderRadius = '50%';
+            btn.style.width = '40px';
+            btn.style.height = '40px';
+            btn.style.marginTop = '25px';
+            btn.classList.add('btn-sm', 'p-2');
+            btn.title = 'Remover medicamento';
+            
+            // Centralizar o botão no container
+            const container = btn.parentElement;
+            container.classList.add('d-flex', 'align-items-center', 'justify-content-center');
+            container.classList.remove('align-items-end');
+        }
+    });
 });
 </script>
+
+<style>
+.btn-outline-danger:hover {
+    transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+</style>
 {% endblock %}
