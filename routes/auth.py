@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from models import Medico, Administrador
 from app import db
 from werkzeug.security import check_password_hash
+from datetime import datetime
 import logging
 
 auth_bp = Blueprint('auth', __name__)
@@ -19,28 +20,48 @@ def login():
             return render_template('login.html')
         
         try:
+            logging.info(f'Login attempt - Nome: {nome}, CRM: {crm}')
+            
             # Primeiro, verificar se é administrador (usando nome como usuário)
             admin = Administrador.query.filter_by(usuario=nome, ativo=True).first()
+            logging.info(f'Admin query result: {admin is not None}')
             
-            if admin and check_password_hash(admin.senha, senha):
-                # Login como administrador
-                session['admin'] = {
-                    'id': admin.id,
-                    'usuario': admin.usuario,
-                    'nome': admin.nome
-                }
+            if admin:
+                logging.info(f'Admin found: {admin.nome}, checking password...')
+                senha_valida = check_password_hash(admin.senha, senha)
+                logging.info(f'Password validation: {senha_valida}')
                 
-                # Update last access
-                admin.ultimo_acesso = db.session.query(db.func.now()).scalar()
-                db.session.commit()
-                
-                # Log admin login
-                from utils.security import log_admin_action
-                log_admin_action('login', admin.usuario, f'Login administrativo realizado', request.remote_addr)
-                
-                flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
-                logging.info(f'Admin login successful for: {nome}')
-                return redirect(url_for('admin.dashboard'))
+                if senha_valida:
+                    # Limpar sessão completamente
+                    session.clear()
+                    
+                    # Login como administrador
+                    session['admin'] = True
+                    session['admin_data'] = {
+                        'id': admin.id,
+                        'usuario': admin.usuario,
+                        'nome': admin.nome,
+                        'email': admin.email
+                    }
+                    session['usuario'] = admin.nome
+                    session.permanent = True
+                    
+                    # Update last access
+                    admin.ultimo_acesso = datetime.utcnow()
+                    db.session.commit()
+                    
+                    # Log admin login
+                    try:
+                        from utils.security import log_admin_action
+                        log_admin_action('login', admin.usuario, f'Login administrativo realizado', request.remote_addr)
+                    except Exception as log_error:
+                        logging.warning(f'Failed to log admin action: {log_error}')
+                    
+                    flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
+                    logging.info(f'Admin login successful for: {nome}')
+                    return redirect(url_for('admin.dashboard'))
+                else:
+                    logging.warning(f'Invalid password for admin: {nome}')
             
             # Se não é admin, verificar se é médico (CRM obrigatório para médicos)
             if crm:  # Se CRM foi fornecido, tentar login como médico
