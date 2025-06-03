@@ -11,7 +11,7 @@ def require_admin(f):
     def decorated_function(*args, **kwargs):
         if 'admin' not in session:
             flash('Acesso não autorizado. Faça login como administrador.', 'error')
-            return redirect(url_for('admin.admin_login'))
+            return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
 
