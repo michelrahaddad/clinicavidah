@@ -219,3 +219,22 @@ class FormularioAltoCusto(db.Model):
     # Relationships
     paciente = relationship('Paciente', back_populates='formularios_alto_custo')
     medico = relationship('Medico', back_populates='formularios_alto_custo')
+
+class ExamePersonalizado(db.Model):
+    __tablename__ = 'exames_personalizados'
+    
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(200), nullable=False)
+    tipo = Column(String(20), nullable=False)  # 'laboratorial' ou 'imagem'
+    categoria = Column(String(100), nullable=True)
+    ativo = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Foreign Key
+    id_medico = Column(Integer, ForeignKey('medicos.id'), nullable=False)
+    
+    # Relationships
+    medico = relationship('Medico', back_populates='exames_personalizados')
+
+# Add relationship to Medico model
+Medico.exames_personalizados = relationship('ExamePersonalizado', back_populates='medico', lazy=True)
