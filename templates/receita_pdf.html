@@ -6,133 +6,115 @@
     <style>
         @page {
             size: A4;
-            margin: 2.5cm 2cm;
-            @bottom-center {
-                content: "Sistema Médico VIDAH - " attr(data-date);
-                font-size: 10pt;
-                color: #666;
-            }
+            margin: 2cm;
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 11pt;
-            line-height: 1.5;
-            color: #333;
+            font-size: 12pt;
+            line-height: 1.4;
+            color: #000;
             margin: 0;
             padding: 0;
         }
         .header {
             text-align: center;
-            border-bottom: 2px solid #0066cc;
-            padding-bottom: 20px;
             margin-bottom: 30px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 15px;
         }
-        .logo {
-            font-size: 24pt;
+        .clinic-name {
+            font-size: 18pt;
             font-weight: bold;
-            color: #0066cc;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
-        .doctor-info {
-            margin-bottom: 10px;
-        }
-        .patient-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-left: 4px solid #0066cc;
-            margin-bottom: 20px;
-        }
-        .prescription-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-        }
-        .prescription-table th,
-        .prescription-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        .prescription-table th {
-            background-color: #0066cc;
-            color: white;
-            font-weight: bold;
-        }
-        .prescription-table tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        .footer {
-            position: fixed;
-            bottom: 2cm;
-            left: 0;
-            right: 0;
-            text-align: center;
+        .clinic-info {
             font-size: 10pt;
-            color: #666;
+            color: #555;
+            margin-bottom: 15px;
         }
-        .signature {
-            margin-top: 50px;
+        .patient-section {
+            margin-bottom: 25px;
+            font-size: 12pt;
+        }
+        .via-section {
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 12pt;
+        }
+        .prescription-item {
+            margin-bottom: 15px;
+            font-size: 12pt;
+        }
+        .medication-number {
+            font-weight: bold;
+        }
+        .medication-name {
+            display: inline-block;
+            width: 250px;
+            border-bottom: 1px dotted #000;
+            margin-right: 10px;
+        }
+        .medication-quantity {
+            font-size: 11pt;
+        }
+        .posology {
+            margin-left: 20px;
+            font-size: 11pt;
+            margin-top: 3px;
+        }
+        .signature-section {
+            margin-top: 60px;
             text-align: center;
         }
-        .signature-line {
-            border-top: 1px solid #333;
-            width: 300px;
-            margin: 0 auto;
-            padding-top: 10px;
+        .doctor-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .crm-info {
+            margin-bottom: 10px;
+        }
+        .signature-image {
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">SISTEMA VIDAH</div>
-        <div class="doctor-info">
-            <strong>Dr(a). {{ medico }}</strong><br>
-            CRM: {{ crm }}
+        <div class="clinic-name">Grupo VIDAH</div>
+        <div class="clinic-info">
+            Endereço: R. XV de Novembro, 594 - Centro, Ibitinga - SP, 14940-000<br>
+            Telefone: (16) 3342-4768
         </div>
-        <div>{{ data }}</div>
     </div>
     
-    <div class="patient-info">
+    <div class="patient-section">
         <strong>Paciente:</strong> {{ nome_paciente }}
     </div>
     
-    <h3 style="color: #0066cc; margin-bottom: 20px;">PRESCRIÇÃO MÉDICA</h3>
-    
-    <table class="prescription-table">
-        <thead>
-            <tr>
-                <th>Medicamento</th>
-                <th>Posologia</th>
-                <th>Duração</th>
-                <th>Via</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for medicamento, posologia, duracao, via in zip(medicamentos, posologias, duracoes, vias) %}
-            <tr>
-                <td><strong>{{ medicamento }}</strong></td>
-                <td>{{ posologia }}</td>
-                <td>{{ duracao }}</td>
-                <td>{{ via }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
-    <div class="signature">
-        {% if assinatura %}
-        <div style="margin-bottom: 10px;">
-            <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 80px; border: 1px solid #ddd;">
-        </div>
-        {% endif %}
-        <div class="signature-line">
-            <strong>Dr(a). {{ medico }}</strong><br>
-            CRM: {{ crm }}
-        </div>
+    <div class="via-section">
+        Via {{ vias[0] if vias else 'oral' }}
     </div>
     
-    <div class="footer">
-        Sistema Médico VIDAH - {{ data }}
+    <div class="prescription-content">
+        {% for medicamento, posologia, duracao, via in zip(medicamentos, posologias, duracoes, vias) %}
+        <div class="prescription-item">
+            <span class="medication-number">{{ loop.index }})</span>
+            <span class="medication-name">{{ medicamento }}</span>
+            <span class="medication-quantity">{{ duracao }}</span>
+            <div class="posology">- {{ posologia }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="signature-section">
+        {% if assinatura %}
+        <div class="signature-image">
+            <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 60px;">
+        </div>
+        {% endif %}
+        <div class="doctor-name">{{ medico }}</div>
+        <div class="crm-info">CRM {{ crm }}</div>
+        <div style="font-size: 10pt; margin-top: 10px;">Assinatura digital</div>
     </div>
 </body>
 </html>
