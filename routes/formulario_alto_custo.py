@@ -45,8 +45,8 @@ def salvar_formulario_alto_custo():
         responsavel_nome = sanitizar_entrada(request.form.get('responsavel_nome', ''))
         medico_cns = sanitizar_entrada(request.form.get('medico_cns', ''))
         
-        if not all([nome_paciente, nome_mae, peso, altura, medicamento, quantidade, anamnese]):
-            flash('Todos os campos obrigatórios devem ser preenchidos.', 'error')
+        if not all([medicamento, quantidade, anamnese]):
+            flash('Medicamento, quantidade e anamnese são obrigatórios.', 'error')
             return redirect(url_for('formulario_alto_custo.formulario_alto_custo'))
         
         # Get doctor info
