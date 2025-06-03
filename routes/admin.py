@@ -51,7 +51,7 @@ def dashboard():
         return render_template('admin/dashboard.html', total_medicos=0, total_receitas=0, 
                              total_exames_lab=0, total_exames_img=0, total_agendamentos=0)
 
-@admin_bp.route('/neural-stats')
+@admin_bp.route('/estatisticas-neurais')
 @require_admin
 def neural_stats():
     """Neural statistics page"""
