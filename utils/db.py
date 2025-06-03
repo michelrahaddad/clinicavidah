@@ -180,6 +180,10 @@ def get_detailed_statistics(medico_id=None):
         
     except Exception as e:
         logging.error(f'Detailed statistics error: {e}')
+        try:
+            db.session.rollback()
+        except:
+            pass
         return {
             'medicamentos': [],
             'exames_lab': [],
@@ -191,6 +195,7 @@ def get_monthly_evolution(medico_id=None):
     try:
         from datetime import datetime, timedelta
         from sqlalchemy import func, extract
+        from models import Receita, ExameLab, ExameImg
         
         # Get last 12 months
         current_date = datetime.now()
@@ -258,6 +263,10 @@ def get_monthly_evolution(medico_id=None):
         
     except Exception as e:
         logging.error(f'Monthly evolution error: {e}')
+        try:
+            db.session.rollback()
+        except:
+            pass
         return {
             'months': [],
             'receitas': [],

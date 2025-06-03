@@ -304,6 +304,86 @@
         {% endif %}
     </div>
 
+    <!-- Detailed Statistics Section -->
+    <div class="section">
+        <h2>Estatísticas Detalhadas por Categoria</h2>
+        
+        <!-- Top Medicamentos -->
+        <h3>Medicamentos Mais Prescritos</h3>
+        {% if stats.detailed_stats.medicamentos %}
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Posição</th>
+                    <th>Medicamento</th>
+                    <th>Quantidade Prescrita</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for med in stats.detailed_stats.medicamentos %}
+                <tr>
+                    <td>{{ loop.index }}º</td>
+                    <td>{{ med.nome }}</td>
+                    <td>{{ med.quantidade }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum medicamento prescrito no período analisado.</p>
+        {% endif %}
+
+        <!-- Top Exames Laboratoriais -->
+        <h3 style="margin-top: 25px;">Exames Laboratoriais Mais Solicitados</h3>
+        {% if stats.detailed_stats.exames_lab %}
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Posição</th>
+                    <th>Exame Laboratorial</th>
+                    <th>Quantidade Solicitada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in stats.detailed_stats.exames_lab %}
+                <tr>
+                    <td>{{ loop.index }}º</td>
+                    <td>{{ exam.nome }}</td>
+                    <td>{{ exam.quantidade }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum exame laboratorial solicitado no período analisado.</p>
+        {% endif %}
+
+        <!-- Top Exames de Imagem -->
+        <h3 style="margin-top: 25px;">Exames de Imagem Mais Solicitados</h3>
+        {% if stats.detailed_stats.exames_img %}
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Posição</th>
+                    <th>Exame de Imagem</th>
+                    <th>Quantidade Solicitada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exam in stats.detailed_stats.exames_img %}
+                <tr>
+                    <td>{{ loop.index }}º</td>
+                    <td>{{ exam.nome }}</td>
+                    <td>{{ exam.quantidade }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>Nenhum exame de imagem solicitado no período analisado.</p>
+        {% endif %}
+    </div>
+
     <div class="section">
         <h2>Observações e Recomendações</h2>
         <div class="insights">
