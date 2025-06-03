@@ -94,7 +94,7 @@ def neural_stats():
         for i in range(24):
             valor = int(20 * (1 + 0.5 * (i - 14)**2 / 100))
             atividade_por_hora[i] = valor if valor > 0 else 0
-        max_atividade = max(atividade_por_hora.values()) if atividade_por_hora else 1
+        max_atividade = max(atividade_por_hora.values()) if atividade_por_hora and atividade_por_hora.values() else 1
         uso_mensal = [total_receitas//6, total_receitas//4, total_receitas//3, total_receitas//2, int(total_receitas//1.5), total_receitas]
         
         stats = {
@@ -143,11 +143,14 @@ def backup_management():
                 if file.endswith('.sql') or file.endswith('.gz'):
                     file_path = os.path.join(backup_dir, file)
                     stat = os.stat(file_path)
-                    from datetime import datetime
+                    from utils.timezone_helper import utc_to_brasilia
+                    import datetime
+                    utc_time = datetime.datetime.fromtimestamp(stat.st_mtime, tz=datetime.timezone.utc)
+                    brasilia_time = utc_to_brasilia(utc_time)
                     backups.append({
                         'name': file,
                         'size': stat.st_size,
-                        'date': datetime.fromtimestamp(stat.st_mtime)
+                        'date': brasilia_time
                     })
         
         return render_template('admin/backup.html', config=config, backups=backups)
