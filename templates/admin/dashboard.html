@@ -113,7 +113,7 @@
             </a>
             
             <div class="navbar-nav ms-auto">
-                <a class="nav-link text-light me-3" href="{{ url_for('admin.estatisticas_neurais') }}">
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.neural_stats') }}">
                     <i class="fas fa-chart-line me-1"></i>Estatísticas Neurais
                 </a>
                 <a class="nav-link text-light me-3" href="{{ url_for('admin.backup_management') }}">
@@ -122,10 +122,10 @@
                 <a class="nav-link text-light me-3" href="{{ url_for('admin.system_update') }}">
                     <i class="fas fa-upload me-1"></i>Atualizações
                 </a>
-                <a class="nav-link text-light me-3" href="{{ url_for('admin.system_logs') }}">
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.logs') }}">
                     <i class="fas fa-file-alt me-1"></i>Logs
                 </a>
-                <a class="nav-link text-light" href="{{ url_for('admin.admin_logout') }}">
+                <a class="nav-link text-light" href="{{ url_for('auth.logout') }}">
                     <i class="fas fa-sign-out-alt me-1"></i>Sair
                 </a>
             </div>
@@ -150,14 +150,14 @@
             <div class="col-md-3 mb-3">
                 <div class="stat-card p-4 text-center text-light">
                     <i class="fas fa-user-md fa-3x mb-3 text-info"></i>
-                    <h3 class="fw-bold">{{ stats.total_medicos }}</h3>
+                    <h3 class="fw-bold">{{ total_medicos }}</h3>
                     <p class="mb-0">Médicos Cadastrados</p>
                 </div>
             </div>
             <div class="col-md-3 mb-3">
                 <div class="stat-card p-4 text-center text-light">
                     <i class="fas fa-users fa-3x mb-3 text-success"></i>
-                    <h3 class="fw-bold">{{ stats.total_pacientes }}</h3>
+                    <h3 class="fw-bold">{{ total_receitas }}</h3>
                     <p class="mb-0">Pacientes Cadastrados</p>
                 </div>
             </div>

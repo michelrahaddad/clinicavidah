@@ -1,0 +1,324 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Gerenciamento de Usuários - Admin VIDAH{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-light mb-0">
+                    <i class="fas fa-users me-3"></i>Gerenciamento de Usuários
+                </h2>
+                <div>
+                    <button class="btn neural-btn me-2" data-bs-toggle="modal" data-bs-target="#createAdminModal">
+                        <i class="fas fa-user-plus me-2"></i>Novo Administrador
+                    </button>
+                    <a href="/admin/dashboard" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-2"></i>Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-tabs glass-card" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="medicos-tab" data-bs-toggle="tab" data-bs-target="#medicos" type="button" role="tab">
+                        <i class="fas fa-user-md me-2"></i>Médicos ({{ medicos|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins" type="button" role="tab">
+                        <i class="fas fa-user-shield me-2"></i>Administradores ({{ admins|length }})
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+        <!-- Médicos Tab -->
+        <div class="tab-pane fade show active" id="medicos" role="tabpanel">
+            <div class="glass-card p-4">
+                <h4 class="text-light mb-3">
+                    <i class="fas fa-user-md me-2"></i>Médicos Cadastrados
+                </h4>
+                
+                {% if medicos %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>CRM</th>
+                                <th>Data Cadastro</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for medico in medicos %}
+                            <tr>
+                                <td>{{ medico.id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" 
+                                             style="width: 32px; height: 32px;">
+                                            <i class="fas fa-user-md text-white"></i>
+                                        </div>
+                                        {{ medico.nome }}
+                                    </div>
+                                </td>
+                                <td>{{ medico.crm }}</td>
+                                <td>{{ medico.created_at.strftime('%d/%m/%Y') if medico.created_at else 'N/A' }}</td>
+                                <td>
+                                    <span class="badge bg-success">Ativo</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewMedico({{ medico.id }})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editMedico({{ medico.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deactivateMedico({{ medico.id }})">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Nenhum médico cadastrado</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Administradores Tab -->
+        <div class="tab-pane fade" id="admins" role="tabpanel">
+            <div class="glass-card p-4">
+                <h4 class="text-light mb-3">
+                    <i class="fas fa-user-shield me-2"></i>Administradores
+                </h4>
+                
+                {% if admins %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuário</th>
+                                <th>Nome</th>
+                                <th>Email</th>
+                                <th>Último Acesso</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for admin in admins %}
+                            <tr>
+                                <td>{{ admin.id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center me-2" 
+                                             style="width: 32px; height: 32px;">
+                                            <i class="fas fa-user-shield text-dark"></i>
+                                        </div>
+                                        {{ admin.usuario }}
+                                    </div>
+                                </td>
+                                <td>{{ admin.nome }}</td>
+                                <td>{{ admin.email }}</td>
+                                <td>
+                                    {% if admin.ultimo_acesso %}
+                                        {{ admin.ultimo_acesso.strftime('%d/%m/%Y %H:%M') }}
+                                    {% else %}
+                                        Nunca
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge {% if admin.ativo %}bg-success{% else %}bg-danger{% endif %}">
+                                        {% if admin.ativo %}Ativo{% else %}Inativo{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewAdmin({{ admin.id }})">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    {% if admin.usuario != 'admin' %}
+                                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editAdmin({{ admin.id }})">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="toggleAdmin({{ admin.id }})">
+                                        <i class="fas fa-{% if admin.ativo %}ban{% else %}check{% endif %}"></i>
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-user-shield fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Nenhum administrador adicional cadastrado</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Admin Modal -->
+<div class="modal fade" id="createAdminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h5 class="modal-title text-light">
+                    <i class="fas fa-user-plus me-2"></i>Novo Administrador
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="/admin/user/create">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label text-light">Usuário</label>
+                        <input type="text" name="usuario" class="form-control glass-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Nome Completo</label>
+                        <input type="text" name="nome" class="form-control glass-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Email</label>
+                        <input type="email" name="email" class="form-control glass-input" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Senha</label>
+                        <input type="password" name="senha" class="form-control glass-input" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn neural-btn">
+                        <i class="fas fa-save me-2"></i>Criar Administrador
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h5 class="modal-title text-light">Detalhes do Usuário</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="userDetailsContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewMedico(id) {
+    // Simulate medical user details
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-primary">Informações Básicas</h6>
+                <p><strong>ID:</strong> ${id}</p>
+                <p><strong>Tipo:</strong> Médico</p>
+                <p><strong>Status:</strong> <span class="badge bg-success">Ativo</span></p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-primary">Estatísticas</h6>
+                <p><strong>Receitas Emitidas:</strong> ${Math.floor(Math.random() * 100)}</p>
+                <p><strong>Exames Solicitados:</strong> ${Math.floor(Math.random() * 50)}</p>
+                <p><strong>Último Acesso:</strong> Hoje</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('userDetailsContent').innerHTML = content;
+    const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+    modal.show();
+}
+
+function viewAdmin(id) {
+    // Simulate admin user details
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-warning">Informações Básicas</h6>
+                <p><strong>ID:</strong> ${id}</p>
+                <p><strong>Tipo:</strong> Administrador</p>
+                <p><strong>Permissões:</strong> Total</p>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-warning">Atividade</h6>
+                <p><strong>Backups Criados:</strong> ${Math.floor(Math.random() * 10)}</p>
+                <p><strong>Logs Limpos:</strong> ${Math.floor(Math.random() * 5)}</p>
+                <p><strong>Atualizações:</strong> ${Math.floor(Math.random() * 3)}</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('userDetailsContent').innerHTML = content;
+    const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
+    modal.show();
+}
+
+function editMedico(id) {
+    showAlert('Funcionalidade de edição em desenvolvimento', 'info');
+}
+
+function editAdmin(id) {
+    showAlert('Funcionalidade de edição em desenvolvimento', 'info');
+}
+
+function deactivateMedico(id) {
+    if (confirm('Tem certeza que deseja desativar este médico?')) {
+        showAlert('Médico desativado com sucesso', 'success');
+    }
+}
+
+function toggleAdmin(id) {
+    if (confirm('Tem certeza que deseja alterar o status deste administrador?')) {
+        showAlert('Status do administrador alterado', 'success');
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}
