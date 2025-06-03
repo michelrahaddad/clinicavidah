@@ -20,9 +20,11 @@ def cadastrar_medico():
                 flash('Todos os campos são obrigatórios, incluindo a assinatura digital.', 'error')
                 return render_template('cadastro_medico.html')
             
-            # Check if CRM already exists
-            existente = Medico.query.filter_by(crm=crm).first()
-            if existente:
+            # Check if CRM already exists - force fresh query
+            from sqlalchemy import text
+            db.session.commit()  # Ensure any pending changes are committed
+            result = db.session.execute(text("SELECT id FROM medicos WHERE crm = :crm"), {'crm': crm}).fetchone()
+            if result:
                 flash('CRM já cadastrado no sistema!', 'error')
                 return render_template('cadastro_medico.html')
             
