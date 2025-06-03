@@ -76,31 +76,41 @@ def salvar_receita():
         db.session.commit()
         
         # Generate PDF
-        logging.info(f'Starting PDF generation for prescription: {nome_paciente}')
-        pdf_html = render_template('receita_pdf.html',
-                                 nome_paciente=nome_paciente,
-                                 medicamentos=medicamentos,
-                                 posologias=posologias,
-                                 duracoes=duracoes,
-                                 vias=vias,
-                                 medico=medico.nome,
-                                 crm=medico.crm,
-                                 assinatura=medico.assinatura,
-                                 data=data,
-                                 zip=zip)
-        
-        logging.info('HTML template rendered successfully')
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
-        logging.info('PDF file generated successfully')
-        
-        response = make_response(pdf_file)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=receita_{nome_paciente}_{data}.pdf'
-        
-        flash('Receita salva e PDF gerado com sucesso!', 'success')
-        logging.info(f'Prescription created for patient: {nome_paciente}')
-        
-        return response
+        try:
+            logging.info(f'Starting PDF generation for prescription: {nome_paciente}')
+            pdf_html = render_template('receita_pdf.html',
+                                     nome_paciente=nome_paciente,
+                                     medicamentos=medicamentos,
+                                     posologias=posologias,
+                                     duracoes=duracoes,
+                                     vias=vias,
+                                     medico=medico.nome,
+                                     crm=medico.crm,
+                                     assinatura=medico.assinatura,
+                                     data=data,
+                                     zip=zip)
+            
+            logging.info('HTML template rendered successfully')
+            
+            # Create WeasyPrint HTML object with better error handling
+            html_doc = weasyprint.HTML(string=pdf_html, base_url=request.url_root)
+            pdf_file = html_doc.write_pdf()
+            logging.info('PDF file generated successfully')
+            
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'attachment; filename=receita_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            
+            flash('Receita salva e PDF gerado com sucesso!', 'success')
+            logging.info(f'Prescription created for patient: {nome_paciente}')
+            
+            return response
+            
+        except Exception as pdf_error:
+            logging.error(f'PDF generation error: {pdf_error}')
+            # If PDF generation fails, redirect with success message for data saving
+            flash('Receita salva com sucesso! Erro na geração do PDF - verifique os dados.', 'warning')
+            return redirect(url_for('receita.receita'))
         
     except Exception as e:
         logging.error(f'Prescription error: {e}')
