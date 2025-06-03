@@ -14,8 +14,8 @@ def login():
         crm = request.form.get('crm', '').strip()
         senha = request.form.get('senha', '')
         
-        if not nome or not crm or not senha:
-            flash('Todos os campos são obrigatórios.', 'error')
+        if not nome or not senha:
+            flash('Nome e senha são obrigatórios.', 'error')
             return render_template('login.html')
         
         try:
@@ -42,22 +42,25 @@ def login():
                 logging.info(f'Admin login successful for: {nome}')
                 return redirect(url_for('admin.dashboard'))
             
-            # Se não é admin, verificar se é médico
-            medico = Medico.query.filter_by(nome=nome, crm=crm).first()
-            
-            if medico and medico.senha and check_password_hash(medico.senha, senha):
-                session['usuario'] = medico.nome
-                session['medico_data'] = {
-                    'id': medico.id,
-                    'nome': medico.nome,
-                    'crm': medico.crm
-                }
-                flash(f'Bem-vindo, {medico.nome}!', 'success')
-                logging.info(f'Login successful for user: {nome} (CRM: {crm})')
-                return redirect(url_for('dashboard.dashboard'))
+            # Se não é admin, verificar se é médico (CRM obrigatório para médicos)
+            if crm:  # Se CRM foi fornecido, tentar login como médico
+                medico = Medico.query.filter_by(nome=nome, crm=crm).first()
+                
+                if medico and medico.senha and check_password_hash(medico.senha, senha):
+                    session['usuario'] = medico.nome
+                    session['medico_data'] = {
+                        'id': medico.id,
+                        'nome': medico.nome,
+                        'crm': medico.crm
+                    }
+                    flash(f'Bem-vindo, {medico.nome}!', 'success')
+                    logging.info(f'Login successful for user: {nome} (CRM: {crm})')
+                    return redirect(url_for('dashboard.dashboard'))
+                else:
+                    flash('Credenciais inválidas. Verifique nome, CRM e senha.', 'error')
+                    logging.warning(f'Failed login attempt for: {nome} (CRM: {crm})')
             else:
-                flash('Credenciais inválidas. Verifique nome, CRM e senha.', 'error')
-                logging.warning(f'Failed login attempt for: {nome} (CRM: {crm})')
+                flash('Para acessar como médico, é necessário informar o CRM.', 'error')
                 
         except Exception as e:
             logging.error(f'Login error: {e}')
