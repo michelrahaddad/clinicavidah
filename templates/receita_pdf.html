@@ -159,20 +159,19 @@
     </div>
     
     <div class="signature-section">
+        <div class="doctor-name">{{ medico }}</div>
+        <div class="crm-info">CRM {{ crm }}</div>
         {% if assinatura and assinatura != 'assinatura' %}
-        <div class="signature-image">
-            <img src="data:image/png;base64,{{ assinatura }}" alt="Assinatura Digital" style="max-width: 150px; max-height: 50px; margin-bottom: 10px;">
+        <div class="signature-image" style="margin-top: 15px;">
+            <img src="data:image/png;base64,{{ assinatura }}" alt="Assinatura" style="max-width: 150px; max-height: 50px;">
         </div>
         {% else %}
-        <div style="height: 60px; margin-bottom: 10px;">
-            <svg width="120" height="40" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 30 Q 30 10, 50 25 Q 70 35, 90 20 Q 100 15, 110 25" stroke="#0066cc" stroke-width="2" fill="none"/>
+        <div style="height: 40px; margin-top: 15px;">
+            <svg width="120" height="30" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 20 Q 30 5, 50 15 Q 70 25, 90 10 Q 100 8, 110 15" stroke="#0066cc" stroke-width="1.5" fill="none"/>
             </svg>
         </div>
         {% endif %}
-        <div class="doctor-name">{{ medico }}</div>
-        <div class="crm-info">CRM {{ crm }}</div>
-        <div style="font-size: 10pt; margin-top: 10px;">Assinatura digital</div>
     </div>
 </body>
 </html>
