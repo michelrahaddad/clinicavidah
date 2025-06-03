@@ -22,6 +22,7 @@ class Medico(db.Model):
     relatorios = relationship('RelatorioMedico', back_populates='medico', lazy=True)
     atestados = relationship('AtestadoMedico', back_populates='medico', lazy=True)
     formularios_alto_custo = relationship('FormularioAltoCusto', back_populates='medico', lazy=True)
+    exames_personalizados = relationship('ExamePersonalizado', back_populates='medico', lazy=True)
 
 class Paciente(db.Model):
     __tablename__ = 'pacientes'
@@ -236,5 +237,4 @@ class ExamePersonalizado(db.Model):
     # Relationships
     medico = relationship('Medico', back_populates='exames_personalizados')
 
-# Add relationship to Medico model
-Medico.exames_personalizados = relationship('ExamePersonalizado', back_populates='medico', lazy=True)
+
