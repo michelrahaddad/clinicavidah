@@ -96,88 +96,10 @@ def get_dashboard_stats(medico_id=None):
             'detailed_stats': {'medicamentos': [], 'exames_lab': [], 'exames_img': []}
         }
 
-def get_monthly_evolution(medico_id=None):
-    """Get monthly evolution data for the last 12 months"""
-    try:
-        from datetime import datetime, timedelta
-        from sqlalchemy import func, extract
-        
-        # Get last 12 months
-        current_date = datetime.now()
-        months_data = []
-        receitas_data = []
-        exames_lab_data = []
-        exames_img_data = []
-        
-        for i in range(11, -1, -1):
-            # Calculate the month
-            month_date = current_date - timedelta(days=30 * i)
-            month_year = month_date.strftime('%Y-%m')
-            month_name = month_date.strftime('%b/%y')
-            months_data.append(month_name)
-            
-            # Query data for this month
-            if medico_id:
-                # Receitas count for this month
-                receitas_count = db.session.query(func.count(Receita.id)).filter(
-                    Receita.id_medico == medico_id,
-                    extract('year', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.year,
-                    extract('month', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.month
-                ).scalar() or 0
-                
-                # Exames Lab count for this month
-                exames_lab_count = db.session.query(func.count(ExameLab.id)).filter(
-                    ExameLab.id_medico == medico_id,
-                    extract('year', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.year,
-                    extract('month', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.month
-                ).scalar() or 0
-                
-                # Exames Img count for this month
-                exames_img_count = db.session.query(func.count(ExameImg.id)).filter(
-                    ExameImg.id_medico == medico_id,
-                    extract('year', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.year,
-                    extract('month', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.month
-                ).scalar() or 0
-            else:
-                # General data for all doctors
-                receitas_count = db.session.query(func.count(Receita.id)).filter(
-                    extract('year', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.year,
-                    extract('month', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.month
-                ).scalar() or 0
-                
-                exames_lab_count = db.session.query(func.count(ExameLab.id)).filter(
-                    extract('year', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.year,
-                    extract('month', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.month
-                ).scalar() or 0
-                
-                exames_img_count = db.session.query(func.count(ExameImg.id)).filter(
-                    extract('year', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.year,
-                    extract('month', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.month
-                ).scalar() or 0
-            
-            receitas_data.append(receitas_count)
-            exames_lab_data.append(exames_lab_count)
-            exames_img_data.append(exames_img_count)
-        
-        return {
-            'months': months_data,
-            'receitas': receitas_data,
-            'exames_lab': exames_lab_data,
-            'exames_img': exames_img_data
-        }
-        
-    except Exception as e:
-        logging.error(f'Monthly evolution error: {e}')
-        return {
-            'months': [],
-            'receitas': [],
-            'exames_lab': [],
-            'exames_img': []
-        }
-
 def get_detailed_statistics(medico_id=None):
     """Get detailed statistics by medication, lab exams, and imaging exams"""
     try:
+        from models import Receita, ExameLab, ExameImg
         from sqlalchemy import func, text
         
         # Analyze medications from prescriptions
@@ -263,6 +185,87 @@ def get_detailed_statistics(medico_id=None):
             'exames_lab': [],
             'exames_img': []
         }
+
+def get_monthly_evolution(medico_id=None):
+    """Get monthly evolution data for the last 12 months"""
+    try:
+        from datetime import datetime, timedelta
+        from sqlalchemy import func, extract
+        
+        # Get last 12 months
+        current_date = datetime.now()
+        months_data = []
+        receitas_data = []
+        exames_lab_data = []
+        exames_img_data = []
+        
+        for i in range(11, -1, -1):
+            # Calculate the month
+            month_date = current_date - timedelta(days=30 * i)
+            month_year = month_date.strftime('%Y-%m')
+            month_name = month_date.strftime('%b/%y')
+            months_data.append(month_name)
+            
+            # Query data for this month
+            if medico_id:
+                # Receitas count for this month
+                receitas_count = db.session.query(func.count(Receita.id)).filter(
+                    Receita.id_medico == medico_id,
+                    extract('year', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.year,
+                    extract('month', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.month
+                ).scalar() or 0
+                
+                # Exames Lab count for this month
+                exames_lab_count = db.session.query(func.count(ExameLab.id)).filter(
+                    ExameLab.id_medico == medico_id,
+                    extract('year', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.year,
+                    extract('month', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.month
+                ).scalar() or 0
+                
+                # Exames Img count for this month
+                exames_img_count = db.session.query(func.count(ExameImg.id)).filter(
+                    ExameImg.id_medico == medico_id,
+                    extract('year', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.year,
+                    extract('month', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.month
+                ).scalar() or 0
+            else:
+                # General data for all doctors
+                receitas_count = db.session.query(func.count(Receita.id)).filter(
+                    extract('year', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.year,
+                    extract('month', func.to_date(Receita.data, 'YYYY-MM-DD')) == month_date.month
+                ).scalar() or 0
+                
+                exames_lab_count = db.session.query(func.count(ExameLab.id)).filter(
+                    extract('year', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.year,
+                    extract('month', func.to_date(ExameLab.data, 'YYYY-MM-DD')) == month_date.month
+                ).scalar() or 0
+                
+                exames_img_count = db.session.query(func.count(ExameImg.id)).filter(
+                    extract('year', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.year,
+                    extract('month', func.to_date(ExameImg.data, 'YYYY-MM-DD')) == month_date.month
+                ).scalar() or 0
+            
+            receitas_data.append(receitas_count)
+            exames_lab_data.append(exames_lab_count)
+            exames_img_data.append(exames_img_count)
+        
+        return {
+            'months': months_data,
+            'receitas': receitas_data,
+            'exames_lab': exames_lab_data,
+            'exames_img': exames_img_data
+        }
+        
+    except Exception as e:
+        logging.error(f'Monthly evolution error: {e}')
+        return {
+            'months': [],
+            'receitas': [],
+            'exames_lab': [],
+            'exames_img': []
+        }
+
+
 
 def init_database():
     """Initialize database with sample data"""
