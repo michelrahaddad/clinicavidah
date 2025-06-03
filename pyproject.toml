@@ -16,4 +16,5 @@ dependencies = [
     "wtforms>=3.2.1",
     "trafilatura>=2.0.0",
     "psutil>=7.0.0",
+    "pytz>=2025.2",
 ]

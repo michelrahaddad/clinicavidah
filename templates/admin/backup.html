@@ -82,7 +82,7 @@
                             <p class="text-light mb-0">Último Backup</p>
                             <small class="text-primary">
                                 {% if config and config.ultimo_backup %}
-                                    {{ config.ultimo_backup.strftime('%d/%m/%Y %H:%M') }}
+                                    {{ moment(config.ultimo_backup).format('DD/MM/YYYY HH:mm') }}
                                 {% else %}
                                     Nunca
                                 {% endif %}

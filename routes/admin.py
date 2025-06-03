@@ -181,10 +181,13 @@ def system_update():
 def create_backup():
     """Create system backup"""
     try:
-        import datetime
+        from utils.timezone_helper import now_brasilia, format_brasilia_full
         from sqlalchemy import text
         
-        backup_name = f"backup_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+        # Use Brasília timezone
+        current_time = now_brasilia()
+        
+        backup_name = f"backup_{current_time.strftime('%Y%m%d_%H%M%S')}.sql"
         backup_path = os.path.join('backups', backup_name)
         
         os.makedirs('backups', exist_ok=True)
@@ -192,7 +195,7 @@ def create_backup():
         # Create actual database backup
         with open(backup_path, 'w', encoding='utf-8') as f:
             f.write(f"-- Sistema Médico VIDAH Database Backup\n")
-            f.write(f"-- Created at: {datetime.datetime.now()}\n")
+            f.write(f"-- Created at: {format_brasilia_full(current_time)}\n")
             f.write(f"-- Database: PostgreSQL\n\n")
             
             # Backup each table
@@ -219,7 +222,7 @@ def create_backup():
         # Update backup config
         config = BackupConfig.query.first()
         if config:
-            config.ultimo_backup = datetime.datetime.utcnow()
+            config.ultimo_backup = current_time.replace(tzinfo=None)
             db.session.commit()
         
         # Log the backup creation
@@ -233,7 +236,7 @@ def create_backup():
             'message': 'Backup criado com sucesso', 
             'file': backup_name,
             'size': os.path.getsize(backup_path),
-            'timestamp': datetime.datetime.now().isoformat()
+            'timestamp': current_time.isoformat()
         })
         
     except Exception as e:
