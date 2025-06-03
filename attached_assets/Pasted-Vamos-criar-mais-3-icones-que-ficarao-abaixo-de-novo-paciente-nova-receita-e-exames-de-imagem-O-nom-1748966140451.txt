@@ -1,0 +1,11 @@
+Vamos criar mais 3 icones que ficarao abaixo de novo paciente ,nova receita e exames de imagem.O nome dos icones serão . 1)Relatório médico,2)atestado médico e 3)Formulario de Alto Custo.Ao clicar em relatório médico direcionará para um template onde teremos o nome do paciente /Cid da doença e terá uma caixa de texto onde será escrita pelo médico .Abaixo da caixa de texto terá o nome do médico /crm e assinatura digital.Lembrando que os campos nome medico/crm/assinatura digital será preenchido automaticamente a partir do cadastro do médico.O campo nome do paciente será preenchido automaticamente a partir da criação de novo paciente. O cid-10 é codigo internacional de doenças,criar o banco de dados para o cid-10.Haverá um campo para pesquisa para essas doenças que podem ser pesquisas por letras e nome em forma de auto-complete,por padrão deixaremos seleciona a doença I10.0 ou hipertensão arterial.Se baseie nessa fonte confiavel http://tabnet.datasus.gov.br/cgi/sih/mxcid10lm.htm par contruir o banco de dados CID-10 .O segundo icone é o atestado médico ,que direcionará o paciente para pagina atestado médico,essa também contara o cid 10 que deve ser selecionado no mesmo padrão da pagina do relatório médico .''ATESTADO MÉDICO
+
+Atesto, para os devidos fins, que o(a) Sr(a). __________________________________,
+foi atendido(a) nesta data em consulta médica, apresentando
+quadro clínico que requer afastamento de suas atividades laborais por ______ dias,
+a contar de // até //__, por motivo de saúde.
+
+CID: ____________________ (opcional, se autorizado pelo paciente)
+
+Data: //______ .Preencher automaticamente o campo do nome do paciente ,Cid será preenchido como falei e preencher campos que remetem data atual . Abaixo da caixa de texto terá o nome do médico /crm e assinatura digital.Lembrando que os campos nome medico/crm/assinatura digital
+.Já a pagina 3 é formulario de alto custo do SUS,siga o modelo abaixo indexado .Preencher automaticamente nome do paciente e dados do médico prescritor como nome e crm .Siga o modelo identico indexado em pdf .também preencher o cid-10 ,mesmo padrao do relatorio médico e atestado médico.
