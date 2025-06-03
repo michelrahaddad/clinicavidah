@@ -119,15 +119,25 @@
                 <div class="card-body">
                     <div class="detailed-stats-list">
                         {% if detailed_stats.medicamentos %}
+                            {% set ranking_pos = 1 %}
+                            {% set last_quantity = detailed_stats.medicamentos[0].quantidade %}
                             {% for med in detailed_stats.medicamentos %}
+                                {% if med.quantidade < last_quantity %}
+                                    {% set ranking_pos = loop.index %}
+                                    {% set last_quantity = med.quantidade %}
+                                {% endif %}
                             <div class="stat-item d-flex justify-content-between align-items-center">
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
-                                        <span class="badge bg-secondary me-2" style="font-size: 0.7rem;">{{ loop.index }}º</span>
-                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ med.nome[:35] }}{% if med.nome|length > 35 %}...{% endif %}</h6>
+                                        <span class="badge bg-primary me-2" style="font-size: 0.75rem;">{{ ranking_pos }}º Lugar</span>
+                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ med.nome[:30] }}{% if med.nome|length > 30 %}...{% endif %}</h6>
                                     </div>
+                                    <small class="text-muted">Prescrito {{ med.quantidade }} vez{% if med.quantidade != 1 %}es{% endif %}</small>
                                 </div>
-                                <span class="badge bg-success badge-large">{{ med.quantidade }}</span>
+                                <div class="text-end">
+                                    <div class="badge bg-success" style="font-size: 0.9rem;">{{ med.quantidade }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">prescrições</div>
+                                </div>
                             </div>
                             {% endfor %}
                         {% else %}
@@ -153,15 +163,25 @@
                 <div class="card-body">
                     <div class="detailed-stats-list">
                         {% if detailed_stats.exames_lab %}
+                            {% set ranking_pos = 1 %}
+                            {% set last_quantity = detailed_stats.exames_lab[0].quantidade %}
                             {% for exam in detailed_stats.exames_lab %}
+                                {% if exam.quantidade < last_quantity %}
+                                    {% set ranking_pos = loop.index %}
+                                    {% set last_quantity = exam.quantidade %}
+                                {% endif %}
                             <div class="stat-item d-flex justify-content-between align-items-center">
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
-                                        <span class="badge bg-secondary me-2" style="font-size: 0.7rem;">{{ loop.index }}º</span>
-                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ exam.nome[:35] }}{% if exam.nome|length > 35 %}...{% endif %}</h6>
+                                        <span class="badge bg-primary me-2" style="font-size: 0.75rem;">{{ ranking_pos }}º Lugar</span>
+                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ exam.nome[:30] }}{% if exam.nome|length > 30 %}...{% endif %}</h6>
                                     </div>
+                                    <small class="text-muted">Solicitado {{ exam.quantidade }} vez{% if exam.quantidade != 1 %}es{% endif %}</small>
                                 </div>
-                                <span class="badge bg-info badge-large">{{ exam.quantidade }}</span>
+                                <div class="text-end">
+                                    <div class="badge bg-info" style="font-size: 0.9rem;">{{ exam.quantidade }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">solicitações</div>
+                                </div>
                             </div>
                             {% endfor %}
                         {% else %}
@@ -187,15 +207,25 @@
                 <div class="card-body">
                     <div class="detailed-stats-list">
                         {% if detailed_stats.exames_img %}
+                            {% set ranking_pos = 1 %}
+                            {% set last_quantity = detailed_stats.exames_img[0].quantidade %}
                             {% for exam in detailed_stats.exames_img %}
+                                {% if exam.quantidade < last_quantity %}
+                                    {% set ranking_pos = loop.index %}
+                                    {% set last_quantity = exam.quantidade %}
+                                {% endif %}
                             <div class="stat-item d-flex justify-content-between align-items-center">
                                 <div class="flex-grow-1">
                                     <div class="d-flex align-items-center mb-1">
-                                        <span class="badge bg-secondary me-2" style="font-size: 0.7rem;">{{ loop.index }}º</span>
-                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ exam.nome[:35] }}{% if exam.nome|length > 35 %}...{% endif %}</h6>
+                                        <span class="badge bg-primary me-2" style="font-size: 0.75rem;">{{ ranking_pos }}º Lugar</span>
+                                        <h6 class="text-light mb-0" style="font-size: 0.9rem;">{{ exam.nome[:30] }}{% if exam.nome|length > 30 %}...{% endif %}</h6>
                                     </div>
+                                    <small class="text-muted">Solicitado {{ exam.quantidade }} vez{% if exam.quantidade != 1 %}es{% endif %}</small>
                                 </div>
-                                <span class="badge bg-warning badge-large">{{ exam.quantidade }}</span>
+                                <div class="text-end">
+                                    <div class="badge bg-warning" style="font-size: 0.9rem;">{{ exam.quantidade }}</div>
+                                    <div class="text-muted" style="font-size: 0.7rem;">solicitações</div>
+                                </div>
                             </div>
                             {% endfor %}
                         {% else %}
