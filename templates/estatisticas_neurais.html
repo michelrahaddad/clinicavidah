@@ -40,6 +40,40 @@
         padding: 15px;
     }
 
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .detailed-stats-list .stat-item h6 {
+            font-size: 0.8rem !important;
+        }
+        
+        .stat-item .badge {
+            font-size: 0.7rem !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .row {
+            margin: 0 -8px;
+        }
+        
+        .col-lg-4 {
+            padding: 0 8px;
+        }
+        
+        .stats-card {
+            margin-bottom: 20px;
+        }
+    }
+
+    /* Ensure content doesn't overflow */
+    .stats-card {
+        overflow: hidden;
+    }
+
+    .card-body {
+        overflow-x: hidden;
+    }
+
     .detailed-stats-list::-webkit-scrollbar {
         width: 6px;
     }
@@ -124,7 +158,7 @@
 
     <!-- Detailed Statistics -->
     <div class="row">
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6 mb-4">
             <div class="card glass-card stats-card">
                 <div class="card-header">
                     <h6 class="mb-0 text-light">
@@ -168,7 +202,7 @@
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6 mb-4">
             <div class="card glass-card stats-card">
                 <div class="card-header">
                     <h6 class="mb-0 text-light">
@@ -212,7 +246,7 @@
             </div>
         </div>
         
-        <div class="col-md-4 mb-4">
+        <div class="col-lg-4 col-md-6 mb-4">
             <div class="card glass-card stats-card">
                 <div class="card-header">
                     <h6 class="mb-0 text-light">
