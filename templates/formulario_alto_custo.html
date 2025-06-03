@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Formulário de Alto Custo - Sistema VIDAH{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-dollar-sign text-warning me-3" style="font-size: 2rem;"></i>
+                    <div>
+                        <h2 class="mb-0 text-light">Formulário de Alto Custo</h2>
+                        <p class="text-muted mb-0">Solicite medicamentos de alto custo SUS</p>
+                    </div>
+                </div>
+                <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-light neural-btn">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+
+            <form method="POST" action="{{ url_for('formulario_alto_custo.salvar_formulario_alto_custo') }}" class="needs-validation" novalidate>
+                <!-- Dados do Estabelecimento -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-hospital me-2 text-warning"></i>
+                            Dados do Estabelecimento
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="cnes" class="form-label text-light">
+                                    <i class="fas fa-id-card me-2"></i>CNES
+                                </label>
+                                <input type="text" 
+                                       name="cnes" 
+                                       id="cnes"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: 1234567"
+                                       value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="estabelecimento" class="form-label text-light">
+                                    <i class="fas fa-building me-2"></i>Nome do Estabelecimento
+                                </label>
+                                <input type="text" 
+                                       name="estabelecimento" 
+                                       id="estabelecimento"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: UBS Central"
+                                       value="Grupo VIDAH">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados do Paciente -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-user me-2 text-warning"></i>
+                            Dados do Paciente
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_paciente" class="form-label text-light">
+                                    <i class="fas fa-user me-2"></i>Nome do Paciente *
+                                </label>
+                                <div class="position-relative">
+                                    <input type="text" 
+                                           name="nome_paciente" 
+                                           id="nome_paciente"
+                                           class="form-control glass-input" 
+                                           placeholder="Digite o nome do paciente..."
+                                           value="{{ nome_paciente }}"
+                                           autocomplete="off"
+                                           required>
+                                    <div id="paciente-suggestions" class="suggestions-dropdown"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_mae" class="form-label text-light">
+                                    <i class="fas fa-female me-2"></i>Nome da Mãe *
+                                </label>
+                                <input type="text" 
+                                       name="nome_mae" 
+                                       id="nome_mae"
+                                       class="form-control glass-input" 
+                                       placeholder="Digite o nome da mãe..."
+                                       required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="peso" class="form-label text-light">
+                                    <i class="fas fa-weight me-2"></i>Peso (kg) *
+                                </label>
+                                <input type="text" 
+                                       name="peso" 
+                                       id="peso"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: 70.5"
+                                       required>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <label for="altura" class="form-label text-light">
+                                    <i class="fas fa-ruler-vertical me-2"></i>Altura (m) *
+                                </label>
+                                <input type="text" 
+                                       name="altura" 
+                                       id="altura"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: 1.70"
+                                       required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cid_search" class="form-label text-light">
+                                    <i class="fas fa-search me-2"></i>CID-10 *
+                                </label>
+                                <div class="position-relative">
+                                    <input type="text" 
+                                           id="cid_search"
+                                           class="form-control glass-input" 
+                                           placeholder="Digite para buscar CID-10..."
+                                           value="I10.0 - Hipertensão arterial"
+                                           autocomplete="off">
+                                    <input type="hidden" name="cid_codigo" id="cid_codigo" value="I10.0">
+                                    <input type="hidden" name="cid_descricao" id="cid_descricao" value="Hipertensão arterial">
+                                    <div id="cid-suggestions" class="suggestions-dropdown"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medicamento Solicitado -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-pills me-2 text-warning"></i>
+                            Medicamento Solicitado
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="medicamento" class="form-label text-light">
+                                    <i class="fas fa-capsules me-2"></i>Medicamento *
+                                </label>
+                                <input type="text" 
+                                       name="medicamento" 
+                                       id="medicamento"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: Adalimumabe 40mg"
+                                       required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="quantidade" class="form-label text-light">
+                                    <i class="fas fa-calculator me-2"></i>Quantidade *
+                                </label>
+                                <input type="text" 
+                                       name="quantidade" 
+                                       id="quantidade"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: 2 ampolas"
+                                       required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações Clínicas -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-stethoscope me-2 text-warning"></i>
+                            Informações Clínicas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="anamnese" class="form-label text-light">Anamnese e Exame Físico *</label>
+                            <textarea name="anamnese" 
+                                      id="anamnese" 
+                                      class="form-control glass-input" 
+                                      rows="6" 
+                                      placeholder="Descreva o quadro clínico, sintomas, evolução e justificativa para o medicamento..."
+                                      required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tratamento_previo" class="form-label text-light">Tratamentos Prévios</label>
+                            <textarea name="tratamento_previo" 
+                                      id="tratamento_previo" 
+                                      class="form-control glass-input" 
+                                      rows="3" 
+                                      placeholder="Descreva tratamentos anteriores realizados..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dados do Médico -->
+                <div class="card glass-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-user-md me-2 text-warning"></i>
+                            Dados do Médico Prescritor
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="medico_cns" class="form-label text-light">
+                                    <i class="fas fa-id-badge me-2"></i>CNS do Médico
+                                </label>
+                                <input type="text" 
+                                       name="medico_cns" 
+                                       id="medico_cns"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: 123456789012345">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input type="checkbox" 
+                                           name="incapaz" 
+                                           id="incapaz" 
+                                           class="form-check-input">
+                                    <label for="incapaz" class="form-check-label text-light">
+                                        Paciente incapaz de assinar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3" id="responsavel-section" style="display: none;">
+                            <div class="col-md-6">
+                                <label for="responsavel_nome" class="form-label text-light">
+                                    <i class="fas fa-user-shield me-2"></i>Nome do Responsável
+                                </label>
+                                <input type="text" 
+                                       name="responsavel_nome" 
+                                       id="responsavel_nome"
+                                       class="form-control glass-input" 
+                                       placeholder="Nome do responsável legal...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="d-flex justify-content-between mb-4">
+                    <button type="button" class="btn btn-outline-warning neural-btn" onclick="limparFormulario()">
+                        <i class="fas fa-broom me-2"></i>Limpar
+                    </button>
+                    <button type="submit" class="btn btn-warning neural-btn">
+                        <i class="fas fa-save me-2"></i>Gerar Formulário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-complete for patients
+document.getElementById('nome_paciente').addEventListener('input', function() {
+    const query = this.value;
+    if (query.length >= 2) {
+        fetch(`/api/buscar_pacientes?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const suggestions = document.getElementById('paciente-suggestions');
+                suggestions.innerHTML = '';
+                
+                if (data.length > 0) {
+                    suggestions.style.display = 'block';
+                    data.forEach(patient => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = patient.nome;
+                        div.addEventListener('click', () => {
+                            document.getElementById('nome_paciente').value = patient.nome;
+                            suggestions.style.display = 'none';
+                        });
+                        suggestions.appendChild(div);
+                    });
+                }
+            });
+    }
+});
+
+// Auto-complete for CID-10
+document.getElementById('cid_search').addEventListener('input', function() {
+    const query = this.value;
+    if (query.length >= 2) {
+        fetch(`/api/buscar_cid10?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const suggestions = document.getElementById('cid-suggestions');
+                suggestions.innerHTML = '';
+                
+                if (data.length > 0) {
+                    suggestions.style.display = 'block';
+                    data.forEach(cid => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.innerHTML = `<strong>${cid.codigo}</strong> - ${cid.descricao}`;
+                        div.addEventListener('click', () => {
+                            document.getElementById('cid_search').value = `${cid.codigo} - ${cid.descricao}`;
+                            document.getElementById('cid_codigo').value = cid.codigo;
+                            document.getElementById('cid_descricao').value = cid.descricao;
+                            suggestions.style.display = 'none';
+                        });
+                        suggestions.appendChild(div);
+                    });
+                }
+            });
+    }
+});
+
+// Show/hide responsible person field
+document.getElementById('incapaz').addEventListener('change', function() {
+    const responsavelSection = document.getElementById('responsavel-section');
+    if (this.checked) {
+        responsavelSection.style.display = 'block';
+        document.getElementById('responsavel_nome').required = true;
+    } else {
+        responsavelSection.style.display = 'none';
+        document.getElementById('responsavel_nome').required = false;
+        document.getElementById('responsavel_nome').value = '';
+    }
+});
+
+// Clear form function
+function limparFormulario() {
+    if (confirm('Tem certeza que deseja limpar todos os campos?')) {
+        document.getElementById('medicamento').value = '';
+        document.getElementById('quantidade').value = '';
+        document.getElementById('anamnese').value = '';
+        document.getElementById('tratamento_previo').value = '';
+        document.getElementById('nome_mae').value = '';
+        document.getElementById('peso').value = '';
+        document.getElementById('altura').value = '';
+        document.getElementById('medico_cns').value = '';
+        document.getElementById('incapaz').checked = false;
+        document.getElementById('responsavel_nome').value = '';
+        document.getElementById('responsavel-section').style.display = 'none';
+        document.getElementById('cid_search').value = 'I10.0 - Hipertensão arterial';
+        document.getElementById('cid_codigo').value = 'I10.0';
+        document.getElementById('cid_descricao').value = 'Hipertensão arterial';
+    }
+}
+
+// Hide suggestions when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.position-relative')) {
+        document.getElementById('paciente-suggestions').style.display = 'none';
+        document.getElementById('cid-suggestions').style.display = 'none';
+    }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        document.querySelector('form').submit();
+    }
+});
+</script>
+{% endblock %}

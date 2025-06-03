@@ -65,6 +65,7 @@ def create_app():
     from routes.api import api_bp
     from routes.relatorio_medico import relatorio_medico_bp
     from routes.atestado_medico import atestado_medico_bp
+    from routes.formulario_alto_custo import formulario_alto_custo_bp
     from routes.pacientes import pacientes_bp
     from routes.password_recovery import password_recovery_bp
     
@@ -79,6 +80,7 @@ def create_app():
     app.register_blueprint(api_bp)
     app.register_blueprint(relatorio_medico_bp)
     app.register_blueprint(atestado_medico_bp)
+    app.register_blueprint(formulario_alto_custo_bp)
     app.register_blueprint(pacientes_bp)
     app.register_blueprint(password_recovery_bp)
     
