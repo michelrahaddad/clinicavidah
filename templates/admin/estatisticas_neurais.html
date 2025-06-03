@@ -130,7 +130,7 @@
                     <div class="heatmap-grid">
                         {% for hour in range(24) %}
                         <div class="heatmap-cell" data-hour="{{ hour }}" 
-                             style="background: rgba({{ (atividade_por_hora.get(hour, 0) * 255 / max_atividade) | int }}, 100, 255, {{ atividade_por_hora.get(hour, 0) / max_atividade }});">
+                             style="background: rgba({{ (atividade_por_hora.get(hour, 0) * 255 / (max_atividade or 1)) | int }}, 100, 255, {{ atividade_por_hora.get(hour, 0) / (max_atividade or 1) }});">
                             <small>{{ hour }}h</small>
                         </div>
                         {% endfor %}
