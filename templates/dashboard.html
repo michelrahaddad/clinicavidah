@@ -1,5 +1,49 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<style>
+    .detailed-stats-list {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .stat-item {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+    }
+
+    .detailed-stats-list::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <div class="row">
