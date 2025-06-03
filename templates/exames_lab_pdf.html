@@ -141,22 +141,17 @@
         {% endfor %}
     </ul>
     
-    <div class="signature">
-        <div class="signature-line">
-            <strong>Dr(a). {{ medico }}</strong><br>
-            CRM: {{ crm }}
+    <div class="signature" style="text-align: center; margin-top: 40px; page-break-inside: avoid;">
+        <div style="margin-bottom: 30px; border-top: 1px solid #ccc; width: 300px; margin-left: auto; margin-right: auto; padding-top: 15px;">
+            {% if assinatura and assinatura != 'assinatura' and assinatura.startswith('data:image') %}
+            <div style="margin-bottom: 10px;">
+                <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 60px; border: none;">
+            </div>
+            {% endif %}
+            <div style="font-weight: bold; font-size: 12pt; color: #000; margin-bottom: 3px;">Dr. {{ medico }}</div>
+            <div style="font-size: 11pt; color: #333;">CRM: {{ crm }}</div>
+            <div style="font-size: 9pt; color: #666; margin-top: 8px; font-style: italic;">Assinatura Digital</div>
         </div>
-        {% if assinatura and assinatura != 'assinatura' %}
-        <div style="margin-top: 15px;">
-            <img src="data:image/png;base64,{{ assinatura }}" alt="Assinatura" style="max-width: 150px; max-height: 50px;">
-        </div>
-        {% else %}
-        <div style="height: 40px; margin-top: 15px;">
-            <svg width="120" height="30" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 20 Q 30 5, 50 15 Q 70 25, 90 10 Q 100 8, 110 15" stroke="#007bff" stroke-width="1.5" fill="none"/>
-            </svg>
-        </div>
-        {% endif %}
     </div>
     
     <div class="footer">
