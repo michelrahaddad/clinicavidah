@@ -1,0 +1,43 @@
+# Sistema Médico VIDAH - Requirements for Windows
+# Tested on Windows 10/11 (x64)
+
+# Core Flask dependencies
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
+WTForms==3.1.1
+Werkzeug==3.0.1
+SQLAlchemy==2.0.23
+
+# Database support
+psycopg2-binary==2.9.9
+
+# Form validation
+email-validator==2.1.0
+
+# PDF generation
+WeasyPrint==61.2
+
+# Production server (use waitress on Windows instead of gunicorn)
+waitress==3.0.0
+gunicorn==21.2.0
+
+# Windows-specific dependencies
+pywin32>=306; sys_platform == "win32"
+wmi>=1.5.1; sys_platform == "win32"
+
+# Installation notes for Windows:
+# 1. Install Python 3.8+ from https://python.org (check "Add to PATH")
+# 2. Install Visual Studio Build Tools or Visual Studio Community
+# 3. Open Command Prompt or PowerShell as Administrator
+# 4. Create virtual environment: python -m venv venv
+# 5. Activate: venv\Scripts\activate
+# 6. Upgrade pip: python -m pip install --upgrade pip setuptools wheel
+# 7. Install: pip install -r requirements-windows.txt
+#
+# Alternative installation if WeasyPrint fails:
+# pip install --upgrade pip setuptools wheel
+# pip install --pre weasyprint
+#
+# For production on Windows, use waitress instead of gunicorn:
+# waitress-serve --host=0.0.0.0 --port=5000 main:app

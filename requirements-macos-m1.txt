@@ -1,0 +1,37 @@
+# Sistema Médico VIDAH - Requirements for macOS (Apple Silicon M1/M2)
+# Tested on macOS Monterey/Ventura/Sonoma with Apple Silicon
+
+# Core Flask dependencies
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-WTF==1.2.1
+WTForms==3.1.1
+Werkzeug==3.0.1
+SQLAlchemy==2.0.23
+
+# Database support
+psycopg2-binary==2.9.9
+
+# Form validation
+email-validator==2.1.0
+
+# PDF generation - optimized for Apple Silicon
+WeasyPrint==61.2
+
+# Production server
+gunicorn==21.2.0
+
+# Additional dependencies for Apple Silicon compatibility
+cffi>=1.15.0
+pycparser>=2.21
+
+# Optional: For better performance on Apple Silicon
+numpy>=1.24.0
+
+# Installation notes for macOS M1/M2:
+# 1. Install Homebrew: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# 2. Install Python: brew install python@3.11
+# 3. Install system dependencies: brew install cairo pango gdk-pixbuf libffi
+# 4. Create virtual environment: python3 -m venv venv
+# 5. Activate: source venv/bin/activate
+# 6. Install: pip install -r requirements-macos-m1.txt
