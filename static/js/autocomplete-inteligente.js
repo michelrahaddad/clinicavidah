@@ -53,36 +53,47 @@ function setupMedicamentAutoCompleteInteligente() {
 }
 
 function showMedicamentSuggestionsInteligente(input, medicamentos) {
+    console.log('Mostrando sugestões para:', medicamentos.length, 'medicamentos');
+    
     // Remove suggestions existentes
     hideMedicamentSuggestions(input);
     
-    if (medicamentos.length === 0) return;
+    if (medicamentos.length === 0) {
+        console.log('Nenhum medicamento para mostrar');
+        return;
+    }
     
     const suggestions = document.createElement('div');
     suggestions.className = 'autocomplete-suggestions-inteligente';
     suggestions.style.cssText = `
-        position: absolute; 
-        top: 100%; 
-        left: 0; 
-        right: 0; 
-        background: rgba(30, 30, 30, 0.95); 
-        border: 1px solid rgba(255, 255, 255, 0.2); 
-        border-radius: 8px; 
-        max-height: 200px; 
-        overflow-y: auto; 
-        z-index: 1000;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        position: absolute !important; 
+        top: 100% !important; 
+        left: 0 !important; 
+        right: 0 !important; 
+        background: rgba(30, 30, 30, 0.95) !important; 
+        border: 1px solid rgba(255, 255, 255, 0.2) !important; 
+        border-radius: 8px !important; 
+        max-height: 200px !important; 
+        overflow-y: auto !important; 
+        z-index: 10000 !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        display: block !important;
+        width: 100% !important;
     `;
+    
+    console.log('Criando sugestões para:', medicamentos);
     
     medicamentos.forEach((med, index) => {
         const div = document.createElement('div');
         div.style.cssText = `
-            padding: 12px; 
-            cursor: pointer; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            transition: all 0.3s ease;
+            padding: 12px !important; 
+            cursor: pointer !important; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+            transition: all 0.3s ease !important;
+            background: transparent !important;
+            display: block !important;
         `;
         
         const principio = med.principio_ativo || '';
@@ -92,12 +103,12 @@ function showMedicamentSuggestionsInteligente(input, medicamentos) {
         if (med.frequencia) info.push(med.frequencia);
         
         div.innerHTML = `
-            <div style="font-weight: bold; font-size: 14px;">${principio}</div>
+            <div style="font-weight: bold; font-size: 14px; color: #4CAF50;">${principio}</div>
             <small style="color: #aaa; font-size: 12px;">${info.join(' • ')} ${med.vezes_prescrito ? `(${med.vezes_prescrito}x prescrito)` : ''}</small>
         `;
         
         div.addEventListener('mouseenter', () => {
-            div.style.backgroundColor = 'rgba(0, 123, 255, 0.2)';
+            div.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
             div.style.transform = 'translateX(5px)';
         });
         
@@ -107,6 +118,7 @@ function showMedicamentSuggestionsInteligente(input, medicamentos) {
         });
         
         div.addEventListener('click', () => {
+            console.log('Medicamento selecionado:', med);
             input.value = principio;
             suggestions.remove();
             // Auto-preencher campos baseado no histórico
@@ -114,10 +126,15 @@ function showMedicamentSuggestionsInteligente(input, medicamentos) {
         });
         
         suggestions.appendChild(div);
+        console.log('Sugestão adicionada:', principio);
     });
     
-    input.parentNode.style.position = 'relative';
-    input.parentNode.appendChild(suggestions);
+    // Garantir que o container pai tenha position relative
+    const parent = input.parentNode;
+    parent.style.position = 'relative';
+    parent.appendChild(suggestions);
+    
+    console.log('Sugestões inseridas no DOM:', suggestions);
 }
 
 function hideMedicamentSuggestions(input) {
