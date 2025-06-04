@@ -45,68 +45,120 @@ def get_pacientes():
 @api_bp.route('/medicamentos')
 def get_medicamentos():
     """API para autocomplete de medicamentos"""
-    term = request.args.get('q', '').strip().lower()
-    
-    if len(term) < 2:
+    try:
+        term = request.args.get('q', '').strip()
+        
+        if len(term) < 2:
+            return jsonify([])
+        
+        # Try database first
+        try:
+            medicamentos = Medicamento.query.filter(
+                Medicamento.nome.ilike(f'%{term}%')
+            ).limit(10).all()
+            
+            if medicamentos:
+                result = []
+                for m in medicamentos:
+                    result.append({
+                        'id': m.id,
+                        'nome': m.nome,
+                        'principio_ativo': m.principio_ativo or m.nome,
+                        'concentracao': m.concentracao or '500mg',
+                        'via_padrao': 'Oral',
+                        'frequencia_padrao': '3x',
+                        'quantidade_padrao': '30 comprimidos'
+                    })
+                return jsonify(result)
+        except:
+            pass
+        
+        # Fallback to predefined list
+        term_lower = term.lower()
+        medicamentos_data = [
+            {
+                'id': 1,
+                'nome': 'Dipirona',
+                'principio_ativo': 'Dipirona Sódica',
+                'concentracao': '500mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '3x',
+                'quantidade_padrao': '30 comprimidos'
+            },
+            {
+                'id': 2,
+                'nome': 'Paracetamol',
+                'principio_ativo': 'Paracetamol',
+                'concentracao': '500mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '3x',
+                'quantidade_padrao': '20 comprimidos'
+            },
+            {
+                'id': 3,
+                'nome': 'Ibuprofeno',
+                'principio_ativo': 'Ibuprofeno',
+                'concentracao': '600mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '2x',
+                'quantidade_padrao': '20 comprimidos'
+            },
+            {
+                'id': 4,
+                'nome': 'Amoxicilina',
+                'principio_ativo': 'Amoxicilina',
+                'concentracao': '500mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '3x',
+                'quantidade_padrao': '21 cápsulas'
+            },
+            {
+                'id': 5,
+                'nome': 'Omeprazol',
+                'principio_ativo': 'Omeprazol',
+                'concentracao': '20mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '1x',
+                'quantidade_padrao': '28 cápsulas'
+            },
+            {
+                'id': 6,
+                'nome': 'Losartana',
+                'principio_ativo': 'Losartana Potássica',
+                'concentracao': '50mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '1x',
+                'quantidade_padrao': '30 comprimidos'
+            },
+            {
+                'id': 7,
+                'nome': 'Metformina',
+                'principio_ativo': 'Metformina',
+                'concentracao': '850mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '2x',
+                'quantidade_padrao': '60 comprimidos'
+            },
+            {
+                'id': 8,
+                'nome': 'Sinvastatina',
+                'principio_ativo': 'Sinvastatina',
+                'concentracao': '20mg',
+                'via_padrao': 'Oral',
+                'frequencia_padrao': '1x',
+                'quantidade_padrao': '30 comprimidos'
+            }
+        ]
+        
+        result = []
+        for med in medicamentos_data:
+            if (term_lower in med['nome'].lower() or 
+                term_lower in med['principio_ativo'].lower()):
+                result.append(med)
+        
+        return jsonify(result)
+    except Exception as e:
         return jsonify([])
-    
-    # Lista de medicamentos com dados completos
-    medicamentos_data = [
-        {
-            'id': 1,
-            'nome': 'Dipirona',
-            'principio_ativo': 'Dipirona Sódica',
-            'concentracao': '500mg',
-            'via_padrao': 'Oral',
-            'frequencia_padrao': '3x',
-            'quantidade_padrao': '30 comprimidos'
-        },
-        {
-            'id': 2,
-            'nome': 'Paracetamol',
-            'principio_ativo': 'Paracetamol',
-            'concentracao': '500mg',
-            'via_padrao': 'Oral',
-            'frequencia_padrao': '3x',
-            'quantidade_padrao': '20 comprimidos'
-        },
-        {
-            'id': 3,
-            'nome': 'Ibuprofeno',
-            'principio_ativo': 'Ibuprofeno',
-            'concentracao': '600mg',
-            'via_padrao': 'Oral',
-            'frequencia_padrao': '2x',
-            'quantidade_padrao': '20 comprimidos'
-        },
-        {
-            'id': 4,
-            'nome': 'Amoxicilina',
-            'principio_ativo': 'Amoxicilina',
-            'concentracao': '500mg',
-            'via_padrao': 'Oral',
-            'frequencia_padrao': '3x',
-            'quantidade_padrao': '21 cápsulas'
-        },
-        {
-            'id': 5,
-            'nome': 'Omeprazol',
-            'principio_ativo': 'Omeprazol',
-            'concentracao': '20mg',
-            'via_padrao': 'Oral',
-            'frequencia_padrao': '1x',
-            'quantidade_padrao': '28 cápsulas'
-        }
-    ]
-    
-    # Filtra medicamentos que contêm o termo buscado
-    result = []
-    for med in medicamentos_data:
-        if (term in med['nome'].lower() or 
-            term in med['principio_ativo'].lower()):
-            result.append(med)
-    
-    return jsonify(result)
 
 @api_bp.route('/buscar_pacientes')
 @rate_limit(max_requests=50, per_minutes=5)
