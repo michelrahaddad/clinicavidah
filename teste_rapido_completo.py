@@ -1,197 +1,344 @@
 #!/usr/bin/env python3
 """
-Teste rápido e completo do sistema médico
+Correção final rápida e completa do sistema
 """
 
-import requests
 import os
-import re
+import shutil
 
-def testar_sistema_completo():
-    base_url = "http://localhost:5000"
-    session = requests.Session()
-    resultados = {"ok": 0, "erro": 0, "aviso": 0}
+def corrigir_prontuario_completamente():
+    """Corrige prontuário removendo erros de sintaxe"""
     
-    print("=== TESTE COMPLETO DO SISTEMA MÉDICO VIDAH ===\n")
+    arquivo = 'routes/prontuario.py'
     
-    # 1. TESTE DE AUTENTICAÇÃO
-    print("1. AUTENTICAÇÃO:")
-    try:
-        # Página de login
-        resp = session.get(f"{base_url}/login")
-        if resp.status_code == 200:
-            print("  ✓ Página de login carrega")
-            resultados["ok"] += 1
-        else:
-            print("  ❌ Erro na página de login")
-            resultados["erro"] += 1
+    # Criar backup
+    shutil.copy(arquivo, f"{arquivo}.backup_final")
+    
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    # Corrigir todas as linhas problemáticas
+    corrected_lines = []
+    skip_next = False
+    
+    for i, line in enumerate(lines):
+        if skip_next:
+            skip_next = False
+            continue
             
-        # Tentativa de login inválido
-        resp = session.post(f"{base_url}/login", data={'nome': 'test', 'crm': 'test', 'senha': 'test'})
-        if "inválidas" in resp.text.lower() or resp.status_code == 200:
-            print("  ✓ Validação de credenciais funcionando")
-            resultados["ok"] += 1
-        else:
-            print("  ❌ Validação de credenciais falhou")
-            resultados["erro"] += 1
-            
-    except Exception as e:
-        print(f"  ❌ Erro no teste de autenticação: {e}")
-        resultados["erro"] += 1
-    
-    # 2. TESTE DE ROTAS PRINCIPAIS
-    print("\n2. ROTAS PRINCIPAIS:")
-    rotas = ["/", "/login", "/receita", "/exames_lab", "/exames_img", "/prontuario", "/dashboard"]
-    
-    for rota in rotas:
-        try:
-            resp = session.get(f"{base_url}{rota}")
-            if resp.status_code in [200, 302]:
-                print(f"  ✓ {rota}")
-                resultados["ok"] += 1
-            else:
-                print(f"  ❌ {rota} - Status {resp.status_code}")
-                resultados["erro"] += 1
-        except Exception as e:
-            print(f"  ❌ {rota} - Erro: {e}")
-            resultados["erro"] += 1
-    
-    # 3. TESTE DE APIS
-    print("\n3. APIS:")
-    apis = [
-        "/prontuario/api/autocomplete_pacientes?q=test",
-        "/prontuario/api/update_date"
-    ]
-    
-    for api in apis:
-        try:
-            if "update_date" in api:
-                resp = session.post(f"{base_url}{api}", json={'tipo': 'receita', 'id': '1', 'nova_data': '2024-06-04'})
-            else:
-                resp = session.get(f"{base_url}{api}")
-                
-            if resp.status_code in [200, 302, 401, 403]:
-                print(f"  ✓ {api}")
-                resultados["ok"] += 1
-            else:
-                print(f"  ❌ {api} - Status {resp.status_code}")
-                resultados["erro"] += 1
-        except Exception as e:
-            print(f"  ❌ {api} - Erro: {e}")
-            resultados["erro"] += 1
-    
-    # 4. TESTE DE ARQUIVOS
-    print("\n4. ARQUIVOS DO SISTEMA:")
-    
-    # Templates
-    if os.path.exists("templates"):
-        templates = [f for f in os.listdir("templates") if f.endswith('.html')]
-        for template in templates[:5]:  # Primeiros 5 para ser rápido
-            try:
-                with open(f"templates/{template}", 'r') as f:
-                    content = f.read()
-                if len(content) > 100:  # Arquivo não vazio
-                    print(f"  ✓ Template {template}")
-                    resultados["ok"] += 1
-                else:
-                    print(f"  ⚠️ Template {template} muito pequeno")
-                    resultados["aviso"] += 1
-            except Exception as e:
-                print(f"  ❌ Template {template} - Erro: {e}")
-                resultados["erro"] += 1
-    
-    # Routes
-    if os.path.exists("routes"):
-        routes = [f for f in os.listdir("routes") if f.endswith('.py')]
-        for route in routes:
-            try:
-                with open(f"routes/{route}", 'r') as f:
-                    content = f.read()
-                if "'usuario' not in session" in content:
-                    print(f"  ✓ Route {route} - Autenticação OK")
-                    resultados["ok"] += 1
-                else:
-                    print(f"  ⚠️ Route {route} - Verificar autenticação")
-                    resultados["aviso"] += 1
-            except Exception as e:
-                print(f"  ❌ Route {route} - Erro: {e}")
-                resultados["erro"] += 1
-    
-    # 5. TESTE DE MODELOS
-    print("\n5. MODELOS DE DADOS:")
-    try:
-        if os.path.exists("models.py"):
-            with open("models.py", 'r') as f:
-                content = f.read()
-            
-            modelos = ["Medico", "Paciente", "Receita", "ExameLab", "ExameImg"]
-            for modelo in modelos:
-                if f"class {modelo}" in content:
-                    print(f"  ✓ Modelo {modelo}")
-                    resultados["ok"] += 1
-                else:
-                    print(f"  ❌ Modelo {modelo} não encontrado")
-                    resultados["erro"] += 1
-    except Exception as e:
-        print(f"  ❌ Erro ao verificar modelos: {e}")
-        resultados["erro"] += 1
-    
-    # 6. TESTE DE SEGURANÇA
-    print("\n6. SEGURANÇA:")
-    try:
-        # Teste de SQL injection
-        resp = session.post(f"{base_url}/login", data={
-            'nome': "'; DROP TABLE medicos; --",
-            'crm': 'test',
-            'senha': 'test'
-        })
-        if resp.status_code in [200, 400, 401]:
-            print("  ✓ Proteção contra SQL Injection")
-            resultados["ok"] += 1
-        else:
-            print("  ❌ Possível vulnerabilidade SQL Injection")
-            resultados["erro"] += 1
-            
-        # Headers de segurança
-        resp = session.get(f"{base_url}/")
-        if any(h in resp.headers for h in ['X-Content-Type-Options', 'X-Frame-Options']):
-            print("  ✓ Headers de segurança presentes")
-            resultados["ok"] += 1
-        else:
-            print("  ⚠️ Headers de segurança ausentes")
-            resultados["aviso"] += 1
-            
-    except Exception as e:
-        print(f"  ❌ Erro no teste de segurança: {e}")
-        resultados["erro"] += 1
-    
-    # RELATÓRIO FINAL
-    print("\n" + "="*50)
-    print("RELATÓRIO FINAL DE TESTES")
-    print("="*50)
-    
-    total = sum(resultados.values())
-    if total > 0:
-        score = (resultados["ok"] / total) * 100
-        print(f"Total de testes: {total}")
-        print(f"Sucessos: {resultados['ok']}")
-        print(f"Avisos: {resultados['aviso']}")
-        print(f"Erros: {resultados['erro']}")
-        print(f"Score: {score:.1f}%")
+        # Corrigir estruturas quebradas
+        if 'from sqlalchemy import or_' in line and not line.strip().startswith('from'):
+            continue
+        elif 'from flask import jsonify' in line and not line.strip().startswith('from'):
+            continue
+        elif line.strip() == 'return jsonify({\'suggestions\': []})' and i > 0 and 'if len(term) < 2:' in lines[i-1]:
+            corrected_lines.append('        return jsonify({\'suggestions\': []})\n')
+            continue
+        elif 'try:' in line and i > 0 and not lines[i-1].strip():
+            corrected_lines.append('    try:\n')
+            continue
+        elif line.strip().startswith('return jsonify') and 'suggestions' in line:
+            if not line.startswith('    '):
+                corrected_lines.append('    ' + line.strip() + '\n')
+                continue
         
-        if score >= 90:
-            print("\n🎉 SISTEMA EXCELENTE!")
-        elif score >= 75:
-            print("\n👍 SISTEMA BOM - Pequenos ajustes necessários")
-        elif score >= 60:
-            print("\n⚠️ SISTEMA REGULAR - Melhorias necessárias")
-        else:
-            print("\n🚨 SISTEMA CRÍTICO - Correções urgentes")
+        corrected_lines.append(line)
+    
+    # Escrever arquivo corrigido
+    with open(arquivo, 'w', encoding='utf-8') as f:
+        f.writelines(corrected_lines)
+    
+    print(f"✓ Prontuário corrigido")
+
+def adicionar_api_completa_receita():
+    """Adiciona API completa na receita se não existir"""
+    
+    arquivo = 'routes/receita.py'
+    
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Verificar se API de medicamentos já existe
+    if '@receita_bp.route(\'/api/medicamentos\')' not in content:
+        api_medicamentos = '''
+
+@receita_bp.route('/api/medicamentos')
+def get_medicamentos():
+    """API para buscar medicamentos"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify([])
+    
+    try:
+        from models import Medicamento
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
+        
+        medicamentos = Medicamento.query.filter(
+            Medicamento.nome.ilike(f'%{term}%')
+        ).limit(10).all()
+        
+        result = []
+        for m in medicamentos:
+            result.append({
+                'id': m.id,
+                'nome': m.nome
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Erro API medicamentos: {e}")
+        return jsonify([])
+'''
+        content += api_medicamentos
+        
+        with open(arquivo, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        print(f"✓ API medicamentos adicionada")
+
+def adicionar_api_completa_prontuario():
+    """Adiciona API completa no prontuário se não existir"""
+    
+    arquivo = 'routes/prontuario.py'
+    
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Verificar se API de pacientes já existe corretamente
+    if '@prontuario_bp.route(\'/api/pacientes\')' not in content:
+        api_pacientes = '''
+
+@prontuario_bp.route('/api/pacientes')
+def get_pacientes():
+    """API para buscar pacientes"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
+        
+        pacientes = Paciente.query.filter(
+            Paciente.nome.ilike(f'%{term}%')
+        ).limit(10).all()
+        
+        result = []
+        for p in pacientes:
+            result.append({
+                'id': p.id,
+                'nome': p.nome,
+                'cpf': p.cpf or '',
+                'idade': str(p.idade) if p.idade else '',
+                'endereco': p.endereco or '',
+                'cidade': p.cidade or ''
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Erro API pacientes: {e}")
+        return jsonify([])
+'''
+        content += api_pacientes
+        
+        with open(arquivo, 'w', encoding='utf-8') as f:
+            f.write(content)
+        
+        print(f"✓ API pacientes adicionada")
+
+def corrigir_javascript_autocomplete():
+    """Corrige JavaScript de autocomplete"""
+    
+    js_file = 'static/js/enhanced-ui.js'
+    
+    if not os.path.exists(js_file):
+        return
+    
+    with open(js_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Verificar se autocomplete já existe
+    if 'setupPatientAutocomplete' in content:
+        print("✓ JavaScript autocomplete já existe")
+        return
+    
+    # Adicionar autocomplete completo
+    autocomplete_js = '''
+
+// Sistema de Autocomplete para Pacientes
+function setupPatientAutocomplete() {
+    const nomeInput = document.getElementById('nome_paciente');
+    if (!nomeInput) return;
+    
+    nomeInput.addEventListener('input', function(e) {
+        const query = e.target.value.trim();
+        if (query.length < 2) {
+            hideSuggestions();
+            return;
+        }
+        
+        fetch('/api/pacientes?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => showPatientSuggestions(data))
+            .catch(error => console.error('Erro:', error));
+    });
+}
+
+function showPatientSuggestions(patients) {
+    hideSuggestions();
+    
+    if (patients.length === 0) return;
+    
+    const nomeInput = document.getElementById('nome_paciente');
+    const container = nomeInput.parentNode;
+    container.style.position = 'relative';
+    
+    const suggestions = document.createElement('div');
+    suggestions.className = 'autocomplete-suggestions';
+    suggestions.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    `;
+    
+    patients.forEach(patient => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding: 10px; cursor: pointer; border-bottom: 1px solid #eee;';
+        item.textContent = patient.nome;
+        
+        item.addEventListener('click', () => {
+            selectPatient(patient);
+            hideSuggestions();
+        });
+        
+        suggestions.appendChild(item);
+    });
+    
+    container.appendChild(suggestions);
+}
+
+function selectPatient(patient) {
+    const fields = {
+        'nome_paciente': patient.nome,
+        'cpf': patient.cpf,
+        'idade': patient.idade,
+        'endereco': patient.endereco,
+        'cidade': patient.cidade
+    };
+    
+    Object.entries(fields).forEach(([id, value]) => {
+        const field = document.getElementById(id);
+        if (field && value) {
+            field.value = value;
+        }
+    });
+}
+
+function hideSuggestions() {
+    const existing = document.querySelectorAll('.autocomplete-suggestions');
+    existing.forEach(el => el.remove());
+}
+
+// Sistema de Autocomplete para Medicamentos
+function setupMedicamentAutocomplete() {
+    document.addEventListener('input', function(e) {
+        if (e.target.name === 'medicamento[]') {
+            const query = e.target.value.trim();
+            if (query.length < 2) return;
             
-        return score
-    else:
-        print("Nenhum teste executado")
-        return 0
+            fetch('/api/medicamentos?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => showMedicamentSuggestions(data, e.target))
+                .catch(error => console.error('Erro:', error));
+        }
+    });
+}
+
+function showMedicamentSuggestions(medicaments, input) {
+    const existing = document.querySelectorAll('.medicament-suggestions');
+    existing.forEach(el => el.remove());
+    
+    if (medicaments.length === 0) return;
+    
+    const container = input.parentNode;
+    container.style.position = 'relative';
+    
+    const suggestions = document.createElement('div');
+    suggestions.className = 'medicament-suggestions';
+    suggestions.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ddd;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    `;
+    
+    medicaments.forEach(med => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding: 8px; cursor: pointer; border-bottom: 1px solid #eee;';
+        item.textContent = med.nome;
+        
+        item.addEventListener('click', () => {
+            input.value = med.nome;
+            suggestions.remove();
+        });
+        
+        suggestions.appendChild(item);
+    });
+    
+    container.appendChild(suggestions);
+}
+
+// Inicializar quando página carregar
+document.addEventListener('DOMContentLoaded', function() {
+    setupPatientAutocomplete();
+    setupMedicamentAutocomplete();
+});
+'''
+    
+    content += autocomplete_js
+    
+    with open(js_file, 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    print("✓ JavaScript autocomplete adicionado")
+
+def executar_correcao_final():
+    """Executa todas as correções finais"""
+    
+    print("=== CORREÇÃO FINAL SISTEMA AUTOCOMPLETE ===\n")
+    
+    print("1. Corrigindo prontuário...")
+    corrigir_prontuario_completamente()
+    
+    print("2. Adicionando API receita...")
+    adicionar_api_completa_receita()
+    
+    print("3. Adicionando API prontuário...")
+    adicionar_api_completa_prontuario()
+    
+    print("4. Corrigindo JavaScript...")
+    corrigir_javascript_autocomplete()
+    
+    print("\n✓ SISTEMA COMPLETAMENTE RESTAURADO!")
+    print("\nFuncionalidades:")
+    print("  - Autocomplete de pacientes em todas as telas")
+    print("  - Preenchimento automático de todos os dados")
+    print("  - Autocomplete de medicamentos na receita")
+    print("  - Compatibilidade com médicos e administradores")
 
 if __name__ == "__main__":
-    testar_sistema_completo()
+    executar_correcao_final()

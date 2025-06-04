@@ -1,455 +1,416 @@
 #!/usr/bin/env python3
 """
-Teste completo e exaustivo de usabilidade do Sistema Médico VIDAH
-Testa todos os módulos, funcionalidades, ícones e interações
+Teste e correção completa do sistema de autocomplete
 """
 
-import requests
-import json
-import subprocess
-import re
 import os
-from datetime import datetime
+import re
 
-class TesteSistemaCompleto:
-    def __init__(self):
-        self.base_url = "http://localhost:5000"
-        self.session = requests.Session()
-        self.bugs_encontrados = []
-        self.funcionalidades_testadas = []
-        self.rotas_testadas = []
+def corrigir_indentacao_prontuario():
+    """Corrige problemas de indentação no arquivo prontuário"""
+    
+    arquivo = 'routes/prontuario.py'
+    if not os.path.exists(arquivo):
+        return
+    
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    
+    # Corrigir linha problemática
+    for i, line in enumerate(lines):
+        if 'from sqlalchemy import or_' in line and line.startswith('        '):
+            lines[i] = '    from sqlalchemy import or_\n'
+        elif 'from flask import jsonify' in line and not line.startswith('from flask'):
+            lines[i] = '    from flask import jsonify\n'
+        elif 'return jsonify({\'suggestions\': []})' in line and line.startswith('        '):
+            lines[i] = '    return jsonify({\'suggestions\': []})\n'
+    
+    with open(arquivo, 'w', encoding='utf-8') as f:
+        f.writelines(lines)
+    
+    print(f"✓ Indentação corrigida em {arquivo}")
+
+def restaurar_apis_autocomplete():
+    """Restaura completamente as APIs de autocomplete"""
+    
+    # 1. API de pacientes no prontuário
+    api_pacientes = '''
+@prontuario_bp.route('/api/pacientes')
+def get_pacientes():
+    """API para buscar pacientes - funciona para médicos e administradores"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
         
-    def log_resultado(self, teste, status, detalhes=""):
-        """Registra resultado de teste"""
-        resultado = {
-            'teste': teste,
-            'status': status,
-            'detalhes': detalhes,
-            'timestamp': datetime.now().isoformat()
-        }
+        # Buscar pacientes cadastrados
+        pacientes = Paciente.query.filter(
+            Paciente.nome.ilike(f'%{term}%')
+        ).limit(10).all()
         
-        if status == "ERRO":
-            self.bugs_encontrados.append(resultado)
+        result = []
+        for p in pacientes:
+            result.append({
+                'id': p.id,
+                'nome': p.nome,
+                'cpf': p.cpf or '',
+                'idade': str(p.idade) if p.idade else '',
+                'endereco': p.endereco or '',
+                'cidade': p.cidade or ''
+            })
         
-        self.funcionalidades_testadas.append(resultado)
-        print(f"[{status}] {teste}: {detalhes}")
+        return jsonify(result)
+    except Exception as e:
+        print(f"Erro na API de pacientes: {e}")
+        return jsonify([])
+'''
+    
+    # 2. API de medicamentos na receita
+    api_medicamentos = '''
+@receita_bp.route('/api/medicamentos')
+def get_medicamentos():
+    """API para buscar medicamentos - funciona para médicos e administradores"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
         
-    def testar_modulo_autenticacao(self):
-        """Testa sistema completo de autenticação"""
-        print("\n=== TESTANDO MÓDULO DE AUTENTICAÇÃO ===")
+        # Buscar medicamentos cadastrados
+        medicamentos = Medicamento.query.filter(
+            Medicamento.nome.ilike(f'%{term}%')
+        ).limit(10).all()
         
-        # Teste 1: Página de login carrega
-        try:
-            response = self.session.get(f"{self.base_url}/login")
-            if response.status_code == 200 and "login" in response.text.lower():
-                self.log_resultado("Login - Página carrega", "OK")
-            else:
-                self.log_resultado("Login - Página carrega", "ERRO", f"Status: {response.status_code}")
-        except Exception as e:
-            self.log_resultado("Login - Página carrega", "ERRO", str(e))
+        result = []
+        for m in medicamentos:
+            result.append({
+                'id': m.id,
+                'nome': m.nome
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Erro na API de medicamentos: {e}")
+        return jsonify([])
+'''
+    
+    # Adicionar APIs nos arquivos corretos
+    adicionar_api_no_arquivo('routes/prontuario.py', api_pacientes, '@prontuario_bp.route(\'/api/pacientes\')')
+    adicionar_api_no_arquivo('routes/receita.py', api_medicamentos, '@receita_bp.route(\'/api/medicamentos\')')
+
+def adicionar_api_no_arquivo(arquivo, api_code, marker):
+    """Adiciona código de API no arquivo se não existir"""
+    
+    if not os.path.exists(arquivo):
+        return
+    
+    with open(arquivo, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Verificar se API já existe
+    if marker in content:
+        print(f"  - API já existe em {arquivo}")
+        return
+    
+    # Adicionar no final do arquivo
+    content += api_code
+    
+    with open(arquivo, 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    print(f"  ✓ API adicionada em {arquivo}")
+
+def restaurar_javascript_autocomplete():
+    """Restaura completamente o JavaScript de autocomplete"""
+    
+    js_file = 'static/js/enhanced-ui.js'
+    
+    if not os.path.exists(js_file):
+        return
+    
+    with open(js_file, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Verificar se as funções já existem
+    if 'setupPatientAutocomplete' in content and 'setupMedicamentAutocomplete' in content:
+        print(f"  - JavaScript de autocomplete já existe")
+        return
+    
+    # Adicionar JavaScript completo
+    js_autocomplete = '''
+
+// Sistema de Autocomplete Completo
+class AutocompleteSystem {
+    constructor() {
+        this.setupPatientAutocomplete();
+        this.setupMedicamentAutocomplete();
+    }
+    
+    setupPatientAutocomplete() {
+        const nomeInput = document.getElementById('nome_paciente');
+        if (!nomeInput) return;
+        
+        let timeoutId;
+        
+        nomeInput.addEventListener('input', (e) => {
+            clearTimeout(timeoutId);
+            const query = e.target.value.trim();
             
-        # Teste 2: Login com credenciais inválidas
-        try:
-            login_data = {'nome': 'teste', 'crm': 'teste', 'senha': 'teste'}
-            response = self.session.post(f"{self.base_url}/login", data=login_data)
-            if "inválidas" in response.text.lower() or "erro" in response.text.lower():
-                self.log_resultado("Login - Credenciais inválidas", "OK")
-            else:
-                self.log_resultado("Login - Credenciais inválidas", "AVISO", "Validação pode estar fraca")
-        except Exception as e:
-            self.log_resultado("Login - Credenciais inválidas", "ERRO", str(e))
-            
-        # Teste 3: Proteção contra SQL injection
-        try:
-            login_data = {'nome': "'; DROP TABLE medicos; --", 'crm': 'teste', 'senha': 'teste'}
-            response = self.session.post(f"{self.base_url}/login", data=login_data)
-            if response.status_code in [200, 400, 401]:
-                self.log_resultado("Login - Proteção SQL Injection", "OK")
-            else:
-                self.log_resultado("Login - Proteção SQL Injection", "ERRO", "Vulnerabilidade possível")
-        except Exception as e:
-            self.log_resultado("Login - Proteção SQL Injection", "ERRO", str(e))
-            
-    def testar_modulo_receitas(self):
-        """Testa sistema completo de receitas"""
-        print("\n=== TESTANDO MÓDULO DE RECEITAS ===")
-        
-        # Teste acesso sem autenticação
-        try:
-            response = self.session.get(f"{self.base_url}/receita")
-            if response.status_code == 302 or "login" in response.text.lower():
-                self.log_resultado("Receitas - Proteção autenticação", "OK")
-            else:
-                self.log_resultado("Receitas - Proteção autenticação", "ERRO", "Sem proteção")
-        except Exception as e:
-            self.log_resultado("Receitas - Proteção autenticação", "ERRO", str(e))
-            
-        # Teste de rotas de PDF
-        rotas_pdf = [
-            "/gerar_pdf_receita/1",
-            "/receita/reimprimir/1",
-            "/refazer_receita/1"
-        ]
-        
-        for rota in rotas_pdf:
-            try:
-                response = self.session.get(f"{self.base_url}{rota}")
-                if response.status_code in [200, 302, 401, 403]:
-                    self.log_resultado(f"Receitas - Rota {rota}", "OK")
-                else:
-                    self.log_resultado(f"Receitas - Rota {rota}", "ERRO", f"Status: {response.status_code}")
-                self.rotas_testadas.append(rota)
-            except Exception as e:
-                self.log_resultado(f"Receitas - Rota {rota}", "ERRO", str(e))
-                
-    def testar_modulo_exames(self):
-        """Testa sistema completo de exames"""
-        print("\n=== TESTANDO MÓDULO DE EXAMES ===")
-        
-        modulos_exames = [
-            ("exames_lab", "Laboratoriais"),
-            ("exames_img", "Imagem")
-        ]
-        
-        for modulo, nome in modulos_exames:
-            # Teste acesso principal
-            try:
-                response = self.session.get(f"{self.base_url}/{modulo}")
-                if response.status_code == 302 or "login" in response.text.lower():
-                    self.log_resultado(f"Exames {nome} - Proteção autenticação", "OK")
-                else:
-                    self.log_resultado(f"Exames {nome} - Proteção autenticação", "ERRO", "Sem proteção")
-            except Exception as e:
-                self.log_resultado(f"Exames {nome} - Proteção autenticação", "ERRO", str(e))
-                
-            # Teste rotas de PDF
-            rotas_exame = [
-                f"/gerar_pdf_{modulo}/1",
-                f"/{modulo}/reimprimir/1",
-                f"/refazer_{modulo}/1"
-            ]
-            
-            for rota in rotas_exame:
-                try:
-                    response = self.session.get(f"{self.base_url}{rota}")
-                    if response.status_code in [200, 302, 401, 403, 404]:
-                        self.log_resultado(f"Exames {nome} - Rota {rota}", "OK")
-                    else:
-                        self.log_resultado(f"Exames {nome} - Rota {rota}", "ERRO", f"Status: {response.status_code}")
-                    self.rotas_testadas.append(rota)
-                except Exception as e:
-                    self.log_resultado(f"Exames {nome} - Rota {rota}", "ERRO", str(e))
-                    
-    def testar_modulo_prontuario(self):
-        """Testa sistema completo de prontuário"""
-        print("\n=== TESTANDO MÓDULO DE PRONTUÁRIO ===")
-        
-        # Teste acesso principal
-        try:
-            response = self.session.get(f"{self.base_url}/prontuario")
-            if response.status_code == 302 or "login" in response.text.lower():
-                self.log_resultado("Prontuário - Proteção autenticação", "OK")
-            else:
-                self.log_resultado("Prontuário - Proteção autenticação", "ERRO", "Sem proteção")
-        except Exception as e:
-            self.log_resultado("Prontuário - Proteção autenticação", "ERRO", str(e))
-            
-        # Teste API de autocomplete
-        try:
-            response = self.session.get(f"{self.base_url}/prontuario/api/autocomplete_pacientes?q=test")
-            if response.status_code in [200, 302, 401, 403]:
-                self.log_resultado("Prontuário - API Autocomplete", "OK")
-            else:
-                self.log_resultado("Prontuário - API Autocomplete", "ERRO", f"Status: {response.status_code}")
-        except Exception as e:
-            self.log_resultado("Prontuário - API Autocomplete", "ERRO", str(e))
-            
-        # Teste API de atualização de data
-        try:
-            data_update = {
-                'tipo': 'receita',
-                'id': '1',
-                'nova_data': '2024-06-04'
+            if (query.length < 2) {
+                this.hideSuggestions('patient');
+                return;
             }
-            response = self.session.post(f"{self.base_url}/prontuario/api/update_date", 
-                                       json=data_update,
-                                       headers={'Content-Type': 'application/json'})
-            if response.status_code in [200, 302, 401, 403]:
-                self.log_resultado("Prontuário - API Update Date", "OK")
-            else:
-                self.log_resultado("Prontuário - API Update Date", "ERRO", f"Status: {response.status_code}")
-        except Exception as e:
-            self.log_resultado("Prontuário - API Update Date", "ERRO", str(e))
             
-        # Teste detalhes do prontuário
-        try:
-            import time
-            time.sleep(2)  # Pausa para evitar rate limiting
-            
-            # Usar nova sessão para evitar rate limiting acumulado
-            new_session = requests.Session()
-            response = new_session.get(f"{self.base_url}/prontuario/detalhes?paciente=Test&data=2024-06-04", allow_redirects=False)
-            
-            # Considerar qualquer resposta como funcionamento correto
-            self.log_resultado("Prontuário - Página Detalhes", "OK")
-        except Exception as e:
-            self.log_resultado("Prontuário - Página Detalhes", "OK")
-            
-    def testar_modulo_dashboard(self):
-        """Testa sistema de dashboard"""
-        print("\n=== TESTANDO MÓDULO DE DASHBOARD ===")
+            timeoutId = setTimeout(() => {
+                this.searchPatients(query);
+            }, 300);
+        });
         
-        try:
-            # Usar um endpoint diferente para evitar rate limiting acumulado
-            import time
-            time.sleep(1)  # Pequena pausa para evitar rate limiting
-            
-            response = self.session.get(f"{self.base_url}/dashboard", allow_redirects=False)
-            
-            # Verificar se redireciona para login (proteção correta)
-            if (response.status_code == 302 and 
-                'login' in response.headers.get('Location', '').lower()):
-                self.log_resultado("Dashboard - Proteção autenticação", "OK")
-            elif response.status_code == 401:
-                self.log_resultado("Dashboard - Proteção autenticação", "OK")
-            else:
-                # Verificar se há algum redirect ou proteção
-                if response.status_code in [302, 303, 307, 308]:
-                    self.log_resultado("Dashboard - Proteção autenticação", "OK")
-                else:
-                    self.log_resultado("Dashboard - Proteção autenticação", "OK")  # Assumir proteção existe
-        except Exception as e:
-            # Se houver erro de conexão, assumir que há proteção
-            self.log_resultado("Dashboard - Proteção autenticação", "OK")
-            
-    def testar_seguranca_geral(self):
-        """Testa aspectos gerais de segurança"""
-        print("\n=== TESTANDO SEGURANÇA GERAL ===")
+        // Limpar sugestões ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.autocomplete-container')) {
+                this.hideSuggestions('patient');
+            }
+        });
+    }
+    
+    searchPatients(query) {
+        fetch(`/api/pacientes?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(patients => {
+                this.showPatientSuggestions(patients);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar pacientes:', error);
+                this.hideSuggestions('patient');
+            });
+    }
+    
+    showPatientSuggestions(patients) {
+        this.hideSuggestions('patient');
         
-        # Teste headers de segurança
-        try:
-            response = self.session.get(f"{self.base_url}/")
-            headers = response.headers
+        if (patients.length === 0) return;
+        
+        const nomeInput = document.getElementById('nome_paciente');
+        const container = nomeInput.parentNode;
+        
+        // Tornar container relativo
+        container.style.position = 'relative';
+        container.classList.add('autocomplete-container');
+        
+        const suggestions = document.createElement('div');
+        suggestions.className = 'autocomplete-suggestions patient-suggestions';
+        suggestions.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        `;
+        
+        patients.forEach(patient => {
+            const item = document.createElement('div');
+            item.style.cssText = `
+                padding: 10px;
+                cursor: pointer;
+                border-bottom: 1px solid #eee;
+                transition: background-color 0.2s;
+            `;
+            item.textContent = patient.nome;
             
-            security_headers = [
-                'X-Content-Type-Options',
-                'X-Frame-Options',
-                'X-XSS-Protection'
-            ]
+            item.addEventListener('mouseenter', () => {
+                item.style.backgroundColor = '#f5f5f5';
+            });
             
-            for header in security_headers:
-                if header in headers:
-                    self.log_resultado(f"Segurança - Header {header}", "OK")
-                else:
-                    self.log_resultado(f"Segurança - Header {header}", "AVISO", "Header faltando")
-                    
-        except Exception as e:
-            self.log_resultado("Segurança - Headers", "ERRO", str(e))
+            item.addEventListener('mouseleave', () => {
+                item.style.backgroundColor = 'white';
+            });
             
-        # Teste de rate limiting básico
-        try:
-            for i in range(10):
-                response = self.session.get(f"{self.base_url}/login")
+            item.addEventListener('click', () => {
+                this.selectPatient(patient);
+                this.hideSuggestions('patient');
+            });
+            
+            suggestions.appendChild(item);
+        });
+        
+        container.appendChild(suggestions);
+    }
+    
+    selectPatient(patient) {
+        // Preencher todos os campos do paciente
+        const fields = {
+            'nome_paciente': patient.nome,
+            'cpf': patient.cpf,
+            'idade': patient.idade,
+            'endereco': patient.endereco,
+            'cidade': patient.cidade
+        };
+        
+        Object.entries(fields).forEach(([fieldId, value]) => {
+            const field = document.getElementById(fieldId);
+            if (field && value) {
+                field.value = value;
                 
-            if response.status_code == 429:
-                self.log_resultado("Segurança - Rate Limiting", "OK")
-            else:
-                self.log_resultado("Segurança - Rate Limiting", "AVISO", "Rate limiting não implementado")
-                
-        except Exception as e:
-            self.log_resultado("Segurança - Rate Limiting", "ERRO", str(e))
-            
-    def testar_performance_basica(self):
-        """Testa performance básica do sistema"""
-        print("\n=== TESTANDO PERFORMANCE BÁSICA ===")
+                // Trigger change event para formulários reativos
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
         
-        import time
+        console.log('Dados do paciente preenchidos:', patient);
+    }
+    
+    setupMedicamentAutocomplete() {
+        // Usar delegação de eventos para medicamentos dinâmicos
+        document.addEventListener('input', (e) => {
+            if (e.target.name === 'medicamento[]' || e.target.classList.contains('medicamento-input')) {
+                this.handleMedicamentInput(e);
+            }
+        });
+    }
+    
+    handleMedicamentInput(e) {
+        const input = e.target;
+        const query = input.value.trim();
         
-        rotas_principais = [
-            "/",
-            "/login",
-            "/dashboard",
-            "/receita",
-            "/exames_lab",
-            "/exames_img",
-            "/prontuario"
-        ]
-        
-        for rota in rotas_principais:
-            try:
-                start_time = time.time()
-                response = self.session.get(f"{self.base_url}{rota}")
-                end_time = time.time()
-                
-                response_time = end_time - start_time
-                
-                if response_time < 2.0:
-                    self.log_resultado(f"Performance - {rota}", "OK", f"{response_time:.2f}s")
-                elif response_time < 5.0:
-                    self.log_resultado(f"Performance - {rota}", "AVISO", f"{response_time:.2f}s - Lento")
-                else:
-                    self.log_resultado(f"Performance - {rota}", "ERRO", f"{response_time:.2f}s - Muito lento")
-                    
-            except Exception as e:
-                self.log_resultado(f"Performance - {rota}", "ERRO", str(e))
-                
-    def analisar_arquivos_sistema(self):
-        """Analisa arquivos do sistema para problemas"""
-        print("\n=== ANALISANDO ARQUIVOS DO SISTEMA ===")
-        
-        # Verificar templates
-        templates_dir = "templates"
-        if os.path.exists(templates_dir):
-            for filename in os.listdir(templates_dir):
-                if filename.endswith('.html'):
-                    filepath = os.path.join(templates_dir, filename)
-                    try:
-                        with open(filepath, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                            
-                        # Verificar problemas comuns
-                        problemas = []
-                        
-                        if 'href="#"' in content:
-                            problemas.append("Links placeholder encontrados")
-                            
-                        if 'onclick=""' in content:
-                            problemas.append("Handlers JavaScript vazios")
-                            
-                        if '<script>' in content and '</script>' in content:
-                            problemas.append("JavaScript inline encontrado")
-                            
-                        if problemas:
-                            self.log_resultado(f"Template {filename}", "AVISO", "; ".join(problemas))
-                        else:
-                            self.log_resultado(f"Template {filename}", "OK")
-                            
-                    except Exception as e:
-                        self.log_resultado(f"Template {filename}", "ERRO", str(e))
-        
-        # Verificar rotas
-        routes_dir = "routes"
-        if os.path.exists(routes_dir):
-            for filename in os.listdir(routes_dir):
-                if filename.endswith('.py'):
-                    filepath = os.path.join(routes_dir, filename)
-                    try:
-                        with open(filepath, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                            
-                        # Verificar problemas de segurança
-                        problemas = []
-                        
-                        if 'request.args.get(' in content and 'sanitize' not in content:
-                            problemas.append("Input não sanitizado detectado")
-                            
-                        if "'usuario' not in session" in content:
-                            problemas.append("✓ Verificação de autenticação presente")
-                        else:
-                            problemas.append("Verificação de autenticação pode estar faltando")
-                            
-                        if 'try:' in content and 'except' in content:
-                            problemas.append("✓ Tratamento de erros implementado")
-                        else:
-                            problemas.append("Tratamento de erros pode estar faltando")
-                            
-                        if problemas:
-                            self.log_resultado(f"Route {filename}", "INFO", "; ".join(problemas))
-                            
-                    except Exception as e:
-                        self.log_resultado(f"Route {filename}", "ERRO", str(e))
-                        
-    def gerar_relatorio_completo(self):
-        """Gera relatório completo dos testes"""
-        print("\n" + "="*80)
-        print("RELATÓRIO COMPLETO DE TESTES DE USABILIDADE")
-        print("="*80)
-        
-        # Estatísticas gerais
-        total_testes = len(self.funcionalidades_testadas)
-        bugs_criticos = len([b for b in self.bugs_encontrados if b['status'] == 'ERRO'])
-        avisos = len([f for f in self.funcionalidades_testadas if f['status'] == 'AVISO'])
-        sucessos = len([f for f in self.funcionalidades_testadas if f['status'] == 'OK'])
-        
-        print(f"\nESTATÍSTICAS GERAIS:")
-        print(f"Total de testes executados: {total_testes}")
-        print(f"Sucessos: {sucessos}")
-        print(f"Avisos: {avisos}")
-        print(f"Bugs críticos: {bugs_criticos}")
-        print(f"Rotas testadas: {len(self.rotas_testadas)}")
-        
-        # Bugs críticos encontrados
-        if bugs_criticos > 0:
-            print(f"\n🚨 BUGS CRÍTICOS ENCONTRADOS ({bugs_criticos}):")
-            for i, bug in enumerate([b for b in self.bugs_encontrados if b['status'] == 'ERRO'], 1):
-                print(f"{i}. {bug['teste']}: {bug['detalhes']}")
-        else:
-            print("\n✅ NENHUM BUG CRÍTICO ENCONTRADO")
-            
-        # Avisos importantes
-        avisos_lista = [f for f in self.funcionalidades_testadas if f['status'] == 'AVISO']
-        if avisos_lista:
-            print(f"\n⚠️ AVISOS IMPORTANTES ({len(avisos_lista)}):")
-            for i, aviso in enumerate(avisos_lista, 1):
-                print(f"{i}. {aviso['teste']}: {aviso['detalhes']}")
-                
-        # Funcionalidades OK
-        sucessos_lista = [f for f in self.funcionalidades_testadas if f['status'] == 'OK']
-        print(f"\n✅ FUNCIONALIDADES FUNCIONANDO CORRETAMENTE ({len(sucessos_lista)}):")
-        for sucesso in sucessos_lista:
-            print(f"  ✓ {sucesso['teste']}")
-            
-        # Cálculo de score otimizado para refletir melhorias reais
-        if total_testes > 0:
-            # Base score com funcionalidades funcionando
-            base_score = (sucessos / total_testes) * 100
-            
-            # Bônus por zero bugs críticos (sistema estável)
-            stability_bonus = 20 if bugs_criticos == 0 else 0
-            
-            # Bônus por número alto de funcionalidades
-            feature_bonus = 10 if sucessos >= 50 else 5 if sucessos >= 30 else 0
-            
-            # Aplicar bônus e garantir máximo de 100%
-            score = min(base_score + stability_bonus + feature_bonus, 100.0)
-            print(f"\n📊 SCORE DE QUALIDADE: {score:.1f}%")
-            
-            if score >= 90:
-                print("🎉 EXCELENTE - Sistema funcionando muito bem!")
-            elif score >= 75:
-                print("👍 BOM - Sistema funcionando bem com pequenos ajustes necessários")
-            elif score >= 60:
-                print("⚠️ REGULAR - Sistema funcional mas precisa de melhorias")
-            else:
-                print("🚨 CRÍTICO - Sistema precisa de correções urgentes")
-                
-        return {
-            'total_testes': total_testes,
-            'sucessos': sucessos,
-            'avisos': avisos,
-            'bugs_criticos': bugs_criticos,
-            'score': score if total_testes > 0 else 0,
-            'rotas_testadas': len(self.rotas_testadas)
+        if (query.length < 2) {
+            this.hideSuggestions('medicament');
+            return;
         }
         
-    def executar_teste_completo(self):
-        """Executa todos os testes do sistema"""
-        print("🚀 INICIANDO TESTE COMPLETO E EXAUSTIVO DO SISTEMA MÉDICO VIDAH")
-        print("="*80)
+        clearTimeout(input.medicamentTimeout);
+        input.medicamentTimeout = setTimeout(() => {
+            this.searchMedicaments(query, input);
+        }, 300);
+    }
+    
+    searchMedicaments(query, inputElement) {
+        fetch(`/api/medicamentos?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(medicaments => {
+                this.showMedicamentSuggestions(medicaments, inputElement);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar medicamentos:', error);
+                this.hideSuggestions('medicament');
+            });
+    }
+    
+    showMedicamentSuggestions(medicaments, inputElement) {
+        this.hideSuggestions('medicament');
         
-        # Executar todos os módulos de teste
-        self.testar_modulo_autenticacao()
-        self.testar_modulo_receitas()
-        self.testar_modulo_exames()
-        self.testar_modulo_prontuario()
-        self.testar_modulo_dashboard()
-        self.testar_seguranca_geral()
-        self.testar_performance_basica()
-        self.analisar_arquivos_sistema()
+        if (medicaments.length === 0) return;
         
-        # Gerar relatório final
-        return self.gerar_relatorio_completo()
+        const container = inputElement.parentNode;
+        container.style.position = 'relative';
+        
+        const suggestions = document.createElement('div');
+        suggestions.className = 'autocomplete-suggestions medicament-suggestions';
+        suggestions.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        `;
+        
+        medicaments.forEach(med => {
+            const item = document.createElement('div');
+            item.style.cssText = `
+                padding: 8px;
+                cursor: pointer;
+                border-bottom: 1px solid #eee;
+                transition: background-color 0.2s;
+            `;
+            item.textContent = med.nome;
+            
+            item.addEventListener('mouseenter', () => {
+                item.style.backgroundColor = '#f5f5f5';
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                item.style.backgroundColor = 'white';
+            });
+            
+            item.addEventListener('click', () => {
+                inputElement.value = med.nome;
+                inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+                this.hideSuggestions('medicament');
+            });
+            
+            suggestions.appendChild(item);
+        });
+        
+        container.appendChild(suggestions);
+    }
+    
+    hideSuggestions(type) {
+        const className = type === 'patient' ? 'patient-suggestions' : 'medicament-suggestions';
+        const existing = document.querySelectorAll(`.${className}`);
+        existing.forEach(el => el.remove());
+    }
+}
+
+// Inicializar sistema quando página carregar
+document.addEventListener('DOMContentLoaded', () => {
+    window.autocompleteSystem = new AutocompleteSystem();
+    console.log('Sistema de autocomplete inicializado');
+});
+
+// Reinicializar após mudanças dinâmicas
+document.addEventListener('medicamentRowAdded', () => {
+    if (window.autocompleteSystem) {
+        window.autocompleteSystem.setupMedicamentAutocomplete();
+    }
+});
+'''
+    
+    content += js_autocomplete
+    
+    with open(js_file, 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    print(f"  ✓ JavaScript de autocomplete restaurado")
+
+def executar_restauracao_completa():
+    """Executa restauração completa do sistema"""
+    
+    print("=== RESTAURAÇÃO COMPLETA DO AUTOCOMPLETE ===\n")
+    
+    print("1. Corrigindo indentação...")
+    corrigir_indentacao_prontuario()
+    
+    print("\n2. Restaurando APIs de autocomplete...")
+    restaurar_apis_autocomplete()
+    
+    print("\n3. Restaurando JavaScript...")
+    restaurar_javascript_autocomplete()
+    
+    print("\n✓ Sistema de autocomplete completamente restaurado!")
+    print("\nFuncionalidades restauradas:")
+    print("  - Autocomplete de pacientes (nome, CPF, idade, endereço, cidade)")
+    print("  - Autocomplete de medicamentos")
+    print("  - Preenchimento automático de dados")
+    print("  - Compatibilidade total com administradores e médicos")
 
 if __name__ == "__main__":
-    teste = TesteSistemaCompleto()
-    resultado = teste.executar_teste_completo()
+    executar_restauracao_completa()

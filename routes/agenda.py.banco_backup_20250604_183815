@@ -1,4 +1,3 @@
-from sqlalchemy import or_
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from utils.db import insert_patient_if_not_exists
 from utils.forms import validar_data, sanitizar_entrada
