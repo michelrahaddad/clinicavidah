@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response, jsonify
 from utils.db import get_db_connection, insert_patient_if_not_exists
 from utils.forms import validar_medicamentos, sanitizar_entrada
 from models import Medico, Receita, Prontuario, Paciente
@@ -112,20 +112,19 @@ def salvar_receita():
             logging.info('HTML template rendered successfully')
             
             # Create WeasyPrint HTML object with better error handling
-            html_doc = weasyprint.HTML(string=pdf_html, base_url=request.url_root)
-            pdf_file = html_doc.write_pdf()
-            logging.info('PDF file generated successfully')
+            # Store the PDF generation data in session for later retrieval
+            session['pdf_data'] = {
+                'type': 'receita',
+                'id': receita_obj.id,
+                'patient_name': nome_paciente,
+                'date': data
+            }
             
-            response = make_response(pdf_file)
-            response.headers['Content-Type'] = 'application/pdf'
-            response.headers['Content-Disposition'] = f'inline; filename=receita_{nome_paciente.replace(" ", "_")}_{data}.pdf'
-            response.headers['X-PDF-Success'] = 'true'
-            response.headers['X-Redirect-URL'] = url_for('receita.receita')
-            
-            flash('Receita salva e PDF gerado com sucesso!', 'success')
+            flash('Receita salva com sucesso!', 'success')
             logging.info(f'Prescription created for patient: {nome_paciente}')
             
-            return response
+            # Redirect to PDF generation endpoint
+            return redirect(url_for('receita.gerar_pdf_receita', receita_id=receita_obj.id))
             
         except Exception as pdf_error:
             logging.error(f'PDF generation error: {pdf_error}')
@@ -198,8 +197,9 @@ def gerar_pdf_reimprimir_receita(receita_obj):
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'inline; filename=receita_{receita_obj.nome_paciente}_{datetime.now().strftime("%Y%m%d")}.pdf'
-        response.headers['X-PDF-Success'] = 'true'
-        response.headers['X-Redirect-URL'] = url_for('prontuario.prontuario')
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
         
         return response
         
@@ -207,3 +207,49 @@ def gerar_pdf_reimprimir_receita(receita_obj):
         logging.error(f'Error generating prescription PDF: {e}')
         flash('Erro ao gerar PDF da receita.', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+
+@receita_bp.route('/gerar_pdf_receita/<int:receita_id>')
+def gerar_pdf_receita(receita_id):
+    """Generate and serve prescription PDF via GET request"""
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        receita_obj = Receita.query.get_or_404(receita_id)
+        medico = Medico.query.get(receita_obj.id_medico)
+        
+        # Prepare data for PDF
+        medicamentos = receita_obj.medicamentos.split(',')
+        posologias = receita_obj.posologias.split(',')
+        duracoes = receita_obj.duracoes.split(',')
+        vias = receita_obj.vias.split(',')
+        
+        # Generate PDF
+        pdf_html = render_template('pdf_receita.html',
+                                 paciente=receita_obj.nome_paciente,
+                                 medicamentos=medicamentos,
+                                 posologias=posologias,
+                                 duracoes=duracoes,
+                                 vias=vias,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
+                                 data=receita_obj.data,
+                                 assinatura=medico.assinatura if medico else None,
+                                 zip=zip)
+        
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+        
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=receita_{receita_obj.nome_paciente.replace(" ", "_")}_{receita_obj.data}.pdf'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        
+        return response
+        
+    except Exception as e:
+        logging.error(f'Error generating prescription PDF: {e}')
+        flash('Erro ao gerar PDF da receita.', 'error')
+        return redirect(url_for('receita.receita'))
