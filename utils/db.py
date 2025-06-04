@@ -14,15 +14,34 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-def insert_patient_if_not_exists(nome_paciente, email=None, telefone=None):
+def insert_patient_if_not_exists(nome_paciente, cpf=None, email=None, telefone=None):
     """Insert patient if not exists and return patient ID"""
-    paciente = Paciente.query.filter_by(nome=nome_paciente).first()
+    # Normalize the name for comparison
+    nome_normalizado = nome_paciente.strip().title()
+    
+    # Check for existing patient by name (case-insensitive) or CPF
+    paciente = None
+    if cpf:
+        # First check by CPF if provided
+        paciente = Paciente.query.filter_by(cpf=cpf).first()
+    
     if not paciente:
-        paciente = Paciente(
-            nome=nome_paciente,
-            email=email,
-            telefone=telefone
-        )
+        # Check by normalized name
+        paciente = db.session.query(Paciente).filter(
+            db.func.lower(db.func.trim(Paciente.nome)) == nome_normalizado.lower()
+        ).first()
+    
+    if not paciente:
+        # Create new patient with required fields
+        paciente = Paciente()
+        paciente.nome = nome_normalizado
+        paciente.cpf = cpf or "000.000.000-00"  # Default CPF if not provided
+        paciente.idade = 0  # Default age
+        paciente.endereco = "Não informado"  # Default address
+        paciente.cidade_uf = "Não informado/XX"  # Default city/state
+        paciente.email = email
+        paciente.telefone = telefone
+        
         db.session.add(paciente)
         db.session.flush()
     return paciente.id
