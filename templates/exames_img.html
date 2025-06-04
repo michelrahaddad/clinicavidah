@@ -75,7 +75,23 @@
                         <div class="input-group" style="width: 250px;">
                             <input type="text" id="buscarExame" class="form-control glass-input" 
                                    placeholder="Buscar exame..." 
-                                   style="border-radius: 8px; font-size: 14px; height: 38px;">
+                                   style="border-radius: 8px; font-size: 14px; height: 38px;"
+                                   oninput="(function(e) {
+                                       const termo = e.target.value.toLowerCase().trim();
+                                       const checkboxes = document.querySelectorAll('.form-check');
+                                       checkboxes.forEach(checkbox => {
+                                           const label = checkbox.querySelector('.form-check-label');
+                                           if (label) {
+                                               const texto = label.textContent.toLowerCase();
+                                               if (termo === '' || texto.includes(termo)) {
+                                                   checkbox.style.display = 'block';
+                                                   checkbox.parentElement.style.display = 'block';
+                                               } else {
+                                                   checkbox.style.display = 'none';
+                                               }
+                                           }
+                                       });
+                                   })(event)">
                         </div>
                         <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalExamesPersonalizados"
                                 style="border-radius: 8px; padding: 8px 16px;">
