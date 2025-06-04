@@ -5,31 +5,47 @@
 
 // Configuração do autocomplete inteligente de medicamentos
 function setupMedicamentAutoCompleteInteligente() {
-    const medicamentInputs = document.querySelectorAll('input[id^="principio_ativo_"]');
+    const medicamentInputs = document.querySelectorAll('input[id^="principio_ativo_"], input.medicamento-autocomplete');
+    console.log('Inputs encontrados para autocomplete:', medicamentInputs.length);
     
-    medicamentInputs.forEach(input => {
-        input.addEventListener('input', function() {
+    medicamentInputs.forEach((input, index) => {
+        console.log(`Configurando input ${index}:`, input.id);
+        
+        // Remover listeners antigos para evitar conflitos
+        const newInput = input.cloneNode(true);
+        input.parentNode.replaceChild(newInput, input);
+        
+        newInput.addEventListener('input', function() {
             const query = this.value;
+            console.log('Input detectado:', query);
+            
             if (query.length < 2) {
-                hideMedicamentSuggestions(input);
+                hideMedicamentSuggestions(newInput);
                 return;
             }
             
+            console.log('Fazendo busca para:', query);
             // Usar API do histórico para autocomplete inteligente
             fetch('/api/medicamentos_historico?q=' + encodeURIComponent(query))
-                .then(response => response.json())
-                .then(data => {
-                    showMedicamentSuggestionsInteligente(input, data);
+                .then(response => {
+                    console.log('Resposta da API:', response.status);
+                    return response.json();
                 })
-                .catch(error => console.error('Erro:', error));
+                .then(data => {
+                    console.log('Dados recebidos:', data);
+                    showMedicamentSuggestionsInteligente(newInput, data);
+                })
+                .catch(error => {
+                    console.error('Erro na API:', error);
+                });
         });
         
         // Auto-preenchimento ao selecionar medicamento
-        input.addEventListener('blur', function() {
+        newInput.addEventListener('blur', function() {
             setTimeout(() => {
                 const principio = this.value.trim();
                 if (principio && this.value.length > 2) {
-                    autoPreencherMedicamentoHistorico(input, principio);
+                    autoPreencherMedicamentoHistorico(newInput, principio);
                 }
             }, 200);
         });
