@@ -50,8 +50,16 @@ def salvar_atestado_medico():
         fim = inicio + timedelta(days=dias_afastamento - 1)
         data_fim = fim.strftime('%Y-%m-%d')
         
-        # Get doctor info
-        medico = Medico.query.filter_by(id=session['usuario']['id']).first()
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
+        
+        medico = Medico.query.get(medico_id)
         if not medico:
             flash('Médico não encontrado.', 'error')
             return redirect(url_for('atestado_medico.atestado_medico'))
@@ -95,9 +103,9 @@ def salvar_atestado_medico():
                                  dias_afastamento=dias_afastamento,
                                  data_inicio=inicio.strftime('%d/%m/%Y'),
                                  data_fim=fim.strftime('%d/%m/%Y'),
-                                 medico=medico.nome,
-                                 crm=medico.crm,
-                                 assinatura=medico.assinatura,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
+                                 assinatura=medico.assinatura if medico else None,
                                  data=datetime.now().strftime('%d/%m/%Y'))
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()

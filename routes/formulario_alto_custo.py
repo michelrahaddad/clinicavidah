@@ -50,8 +50,16 @@ def salvar_formulario_alto_custo():
             flash('Medicamento, quantidade e anamnese são obrigatórios.', 'error')
             return redirect(url_for('formulario_alto_custo.formulario_alto_custo'))
         
-        # Get doctor info
-        medico = Medico.query.filter_by(id=session['usuario']['id']).first()
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
+        
+        medico = Medico.query.get(medico_id)
         if not medico:
             flash('Médico não encontrado.', 'error')
             return redirect(url_for('formulario_alto_custo.formulario_alto_custo'))
@@ -116,10 +124,10 @@ def salvar_formulario_alto_custo():
                                  tratamento_previo=tratamento_previo,
                                  incapaz=incapaz,
                                  responsavel_nome=responsavel_nome,
-                                 medico=medico.nome,
-                                 crm=medico.crm,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
                                  medico_cns=medico_cns,
-                                 assinatura=medico.assinatura,
+                                 assinatura=medico.assinatura if medico else None,
                                  data=datetime.now().strftime('%d/%m/%Y'))
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()

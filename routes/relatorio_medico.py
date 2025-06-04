@@ -39,8 +39,16 @@ def salvar_relatorio_medico():
             flash('Todos os campos obrigatórios devem ser preenchidos.', 'error')
             return redirect(url_for('relatorio_medico.relatorio_medico'))
         
-        # Get doctor info
-        medico = Medico.query.filter_by(id=session['usuario']['id']).first()
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
+        
+        medico = Medico.query.get(medico_id)
         if not medico:
             flash('Médico não encontrado.', 'error')
             return redirect(url_for('relatorio_medico.relatorio_medico'))
@@ -80,9 +88,9 @@ def salvar_relatorio_medico():
                                  cid_codigo=cid_codigo,
                                  cid_descricao=cid_descricao,
                                  relatorio_texto=relatorio_texto,
-                                 medico=medico.nome,
-                                 crm=medico.crm,
-                                 assinatura=medico.assinatura,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
+                                 assinatura=medico.assinatura if medico else None,
                                  data=data)
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
