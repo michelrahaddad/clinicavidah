@@ -73,6 +73,10 @@ def create_app():
         response.headers['X-XSS-Protection'] = '1; mode=block'
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
         response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; font-src 'self' cdn.jsdelivr.net; img-src 'self' data:;"
+        # Cache headers for static resources
+        if request.endpoint == 'static':
+            response.headers['Cache-Control'] = 'public, max-age=31536000'
+            response.headers['Expires'] = '31536000'
         return response
     
     # Register blueprints
@@ -114,15 +118,6 @@ def create_app():
     app.register_blueprint(estatisticas_neurais_bp)
     app.register_blueprint(admin_bp)
     
-
-@app.after_request
-def add_cache_headers(response):
-    """Add cache headers for static resources"""
-    if request.endpoint == 'static':
-        response.headers['Cache-Control'] = 'public, max-age=31536000'
-        response.headers['Expires'] = '31536000'
-    return response
-
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
