@@ -135,10 +135,10 @@
                     <p class="text-muted mb-0 mt-2">Análise detalhada dos dados médicos por categoria</p>
                 </div>
                 <div>
-                    <a href="{{ url_for('relatorios.relatorio_estatisticas_pdf') }}" 
-                       class="btn btn-primary neural-btn px-4 py-2" target="_blank">
+                    <button onclick="exportPDF()" 
+                            class="btn btn-primary neural-btn px-4 py-2" id="pdf-export-btn">
                         <i class="fas fa-file-pdf me-2"></i>Exportar PDF
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
@@ -487,5 +487,47 @@
             currentChart = 'stats';
         }
     };
+
+    // PDF Export Function for Neural Statistics
+    function exportPDF() {
+        const btn = document.getElementById('pdf-export-btn');
+        const originalText = btn.innerHTML;
+        
+        // Show loading state
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Gerando PDF...';
+        btn.disabled = true;
+        
+        // Create a temporary link to download the PDF
+        fetch('{{ url_for("relatorios.relatorio_estatisticas_pdf") }}')
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Erro na geração do PDF');
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `relatorio_estatisticas_neurais_${Date.now()}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                // Reset button state
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao gerar PDF. Tente novamente.');
+                
+                // Reset button state
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
 </script>
 {% endblock %}
