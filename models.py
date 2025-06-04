@@ -278,4 +278,24 @@ class BackupConfig(db.Model):
     proximo_backup = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class Atestado(db.Model):
+    __tablename__ = 'atestados'
+    
+    id = Column(Integer, primary_key=True)
+    nome_paciente = Column(String(200), nullable=False)
+    dias_afastamento = Column(Integer, nullable=False)
+    data_criacao = Column(DateTime, default=datetime.utcnow)
+    usuario_id = Column(Integer, nullable=True)
 
+
+
+class Medicamento(db.Model):
+    __tablename__ = 'medicamentos'
+    
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(200), nullable=False)
+    tipo = Column(String(100), nullable=True)
+    principio_ativo = Column(String(200), nullable=True)
+    concentracao = Column(String(100), nullable=True)
+    forma_farmaceutica = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

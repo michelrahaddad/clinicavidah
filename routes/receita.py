@@ -25,7 +25,7 @@ receita_bp = Blueprint('receita', __name__)
 @receita_bp.route('/receita', methods=['GET'])
 def receita():
     """Display prescription form"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     # Get last registered patient for auto-fill
@@ -37,7 +37,7 @@ def receita():
 @receita_bp.route('/salvar_receita', methods=['POST'])
 def salvar_receita():
     """Save prescription and generate PDF"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -157,7 +157,7 @@ def salvar_receita():
 @receita_bp.route('/receita/refazer/<int:id>', methods=['GET'])
 def refazer_receita(id):
     """Refill prescription from prontuario"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -229,7 +229,7 @@ def gerar_pdf_reimprimir_receita(receita_obj):
 @receita_bp.route('/gerar_pdf_receita/<int:receita_id>')
 def gerar_pdf_receita(receita_id):
     """Generate and serve prescription PDF via GET request"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -274,7 +274,7 @@ def gerar_pdf_receita(receita_id):
 @receita_bp.route('/receita/reimprimir/<int:receita_id>')
 def reimprimir_receita(receita_id):
     """Generate PDF for existing prescription with current date"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -322,7 +322,7 @@ def reimprimir_receita(receita_id):
 @receita_bp.route('/refazer_receita/<int:id>')
 def refazer_receita_novo(id):
     """Refaz uma receita existente usando novo nome de função"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -350,7 +350,7 @@ def refazer_receita_novo(id):
 @receita_bp.route('/api/medicamentos')
 def get_medicamentos():
     """API para buscar medicamentos - funciona para médicos e administradores"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
         return jsonify([])
     
     try:
