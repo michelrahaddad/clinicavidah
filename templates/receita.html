@@ -104,6 +104,9 @@
                         <button type="button" class="btn btn-sm btn-outline-warning neural-btn px-3 py-1" onclick="limparMedicamentos()" style="border-radius: 12px; font-size: 0.8rem;">
                             <i class="fas fa-broom me-1"></i>Limpar
                         </button>
+                        <button type="button" class="btn btn-sm btn-success neural-btn px-3 py-1" onclick="adicionarMedicamento()" style="border-radius: 12px; font-size: 0.8rem;">
+                            <i class="fas fa-plus me-1"></i>+ Medicamento
+                        </button>
                     </div>
                 </div>
                 <p class="text-muted mb-0 small">
@@ -113,8 +116,8 @@
             </div>
             <div class="card-body">
                 <div id="medicamentos-container">
-                    <!-- Medicamento 1 -->
-                    <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <!-- Medicamento padrão (sempre visível) -->
+                    <div class="medicamento-row mb-4 p-4" id="medicamento-0" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h6 class="text-info mb-0 fw-bold">
                                 <i class="fas fa-capsules me-2"></i>Medicamento 1
@@ -126,23 +129,24 @@
                                     <i class="fas fa-pills me-1 text-success"></i>Princípio ativo
                                 </label>
                                 <div class="position-relative">
-                                    <input type="text" name="principio_ativo[]" class="form-control glass-input medicamento-autocomplete" 
-                                           placeholder="Ex: Dipirona Sódica" autocomplete="off"
+                                    <input type="text" name="principio_ativo[]" id="principio_ativo_0" class="form-control glass-input medicamento-autocomplete" 
+                                           placeholder="Ex: Dipirona Sódica" autocomplete="off" data-index="0"
                                            style="height: 48px; font-size: 1rem; font-weight: 500;">
+                                    <div class="autocomplete-suggestions" id="suggestions_medicamento_0"></div>
                                 </div>
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
                                     <i class="fas fa-weight me-1 text-warning"></i>Conc.
                                 </label>
-                                <input type="text" name="concentracao[]" class="form-control glass-input" 
+                                <input type="text" name="concentracao[]" id="concentracao_0" class="form-control glass-input" 
                                        placeholder="500mg" style="height: 48px; font-size: 1rem;">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
                                     <i class="fas fa-route me-1 text-primary"></i>Via
                                 </label>
-                                <select name="via[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
+                                <select name="via[]" id="via_0" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
                                     <option value="">Selecione</option>
                                     <option value="Oral">Oral</option>
                                     <option value="Sublingual">Sublingual</option>
@@ -157,7 +161,7 @@
                                 <label class="form-label text-light fw-semibold mb-2">
                                     <i class="fas fa-clock me-1 text-info"></i>Freq
                                 </label>
-                                <select name="frequencia[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
+                                <select name="frequencia[]" id="frequencia_0" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
                                     <option value="">Selecione</option>
                                     <option value="1x">1x</option>
                                     <option value="2x">2x</option>
@@ -172,271 +176,14 @@
                                 <label class="form-label text-light fw-semibold mb-2">
                                     <i class="fas fa-box me-1 text-danger"></i>Qtd
                                 </label>
-                                <input type="text" name="quantidade[]" class="form-control glass-input" 
-                                       placeholder="30 comprimidos ou 1 caixa" style="height: 48px; font-size: 1rem;">
+                                <input type="text" name="quantidade[]" id="quantidade_0" class="form-control glass-input" 
+                                       placeholder="30 comprimidos" style="height: 48px; font-size: 1rem;">
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Medicamento 2 -->
-                    <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="text-info mb-0 fw-bold">
-                                <i class="fas fa-capsules me-2"></i>Medicamento 2
-                            </h6>
-                        </div>
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-pills me-1 text-success"></i>Medicamento
-                                </label>
-                                <div class="position-relative">
-                                    <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
-                                           placeholder="Ex: Paracetamol" autocomplete="off"
-                                           style="height: 48px; font-size: 1rem; font-weight: 500;">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
-                                </label>
-                                <input type="text" name="concentracao[]" class="form-control glass-input" 
-                                       placeholder="500mg" style="height: 48px; font-size: 1rem;">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-route me-1 text-primary"></i>Via
-                                </label>
-                                <select name="via[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="Oral">Oral</option>
-                                    <option value="Sublingual">Sublingual</option>
-                                    <option value="Intramuscular">Intramuscular</option>
-                                    <option value="Endovenosa">Endovenosa</option>
-                                    <option value="Tópica">Tópica</option>
-                                    <option value="Ocular">Ocular</option>
-                                    <option value="Nasal">Nasal</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-clock me-1 text-info"></i>Frequência/dia
-                                </label>
-                                <select name="frequencia[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="1x ao dia">1x ao dia</option>
-                                    <option value="2x ao dia">2x ao dia</option>
-                                    <option value="3x ao dia">3x ao dia</option>
-                                    <option value="4x ao dia">4x ao dia</option>
-                                    <option value="6x ao dia">6x ao dia</option>
-                                    <option value="8x ao dia">8x ao dia</option>
-                                    <option value="Se necessário">Se necessário</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-box me-1 text-danger"></i>Quantidade
-                                </label>
-                                <input type="text" name="quantidade[]" class="form-control glass-input" 
-                                       placeholder="1 caixa ou 30 comprimidos" style="height: 48px; font-size: 1rem;">
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Medicamento 3 -->
-                    <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="text-info mb-0 fw-bold">
-                                <i class="fas fa-capsules me-2"></i>Medicamento 3
-                            </h6>
-                        </div>
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-pills me-1 text-success"></i>Medicamento
-                                </label>
-                                <div class="position-relative">
-                                    <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
-                                           placeholder="Ex: Omeprazol" autocomplete="off"
-                                           style="height: 48px; font-size: 1rem; font-weight: 500;">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
-                                </label>
-                                <input type="text" name="concentracao[]" class="form-control glass-input" 
-                                       placeholder="20mg" style="height: 48px; font-size: 1rem;">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-route me-1 text-primary"></i>Via
-                                </label>
-                                <select name="via[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="Oral">Oral</option>
-                                    <option value="Sublingual">Sublingual</option>
-                                    <option value="Intramuscular">Intramuscular</option>
-                                    <option value="Endovenosa">Endovenosa</option>
-                                    <option value="Tópica">Tópica</option>
-                                    <option value="Ocular">Ocular</option>
-                                    <option value="Nasal">Nasal</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-clock me-1 text-info"></i>Frequência/dia
-                                </label>
-                                <select name="frequencia[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="1x ao dia">1x ao dia</option>
-                                    <option value="2x ao dia">2x ao dia</option>
-                                    <option value="3x ao dia">3x ao dia</option>
-                                    <option value="4x ao dia">4x ao dia</option>
-                                    <option value="6x ao dia">6x ao dia</option>
-                                    <option value="8x ao dia">8x ao dia</option>
-                                    <option value="Se necessário">Se necessário</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-box me-1 text-danger"></i>Quantidade
-                                </label>
-                                <input type="text" name="quantidade[]" class="form-control glass-input" 
-                                       placeholder="1 caixa ou 30 comprimidos" style="height: 48px; font-size: 1rem;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Medicamento 4 -->
-                    <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="text-info mb-0 fw-bold">
-                                <i class="fas fa-capsules me-2"></i>Medicamento 4
-                            </h6>
-                        </div>
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-pills me-1 text-success"></i>Medicamento
-                                </label>
-                                <div class="position-relative">
-                                    <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
-                                           placeholder="Ex: Ibuprofeno" autocomplete="off"
-                                           style="height: 48px; font-size: 1rem; font-weight: 500;">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
-                                </label>
-                                <input type="text" name="concentracao[]" class="form-control glass-input" 
-                                       placeholder="600mg" style="height: 48px; font-size: 1rem;">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-route me-1 text-primary"></i>Via
-                                </label>
-                                <select name="via[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="Oral">Oral</option>
-                                    <option value="Sublingual">Sublingual</option>
-                                    <option value="Intramuscular">Intramuscular</option>
-                                    <option value="Endovenosa">Endovenosa</option>
-                                    <option value="Tópica">Tópica</option>
-                                    <option value="Ocular">Ocular</option>
-                                    <option value="Nasal">Nasal</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-clock me-1 text-info"></i>Frequência/dia
-                                </label>
-                                <select name="frequencia[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="1x ao dia">1x ao dia</option>
-                                    <option value="2x ao dia">2x ao dia</option>
-                                    <option value="3x ao dia">3x ao dia</option>
-                                    <option value="4x ao dia">4x ao dia</option>
-                                    <option value="6x ao dia">6x ao dia</option>
-                                    <option value="8x ao dia">8x ao dia</option>
-                                    <option value="Se necessário">Se necessário</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-box me-1 text-danger"></i>Quantidade
-                                </label>
-                                <input type="text" name="quantidade[]" class="form-control glass-input" 
-                                       placeholder="1 caixa ou 30 comprimidos" style="height: 48px; font-size: 1rem;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Medicamento 5 -->
-                    <div class="medicamento-row mb-4 p-4" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="text-info mb-0 fw-bold">
-                                <i class="fas fa-capsules me-2"></i>Medicamento 5
-                            </h6>
-                        </div>
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-pills me-1 text-success"></i>Medicamento
-                                </label>
-                                <div class="position-relative">
-                                    <input type="text" name="medicamento[]" class="form-control glass-input medicamento-autocomplete" 
-                                           placeholder="Ex: Amoxicilina" autocomplete="off"
-                                           style="height: 48px; font-size: 1rem; font-weight: 500;">
-                                </div>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
-                                </label>
-                                <input type="text" name="concentracao[]" class="form-control glass-input" 
-                                       placeholder="500mg" style="height: 48px; font-size: 1rem;">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-route me-1 text-primary"></i>Via
-                                </label>
-                                <select name="via[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="Oral">Oral</option>
-                                    <option value="Sublingual">Sublingual</option>
-                                    <option value="Intramuscular">Intramuscular</option>
-                                    <option value="Endovenosa">Endovenosa</option>
-                                    <option value="Tópica">Tópica</option>
-                                    <option value="Ocular">Ocular</option>
-                                    <option value="Nasal">Nasal</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-clock me-1 text-info"></i>Frequência/dia
-                                </label>
-                                <select name="frequencia[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                                    <option value="">Selecione</option>
-                                    <option value="1x ao dia">1x ao dia</option>
-                                    <option value="2x ao dia">2x ao dia</option>
-                                    <option value="3x ao dia">3x ao dia</option>
-                                    <option value="4x ao dia">4x ao dia</option>
-                                    <option value="6x ao dia">6x ao dia</option>
-                                    <option value="8x ao dia">8x ao dia</option>
-                                    <option value="Se necessário">Se necessário</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-box me-1 text-danger"></i>Quantidade
-                                </label>
-                                <input type="text" name="quantidade[]" class="form-control glass-input" 
-                                       placeholder="1 caixa ou 30 comprimidos" style="height: 48px; font-size: 1rem;">
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -679,6 +426,101 @@ function limparMedicamentos() {
     document.querySelectorAll('.medicamento-row input, .medicamento-row select').forEach(field => {
         field.value = '';
     });
+}
+
+let medicamentoCounter = 1;
+
+function adicionarMedicamento() {
+    const container = document.getElementById('medicamentos-container');
+    const novoMedicamento = document.createElement('div');
+    novoMedicamento.className = 'medicamento-row mb-4 p-4';
+    novoMedicamento.id = `medicamento-${medicamentoCounter}`;
+    novoMedicamento.style.cssText = 'background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);';
+    
+    novoMedicamento.innerHTML = `
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="text-info mb-0 fw-bold">
+                <i class="fas fa-capsules me-2"></i>Medicamento ${medicamentoCounter + 1}
+            </h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerMedicamento(${medicamentoCounter})" style="border-radius: 8px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label text-light fw-semibold mb-2">
+                    <i class="fas fa-pills me-1 text-success"></i>Princípio ativo
+                </label>
+                <div class="position-relative">
+                    <input type="text" name="principio_ativo[]" id="principio_ativo_${medicamentoCounter}" class="form-control glass-input medicamento-autocomplete" 
+                           placeholder="Ex: Dipirona Sódica" autocomplete="off" data-index="${medicamentoCounter}"
+                           style="height: 48px; font-size: 1rem; font-weight: 500;">
+                    <div class="autocomplete-suggestions" id="suggestions_medicamento_${medicamentoCounter}"></div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-light fw-semibold mb-2">
+                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
+                </label>
+                <input type="text" name="concentracao[]" id="concentracao_${medicamentoCounter}" class="form-control glass-input" 
+                       placeholder="500mg" style="height: 48px; font-size: 1rem;">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-light fw-semibold mb-2">
+                    <i class="fas fa-route me-1 text-primary"></i>Via
+                </label>
+                <select name="via[]" id="via_${medicamentoCounter}" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
+                    <option value="">Selecione</option>
+                    <option value="Oral">Oral</option>
+                    <option value="Sublingual">Sublingual</option>
+                    <option value="Intramuscular">Intramuscular</option>
+                    <option value="Endovenosa">Endovenosa</option>
+                    <option value="Tópica">Tópica</option>
+                    <option value="Ocular">Ocular</option>
+                    <option value="Nasal">Nasal</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label text-light fw-semibold mb-2">
+                    <i class="fas fa-clock me-1 text-info"></i>Freq
+                </label>
+                <select name="frequencia[]" id="frequencia_${medicamentoCounter}" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
+                    <option value="">Selecione</option>
+                    <option value="1x">1x</option>
+                    <option value="2x">2x</option>
+                    <option value="3x">3x</option>
+                    <option value="4x">4x</option>
+                    <option value="6x">6x</option>
+                    <option value="8x">8x</option>
+                    <option value="Se necessário">Se necessário</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label text-light fw-semibold mb-2">
+                    <i class="fas fa-box me-1 text-danger"></i>Qtd
+                </label>
+                <input type="text" name="quantidade[]" id="quantidade_${medicamentoCounter}" class="form-control glass-input" 
+                       placeholder="30 comprimidos" style="height: 48px; font-size: 1rem;">
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(novoMedicamento);
+    
+    // Inicializar autocomplete para o novo medicamento
+    const novoInput = document.getElementById(`principio_ativo_${medicamentoCounter}`);
+    novoInput.addEventListener('input', function() {
+        setupMedicamentAutocomplete(this);
+    });
+    
+    medicamentoCounter++;
+}
+
+function removerMedicamento(index) {
+    const medicamento = document.getElementById(`medicamento-${index}`);
+    if (medicamento) {
+        medicamento.remove();
+    }
 }
 
 // Limpar sugestões quando clicar fora
