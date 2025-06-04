@@ -505,72 +505,69 @@ function adicionarExamePersonalizado() {
         return;
     }
     
-    // Criar novo checkbox para o exame personalizado
-    const novoExameHTML = `
-        <div class="col-12 mb-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="exames[]" 
-                       value="${nomeExame}" 
-                       id="exame_custom_${Date.now()}" checked>
-                <label class="form-check-label text-light" for="exame_custom_${Date.now()}">
-                    ${nomeExame} <small class="text-muted">(Personalizado)</small>
-                </label>
-            </div>
-        </div>
-    `;
+    // Fechar o modal primeiro
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
+    if (modal) {
+        modal.hide();
+    }
     
-    // Encontrar seção de exames personalizados ou criar uma nova
-    let secaoPersonalizados = document.getElementById('secao-exames-personalizados');
-    if (!secaoPersonalizados) {
-        // Criar nova seção para exames personalizados
-        const novaSecao = document.createElement('div');
-        novaSecao.className = 'col-md-6 mb-4';
-        novaSecao.id = 'secao-exames-personalizados';
-        novaSecao.innerHTML = `
-            <h6 class="text-warning mb-3">
-                <i class="fas fa-user-cog me-2"></i>Exames Personalizados
-            </h6>
-            <div class="row" id="lista-exames-personalizados">
-            </div>
-        `;
+    // Aguardar um pouco para o modal fechar completamente
+    setTimeout(() => {
+        // Encontrar seção de exames personalizados ou criar uma nova
+        let secaoPersonalizados = document.getElementById('secao-exames-personalizados');
         
-        // Encontrar o container principal dos exames e adicionar a nova seção
-        const containerExames = document.querySelector('form .row');
-        if (containerExames) {
-            containerExames.appendChild(novaSecao);
-            console.log('Nova seção de exames personalizados criada');
+        if (!secaoPersonalizados) {
+            // Criar nova seção para exames personalizados
+            const containerExames = document.querySelector('form .row');
+            if (containerExames) {
+                const novaSecao = document.createElement('div');
+                novaSecao.className = 'col-md-6 mb-4';
+                novaSecao.id = 'secao-exames-personalizados';
+                novaSecao.innerHTML = `
+                    <h6 class="text-warning mb-3">
+                        <i class="fas fa-user-cog me-2"></i>Exames Personalizados
+                    </h6>
+                    <div class="row" id="lista-exames-personalizados">
+                    </div>
+                `;
+                containerExames.appendChild(novaSecao);
+                console.log('Nova seção de exames personalizados criada');
+                secaoPersonalizados = novaSecao;
+            }
         }
         
-        secaoPersonalizados = novaSecao;
-    }
-    
-    // Adicionar o exame à seção
-    const listaPersonalizados = document.getElementById('lista-exames-personalizados');
-    if (listaPersonalizados) {
-        const novoExameDiv = document.createElement('div');
-        novoExameDiv.className = 'col-12 mb-2';
-        novoExameDiv.innerHTML = `
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="exames[]" 
-                       value="${nomeExame}" 
-                       id="exame_custom_${Date.now()}" checked>
-                <label class="form-check-label text-light" for="exame_custom_${Date.now()}">
-                    ${nomeExame} <small class="text-muted">(Personalizado)</small>
-                </label>
-            </div>
-        `;
-        listaPersonalizados.appendChild(novoExameDiv);
-        console.log('Exame adicionado à lista:', nomeExame);
-    }
-    
-    // Limpar campos do modal
-    document.getElementById('nomeNovoExame').value = '';
-    document.getElementById('categoriaNovoExame').value = '';
-    
-    // Mostrar mensagem de sucesso
-    alert(`Exame "${nomeExame}" adicionado com sucesso e já está selecionado!`);
-    
-    console.log('Exame personalizado adicionado:', nomeExame);
+        // Adicionar o exame à seção
+        const listaPersonalizados = document.getElementById('lista-exames-personalizados');
+        if (listaPersonalizados) {
+            const timestamp = Date.now();
+            const novoExameDiv = document.createElement('div');
+            novoExameDiv.className = 'col-12 mb-2';
+            novoExameDiv.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                           value="${nomeExame}" 
+                           id="exame_custom_${timestamp}" checked>
+                    <label class="form-check-label text-light" for="exame_custom_${timestamp}">
+                        ${nomeExame} <small class="text-muted">(Personalizado)</small>
+                    </label>
+                </div>
+            `;
+            listaPersonalizados.appendChild(novoExameDiv);
+            console.log('Exame adicionado à lista:', nomeExame);
+            
+            // Rolar para a seção para mostrar o novo exame
+            secaoPersonalizados.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Limpar campos do modal
+        document.getElementById('nomeNovoExame').value = '';
+        document.getElementById('categoriaNovoExame').value = '';
+        
+        // Mostrar mensagem de sucesso
+        alert(`Exame "${nomeExame}" adicionado com sucesso e já está selecionado!`);
+        
+        console.log('Exame personalizado adicionado:', nomeExame);
+    }, 300);
 }
 </script>
 {% endblock %}
