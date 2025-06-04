@@ -311,62 +311,54 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
 <script>
-// Declarar função no escopo global antes do DOM carregar
-window.adicionarExamePersonalizado = function() {
+// Função global para adicionar exame personalizado
+function adicionarExamePersonalizado() {
     const nomeExame = document.getElementById('nomeNovoExame').value.trim();
-    const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
-    
-    console.log('Tentando adicionar exame de imagem:', nomeExame, 'categoria:', categoria);
     
     if (!nomeExame) {
         alert('Por favor, digite o nome do exame.');
         return;
     }
     
-    // Fechar o modal primeiro
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
-    if (modal) {
-        modal.hide();
-    }
+    // Criar novo exame na seção de Exames Personalizados
+    const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
     
-    // Aguardar um pouco para o modal fechar completamente
-    setTimeout(() => {
-        // Usar o container existente de exames personalizados
-        const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
+    if (containerPersonalizados) {
+        const timestamp = Date.now();
+        const novoExameDiv = document.createElement('div');
+        novoExameDiv.className = 'col-12 mb-2';
+        novoExameDiv.innerHTML = `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="exames[]" 
+                       value="${nomeExame}" 
+                       id="exame_custom_${timestamp}" checked>
+                <label class="form-check-label text-light" for="exame_custom_${timestamp}">
+                    ${nomeExame} <small class="text-muted">(Personalizado)</small>
+                </label>
+            </div>
+        `;
         
-        if (containerPersonalizados) {
-            const timestamp = Date.now();
-            const novoExameDiv = document.createElement('div');
-            novoExameDiv.className = 'col-12 mb-2';
-            novoExameDiv.innerHTML = `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="exames[]" 
-                           value="${nomeExame}" 
-                           id="exame_custom_${timestamp}" checked>
-                    <label class="form-check-label text-light" for="exame_custom_${timestamp}">
-                        ${nomeExame} <small class="text-muted">(Personalizado)</small>
-                    </label>
-                </div>
-            `;
-            containerPersonalizados.appendChild(novoExameDiv);
-            console.log('Exame de imagem adicionado ao container correto:', nomeExame);
-            
-            // Rolar para a seção de exames personalizados
-            const secaoPersonalizados = containerPersonalizados.closest('.card');
-            if (secaoPersonalizados) {
-                secaoPersonalizados.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }
+        containerPersonalizados.appendChild(novoExameDiv);
         
         // Limpar campos do modal
         document.getElementById('nomeNovoExame').value = '';
         document.getElementById('categoriaNovoExame').value = '';
         
-        // Mostrar mensagem de sucesso
-        alert(`Exame "${nomeExame}" adicionado com sucesso e já está selecionado!`);
+        // Fechar o modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
+        if (modal) {
+            modal.hide();
+        }
         
-        console.log('Exame personalizado de imagem adicionado:', nomeExame);
-    }, 300);
+        // Rolar para o exame adicionado
+        setTimeout(() => {
+            novoExameDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 500);
+        
+        alert(`Exame "${nomeExame}" adicionado com sucesso!`);
+    } else {
+        alert('Erro: Container de exames personalizados não encontrado.');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -388,69 +380,37 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Campo data_exame não encontrado!');
     }
     
-    // Configurar busca de exames com debug detalhado
+    // Configurar busca de exames - versão limpa e funcional
     const buscarExame = document.getElementById('buscarExame');
-    console.log('Campo de busca encontrado:', buscarExame);
     
     if (buscarExame) {
-        console.log('Adicionando event listener para busca');
-        
         buscarExame.addEventListener('input', function() {
             const termo = this.value.toLowerCase().trim();
-            console.log('=== BUSCA INICIADA ===');
-            console.log('Termo de busca:', termo);
-            console.log('Valor original:', this.value);
             
-            // Selecionar todos os checkboxes de exames
+            // Buscar em todos os checkboxes de exames
             const allFormChecks = document.querySelectorAll('.form-check');
-            console.log('Total de form-checks encontrados:', allFormChecks.length);
             
-            let totalVisible = 0;
-            let totalProcessed = 0;
-            
-            allFormChecks.forEach((formCheck, index) => {
+            allFormChecks.forEach(formCheck => {
                 const label = formCheck.querySelector('.form-check-label');
                 if (label) {
                     const texto = label.textContent.toLowerCase();
-                    totalProcessed++;
                     
-                    const matches = termo === '' || texto.includes(termo);
-                    
-                    if (index < 3) { // Log dos primeiros 3 para debug
-                        console.log(`Exame ${index}: "${label.textContent}" -> ${matches ? 'VISÍVEL' : 'OCULTO'}`);
-                    }
-                    
-                    if (matches) {
+                    if (termo === '' || texto.includes(termo)) {
                         formCheck.style.display = 'block';
-                        totalVisible++;
                     } else {
                         formCheck.style.display = 'none';
                     }
                 }
             });
-            
-            console.log(`Processados: ${totalProcessed}, Visíveis: ${totalVisible}`);
-            console.log('=== BUSCA FINALIZADA ===');
         });
         
-        // Teste manual da busca
-        console.log('Testando busca manualmente...');
-        setTimeout(() => {
-            const testTerms = ['eco', 'cardio', 'ultra'];
-            testTerms.forEach(term => {
-                console.log(`Teste com termo: "${term}"`);
-                buscarExame.value = term;
-                buscarExame.dispatchEvent(new Event('input'));
-            });
-            // Limpar após teste
-            setTimeout(() => {
-                buscarExame.value = '';
-                buscarExame.dispatchEvent(new Event('input'));
-            }, 1000);
-        }, 2000);
-        
-    } else {
-        console.error('Campo de busca não encontrado!');
+        // Limpar busca com ESC
+        buscarExame.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                this.value = '';
+                this.dispatchEvent(new Event('input'));
+            }
+        });
     }
     
     console.log('Sistema de Exames de Imagem carregado');
