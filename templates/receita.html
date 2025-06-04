@@ -364,8 +364,8 @@ function showMedicamentSuggestions(medicaments, input) {
             transition: background-color 0.2s;
         `;
         div.innerHTML = `
-            <strong>${med.nome}</strong><br>
-            <small style="color: #666;">${med.concentracao || ''} ${med.tipo || ''}</small>
+            <strong>${med.principio_ativo}</strong><br>
+            <small style="color: #666;">${med.concentracao || ''} - ${med.tipo || 'Genérico'}</small>
         `;
         
         div.addEventListener('mouseenter', () => {
@@ -379,8 +379,8 @@ function showMedicamentSuggestions(medicaments, input) {
         div.addEventListener('click', () => {
             console.log('Medicamento selecionado:', med);
             
-            // Preenche o princípio ativo
-            input.value = med.principio_ativo || med.nome;
+            // Preenche apenas o princípio ativo limpo
+            input.value = med.principio_ativo;
             
             // Localiza a linha do medicamento
             const medicamentoContainer = input.closest('.medicamento-row');
