@@ -249,6 +249,12 @@
             color: white;
         }
 
+        .btn-xs {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+        }
+
         .empty-state {
             text-align: center;
             padding: 3rem;
@@ -409,97 +415,84 @@
                     <thead>
                         <tr>
                             <th><i class="fas fa-user me-2"></i>Paciente</th>
-                            <th><i class="fas fa-file-alt me-2"></i>Tipo</th>
-                            <th><i class="fas fa-info-circle me-2"></i>Detalhes</th>
                             <th><i class="fas fa-calendar me-2"></i>Data</th>
+                            <th><i class="fas fa-file-alt me-2"></i>Documentos Realizados</th>
                             <th><i class="fas fa-user-md me-2"></i>Médico</th>
                             <th><i class="fas fa-tools me-2"></i>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for resultado in resultados %}
+                        {% for grupo in resultados %}
                         <tr>
                             <td>
-                                <strong>{{ resultado.nome_paciente }}</strong>
+                                <strong>{{ grupo.nome_paciente }}</strong>
                             </td>
+                            <td>{{ grupo.data }}</td>
                             <td>
-                                {% if resultado.tipo == 'receita' %}
-                                    <span class="badge badge-receita">
-                                        <i class="fas fa-pills me-1"></i>Receita
-                                    </span>
-                                {% elif resultado.tipo == 'exame_lab' %}
-                                    <span class="badge badge-exame-lab">
-                                        <i class="fas fa-flask me-1"></i>Exame Lab
-                                    </span>
-                                {% elif resultado.tipo == 'exame_img' %}
-                                    <span class="badge badge-exame-img">
-                                        <i class="fas fa-x-ray me-1"></i>Exame Img
-                                    </span>
-                                {% elif resultado.tipo == 'relatorio' %}
-                                    <span class="badge badge-relatorio">
-                                        <i class="fas fa-file-medical me-1"></i>Relatório
-                                    </span>
-                                {% elif resultado.tipo == 'atestado' %}
-                                    <span class="badge badge-atestado">
-                                        <i class="fas fa-certificate me-1"></i>Atestado
-                                    </span>
-                                {% elif resultado.tipo == 'alto_custo' %}
-                                    <span class="badge badge-alto-custo">
-                                        <i class="fas fa-dollar-sign me-1"></i>Alto Custo
-                                    </span>
-                                {% endif %}
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for documento in grupo.documentos %}
+                                        {% if documento.tipo == 'receita' %}
+                                            <span class="badge badge-receita" title="Receita: {{ documento.detalhes_registro }}">
+                                                <i class="fas fa-pills me-1"></i>Receita
+                                            </span>
+                                        {% elif documento.tipo == 'exame_lab' %}
+                                            <span class="badge badge-exame-lab" title="Exame Lab: {{ documento.detalhes_registro }}">
+                                                <i class="fas fa-flask me-1"></i>Exame Lab
+                                            </span>
+                                        {% elif documento.tipo == 'exame_img' %}
+                                            <span class="badge badge-exame-img" title="Exame Img: {{ documento.detalhes_registro }}">
+                                                <i class="fas fa-x-ray me-1"></i>Exame Img
+                                            </span>
+                                        {% elif documento.tipo == 'relatorio' %}
+                                            <span class="badge badge-relatorio" title="Relatório: {{ documento.detalhes_registro }}">
+                                                <i class="fas fa-file-medical me-1"></i>Relatório
+                                            </span>
+                                        {% elif documento.tipo == 'atestado' %}
+                                            <span class="badge badge-atestado" title="Atestado: {{ documento.detalhes_registro }}">
+                                                <i class="fas fa-certificate me-1"></i>Atestado
+                                            </span>
+                                        {% elif documento.tipo == 'alto_custo' %}
+                                            <span class="badge badge-alto-custo" title="Alto Custo: {{ documento.detalhes_registro }}">
+                                                <i class="fas fa-dollar-sign me-1"></i>Alto Custo
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
                             </td>
+                            <td>{{ grupo.medico_nome }}</td>
                             <td>
-                                <small class="text-muted">{{ resultado.detalhes_registro or 'Sem detalhes' }}</small>
-                            </td>
-                            <td>{{ resultado.data }}</td>
-                            <td>{{ resultado.medico_nome }}</td>
-                            <td>
-                                <div class="d-flex gap-1">
-                                    <!-- Edit Button -->
-                                    {% if resultado.tipo == 'receita' %}
-                                        <a href="{{ url_for('receita.receita') }}?edit_id={{ resultado.id_registro }}" 
-                                           class="btn btn-sm btn-outline-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url_for('receita.gerar_pdf_receita', receita_id=resultado.id_registro) }}" 
-                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF">
-                                            <i class="fas fa-file-pdf"></i>
-                                        </a>
-                                    {% elif resultado.tipo == 'exame_lab' %}
-                                        <a href="{{ url_for('exames_lab.exames_lab') }}?edit_id={{ resultado.id_registro }}" 
-                                           class="btn btn-sm btn-outline-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url_for('exames_lab.gerar_pdf_exame_lab', exame_id=resultado.id_registro) }}" 
-                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF">
-                                            <i class="fas fa-file-pdf"></i>
-                                        </a>
-                                    {% elif resultado.tipo == 'exame_img' %}
-                                        <a href="{{ url_for('exames_img.exames_img') }}?edit_id={{ resultado.id_registro }}" 
-                                           class="btn btn-sm btn-outline-warning" title="Editar">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="{{ url_for('exames_img.gerar_pdf_exame_img', exame_id=resultado.id_registro) }}" 
-                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF">
-                                            <i class="fas fa-file-pdf"></i>
-                                        </a>
-                                    {% elif resultado.tipo == 'relatorio' %}
-                                        <a href="{{ url_for('relatorios.relatorios') }}" 
-                                           class="btn btn-sm btn-outline-warning" title="Ir para Relatórios">
-                                            <i class="fas fa-arrow-right"></i>
-                                        </a>
-                                    {% elif resultado.tipo == 'atestado' %}
-                                        <a href="{{ url_for('atestados.atestados') }}" 
-                                           class="btn btn-sm btn-outline-warning" title="Ir para Atestados">
-                                            <i class="fas fa-arrow-right"></i>
-                                        </a>
-                                    {% elif resultado.tipo == 'alto_custo' %}
-                                        <a href="{{ url_for('alto_custo.alto_custo') }}" 
-                                           class="btn btn-sm btn-outline-warning" title="Ir para Alto Custo">
-                                            <i class="fas fa-arrow-right"></i>
-                                        </a>
-                                    {% endif %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for documento in grupo.documentos %}
+                                        <!-- Edit and PDF buttons for each document -->
+                                        {% if documento.tipo == 'receita' %}
+                                            <a href="{{ url_for('receita.receita') }}?edit_id={{ documento.id_registro }}" 
+                                               class="btn btn-xs btn-outline-warning" title="Editar Receita">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('receita.gerar_pdf_receita', receita_id=documento.id_registro) }}" 
+                                               class="btn btn-xs btn-pdf" target="_blank" title="PDF Receita">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        {% elif documento.tipo == 'exame_lab' %}
+                                            <a href="{{ url_for('exames_lab.exames_lab') }}?edit_id={{ documento.id_registro }}" 
+                                               class="btn btn-xs btn-outline-warning" title="Editar Exame Lab">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('exames_lab.gerar_pdf_exame_lab', exame_id=documento.id_registro) }}" 
+                                               class="btn btn-xs btn-pdf" target="_blank" title="PDF Exame Lab">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        {% elif documento.tipo == 'exame_img' %}
+                                            <a href="{{ url_for('exames_img.exames_img') }}?edit_id={{ documento.id_registro }}" 
+                                               class="btn btn-xs btn-outline-warning" title="Editar Exame Img">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{{ url_for('exames_img.gerar_pdf_exame_img', exame_id=documento.id_registro) }}" 
+                                               class="btn btn-xs btn-pdf" target="_blank" title="PDF Exame Img">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             </td>
                         </tr>

@@ -221,11 +221,25 @@ def prontuario():
                     logging.warning(f"Error processing high cost form {formulario.id}: {e}")
                     continue
         
-        # Sort all results by date (newest first)
-        resultados.sort(key=lambda x: x['data'], reverse=True)
+        # Group results by patient and date
+        grupos = {}
+        for resultado in resultados:
+            key = f"{resultado['nome_paciente']}|{resultado['data']}"
+            if key not in grupos:
+                grupos[key] = {
+                    'nome_paciente': resultado['nome_paciente'],
+                    'data': resultado['data'],
+                    'medico_nome': resultado['medico_nome'],
+                    'documentos': []
+                }
+            grupos[key]['documentos'].append(resultado)
+        
+        # Convert to list and sort by date (newest first)
+        resultados_agrupados = list(grupos.values())
+        resultados_agrupados.sort(key=lambda x: x['data'], reverse=True)
         
         return render_template('prontuario_modern.html', 
-                             resultados=resultados,
+                             resultados=resultados_agrupados,
                              busca_paciente=busca_paciente,
                              filtro_tipo=filtro_tipo,
                              filtro_data_inicio=filtro_data_inicio,
