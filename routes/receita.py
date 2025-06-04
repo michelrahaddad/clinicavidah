@@ -103,9 +103,9 @@ def salvar_receita():
                                      posologias=posologias,
                                      duracoes=duracoes,
                                      vias=vias,
-                                     medico=medico.nome,
-                                     crm=medico.crm,
-                                     assinatura=medico.assinatura,
+                                     medico=medico.nome if medico else "Médico não encontrado",
+                                     crm=medico.crm if medico else "CRM não disponível",
+                                     assinatura=medico.assinatura if medico else None,
                                      data=data,
                                      zip=zip)
             
@@ -185,10 +185,10 @@ def gerar_pdf_reimprimir_receita(receita_obj):
                                  posologias=receita_obj.posologias.split(','),
                                  duracoes=receita_obj.duracoes.split(','),
                                  vias=receita_obj.vias.split(','),
-                                 medico=medico.nome,
-                                 crm=medico.crm,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
                                  data=data_atual,
-                                 assinatura=medico.assinatura,
+                                 assinatura=medico.assinatura if medico else None,
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
