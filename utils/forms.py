@@ -2,38 +2,15 @@ import re
 from datetime import datetime
 
 def validar_cpf(cpf):
-    """Validate CPF format and check digit"""
+    """Validate CPF format - accepts any numeric sequence"""
     if not cpf:
         return False
     
     # Remove non-numeric characters
     cpf = re.sub(r'[^0-9]', '', cpf)
     
-    # Must have 11 digits
-    if len(cpf) != 11:
-        return False
-    
-    # Check for known invalid CPFs
-    if cpf == cpf[0] * 11:
-        return False
-    
-    # Calculate check digits
-    def calculate_check_digit(cpf_digits, weight):
-        total = sum(int(digit) * weight for digit, weight in zip(cpf_digits, range(weight, 1, -1)))
-        remainder = total % 11
-        return 0 if remainder < 2 else 11 - remainder
-    
-    # Validate first check digit
-    first_check = calculate_check_digit(cpf[:9], 10)
-    if int(cpf[9]) != first_check:
-        return False
-    
-    # Validate second check digit
-    second_check = calculate_check_digit(cpf[:10], 11)
-    if int(cpf[10]) != second_check:
-        return False
-    
-    return True
+    # Accept any numeric sequence between 8-11 digits
+    return len(cpf) >= 8 and len(cpf) <= 11
 
 def format_cpf(cpf):
     """Format CPF with dots and dash"""

@@ -631,11 +631,19 @@ def autocomplete():
         sugestoes = []
         pacientes_encontrados = set()
         
+        # Se for admin, buscar em todos os médicos; se for médico específico, só nos seus registros
+        is_admin = admin_data or 'admin_usuario' in session
+        
         # Buscar em receitas
-        receitas = db.session.query(Receita.nome_paciente, Receita.data).filter(
-            Receita.id_medico == medico_id,
-            Receita.nome_paciente.ilike(f'%{termo}%')
-        ).order_by(Receita.data.desc()).limit(10).all()
+        if is_admin:
+            receitas = db.session.query(Receita.nome_paciente, Receita.data).filter(
+                Receita.nome_paciente.ilike(f'%{termo}%')
+            ).order_by(Receita.data.desc()).limit(20).all()
+        else:
+            receitas = db.session.query(Receita.nome_paciente, Receita.data).filter(
+                Receita.id_medico == medico_id,
+                Receita.nome_paciente.ilike(f'%{termo}%')
+            ).order_by(Receita.data.desc()).limit(10).all()
         
         for receita in receitas:
             nome = receita.nome_paciente
@@ -648,10 +656,15 @@ def autocomplete():
                 })
         
         # Buscar em exames laboratoriais
-        exames_lab = db.session.query(ExameLab.nome_paciente, ExameLab.data).filter(
-            ExameLab.id_medico == medico_id,
-            ExameLab.nome_paciente.ilike(f'%{termo}%')
-        ).order_by(ExameLab.data.desc()).limit(10).all()
+        if is_admin:
+            exames_lab = db.session.query(ExameLab.nome_paciente, ExameLab.data).filter(
+                ExameLab.nome_paciente.ilike(f'%{termo}%')
+            ).order_by(ExameLab.data.desc()).limit(20).all()
+        else:
+            exames_lab = db.session.query(ExameLab.nome_paciente, ExameLab.data).filter(
+                ExameLab.id_medico == medico_id,
+                ExameLab.nome_paciente.ilike(f'%{termo}%')
+            ).order_by(ExameLab.data.desc()).limit(10).all()
         
         for exame in exames_lab:
             nome = exame.nome_paciente
@@ -664,10 +677,15 @@ def autocomplete():
                 })
         
         # Buscar em exames de imagem
-        exames_img = db.session.query(ExameImg.nome_paciente, ExameImg.data).filter(
-            ExameImg.id_medico == medico_id,
-            ExameImg.nome_paciente.ilike(f'%{termo}%')
-        ).order_by(ExameImg.data.desc()).limit(10).all()
+        if is_admin:
+            exames_img = db.session.query(ExameImg.nome_paciente, ExameImg.data).filter(
+                ExameImg.nome_paciente.ilike(f'%{termo}%')
+            ).order_by(ExameImg.data.desc()).limit(20).all()
+        else:
+            exames_img = db.session.query(ExameImg.nome_paciente, ExameImg.data).filter(
+                ExameImg.id_medico == medico_id,
+                ExameImg.nome_paciente.ilike(f'%{termo}%')
+            ).order_by(ExameImg.data.desc()).limit(10).all()
         
         for exame in exames_img:
             nome = exame.nome_paciente

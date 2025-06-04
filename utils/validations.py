@@ -6,9 +6,9 @@ import re
 from datetime import datetime
 
 def validar_cpf(cpf):
-    """Valida formato de CPF"""
+    """Valida formato de CPF - aceita qualquer sequência numérica"""
     cpf = re.sub(r'[^0-9]', '', cpf)
-    return len(cpf) == 11 and cpf != cpf[0] * 11
+    return len(cpf) >= 8 and len(cpf) <= 11
 
 def validar_crm(crm):
     """Valida formato de CRM"""
