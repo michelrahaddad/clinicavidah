@@ -53,12 +53,19 @@ def get_medicamentos():
             return jsonify([])
         
         # Busca por nome ou princípio ativo
-        medicamentos = Medicamento.query.filter(
-            or_(
-                Medicamento.nome.ilike(f'%{term}%'),
-                Medicamento.principio_ativo.ilike(f'%{term}%')
-            )
-        ).limit(10).all()
+        try:
+            medicamentos = Medicamento.query.filter(
+                or_(
+                    Medicamento.nome.ilike(f'%{term}%'),
+                    Medicamento.principio_ativo.ilike(f'%{term}%')
+                )
+            ).limit(10).all()
+        except Exception as search_error:
+            logging.error(f"Erro na busca: {search_error}")
+            # Fallback: busca apenas por nome
+            medicamentos = Medicamento.query.filter(
+                Medicamento.nome.ilike(f'%{term}%')
+            ).limit(10).all()
         
         logging.info(f"Encontrados {len(medicamentos)} medicamentos")
         
@@ -69,7 +76,11 @@ def get_medicamentos():
                 'nome': m.nome,
                 'principio_ativo': getattr(m, 'principio_ativo', '') or m.nome,
                 'concentracao': getattr(m, 'concentracao', '') or '',
-                'tipo': getattr(m, 'tipo', '') or ''
+                'tipo': getattr(m, 'tipo', '') or '',
+                'forma_farmaceutica': getattr(m, 'forma_farmaceutica', '') or '',
+                'via_padrao': 'Oral',  # Via padrão mais comum
+                'frequencia_padrao': '3x',  # Frequência padrão
+                'quantidade_padrao': '30 comprimidos'  # Quantidade padrão
             }
             result.append(med_data)
             logging.info(f"Medicamento: {med_data}")

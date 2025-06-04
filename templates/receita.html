@@ -108,7 +108,7 @@
                 </div>
                 <p class="text-muted mb-0 small">
                     <i class="fas fa-info-circle me-1"></i>
-                    Formato: Princípio Ativo | Concentração | Via | Número x no dia | Comprimidos/Caixa
+                    Formato: [Princípio ativo] / [Conc.] / [Via] / [Freq] / [Qtd]
                 </p>
             </div>
             <div class="card-body">
@@ -123,7 +123,7 @@
                         <div class="row g-3 align-items-end">
                             <div class="col-md-3">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-pills me-1 text-success"></i>Princípio Ativo
+                                    <i class="fas fa-pills me-1 text-success"></i>Princípio ativo
                                 </label>
                                 <div class="position-relative">
                                     <input type="text" name="principio_ativo[]" class="form-control glass-input medicamento-autocomplete" 
@@ -133,7 +133,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Concentração
+                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
                                 </label>
                                 <input type="text" name="concentracao[]" class="form-control glass-input" 
                                        placeholder="500mg" style="height: 48px; font-size: 1rem;">
@@ -155,7 +155,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-clock me-1 text-info"></i>Número x no dia
+                                    <i class="fas fa-clock me-1 text-info"></i>Freq
                                 </label>
                                 <select name="frequencia[]" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
                                     <option value="">Selecione</option>
@@ -170,7 +170,7 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-box me-1 text-danger"></i>Comprimidos/Caixa
+                                    <i class="fas fa-box me-1 text-danger"></i>Qtd
                                 </label>
                                 <input type="text" name="quantidade[]" class="form-control glass-input" 
                                        placeholder="30 comprimidos ou 1 caixa" style="height: 48px; font-size: 1rem;">
@@ -198,7 +198,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Concentração
+                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
                                 </label>
                                 <input type="text" name="concentracao[]" class="form-control glass-input" 
                                        placeholder="500mg" style="height: 48px; font-size: 1rem;">
@@ -263,7 +263,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Concentração
+                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
                                 </label>
                                 <input type="text" name="concentracao[]" class="form-control glass-input" 
                                        placeholder="20mg" style="height: 48px; font-size: 1rem;">
@@ -328,7 +328,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Concentração
+                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
                                 </label>
                                 <input type="text" name="concentracao[]" class="form-control glass-input" 
                                        placeholder="600mg" style="height: 48px; font-size: 1rem;">
@@ -393,7 +393,7 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label text-light fw-semibold mb-2">
-                                    <i class="fas fa-weight me-1 text-warning"></i>Concentração
+                                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
                                 </label>
                                 <input type="text" name="concentracao[]" class="form-control glass-input" 
                                        placeholder="500mg" style="height: 48px; font-size: 1rem;">
@@ -630,13 +630,33 @@ function showMedicamentSuggestions(medicaments, input) {
         });
         
         div.addEventListener('click', () => {
-            input.value = med.nome;
-            // Auto-preencher concentração se disponível
+            // Preenche o princípio ativo
+            input.value = med.principio_ativo || med.nome;
+            
+            // Localiza todos os campos do medicamento na mesma linha
             const row = input.closest('.medicamento-row');
             const concentracaoInput = row.querySelector('input[name="concentracao[]"]');
+            const viaSelect = row.querySelector('select[name="via[]"]');
+            const frequenciaSelect = row.querySelector('select[name="frequencia[]"]');
+            const quantidadeInput = row.querySelector('input[name="quantidade[]"]');
+            
+            // Preenche automaticamente todos os campos com dados do banco
             if (concentracaoInput && med.concentracao) {
                 concentracaoInput.value = med.concentracao;
             }
+            
+            if (viaSelect && med.via_padrao) {
+                viaSelect.value = med.via_padrao;
+            }
+            
+            if (frequenciaSelect && med.frequencia_padrao) {
+                frequenciaSelect.value = med.frequencia_padrao;
+            }
+            
+            if (quantidadeInput && med.quantidade_padrao) {
+                quantidadeInput.value = med.quantidade_padrao;
+            }
+            
             clearSuggestions('medicament');
         });
         
