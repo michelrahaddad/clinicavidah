@@ -212,6 +212,142 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar gráfico de estatísticas neurais no dashboard
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    
+    // Dados das estatísticas
+    const chartData = {
+        labels: ['Pacientes', 'Receitas', 'Exames Lab', 'Exames Imagem'],
+        datasets: [{
+            label: 'Quantidade',
+            data: [
+                {{ total_pacientes or 0 }},
+                {{ total_receitas or 0 }},
+                {{ total_exames_lab or 0 }},
+                {{ total_exames_img or 0 }}
+            ],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(255, 99, 132, 0.8)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 205, 86, 1)',
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 2
+        }]
+    };
 
+    // Configurações do gráfico
+    const config = {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: 'white',
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Visão Geral do Sistema',
+                    color: 'white',
+                    font: {
+                        size: 16,
+                        weight: 'bold'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: 'white',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: 'white',
+                        font: {
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            }
+        }
+    };
 
+    // Criar o gráfico
+    new Chart(ctx, config);
+
+    // Animação dos contadores
+    const counters = document.querySelectorAll('.counter');
+    counters.forEach(counter => {
+        const target = parseInt(counter.getAttribute('data-target'));
+        const duration = 1500;
+        const increment = target / (duration / 16);
+        let current = 0;
+        
+        const updateCounter = () => {
+            if (current < target) {
+                current += increment;
+                counter.textContent = Math.floor(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target;
+            }
+        };
+        
+        updateCounter();
+    });
+
+    // Logout functionality
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja sair?')) {
+            window.location.href = '/logout';
+        }
+    });
+
+    // Adicionar efeito hover nos botões neurais
+    document.querySelectorAll('.neural-btn').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.3)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+
+    console.log('Sistema Médico VIDAH - Dashboard carregado com sucesso');
+});
+</script>
 {% endblock %}
