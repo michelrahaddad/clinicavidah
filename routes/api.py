@@ -70,13 +70,13 @@ def get_medicamentos():
             frequencia_padrao = '1x'
             quantidade_padrao = '30 comprimidos'
             
-            # Analisa a forma farmacêutica
+            # Analisa a forma farmacêutica e define via de administração
             if m.forma_farmaceutica:
                 if 'Injetável' in m.forma_farmaceutica:
                     via_padrao = 'Intramuscular'
                     quantidade_padrao = '1 ampola'
                 elif 'Inalação' in m.forma_farmaceutica:
-                    via_padrao = 'Inalatória'
+                    via_padrao = 'Nasal'  # Usando valor que existe no select
                     quantidade_padrao = '1 frasco'
                 elif 'Tópico' in m.forma_farmaceutica:
                     via_padrao = 'Tópica'
@@ -84,16 +84,38 @@ def get_medicamentos():
                 elif 'Cápsula' in m.forma_farmaceutica:
                     quantidade_padrao = '30 cápsulas'
             
-            # Determina frequência baseada no tipo de medicamento
+            # Analisa o nome para determinar via mais específica
             nome_lower = m.nome.lower()
-            if any(word in nome_lower for word in ['losartana', 'omeprazol', 'levotiroxina', 'sinvastatina']):
+            if 'injetável' in nome_lower or 'ampola' in nome_lower:
+                if 'endovenosa' in nome_lower or 'iv' in nome_lower:
+                    via_padrao = 'Endovenosa'
+                else:
+                    via_padrao = 'Intramuscular'
+                quantidade_padrao = '1 ampola'
+            elif 'inalat' in nome_lower or 'spray' in nome_lower:
+                via_padrao = 'Nasal'
+                quantidade_padrao = '1 frasco'
+            elif 'tópic' in nome_lower or 'pomada' in nome_lower or 'creme' in nome_lower:
+                via_padrao = 'Tópica'
+                quantidade_padrao = '1 tubo'
+            elif 'sublingual' in nome_lower:
+                via_padrao = 'Sublingual'
+            
+            # Determina frequência baseada no medicamento específico
+            if any(word in nome_lower for word in ['losartana', 'omeprazol', 'levotiroxina', 'sinvastatina', 'atenolol']):
                 frequencia_padrao = '1x'
-            elif any(word in nome_lower for word in ['metformina', 'captopril', 'atenolol']):
+            elif any(word in nome_lower for word in ['metformina', 'captopril', 'ibuprofeno', 'diclofenaco']):
                 frequencia_padrao = '2x'
-            elif any(word in nome_lower for word in ['dipirona', 'paracetamol', 'amoxicilina']):
+            elif any(word in nome_lower for word in ['dipirona', 'paracetamol', 'amoxicilina', 'cefalexina']):
                 frequencia_padrao = '3x'
-            elif any(word in nome_lower for word in ['ibuprofeno', 'diclofenaco']):
-                frequencia_padrao = '2x'
+            elif any(word in nome_lower for word in ['dipirona', 'tylenol']):
+                frequencia_padrao = '3x'
+            
+            # Ajusta quantidade baseada no tipo de medicamento
+            if 'cápsula' in nome_lower:
+                quantidade_padrao = '30 cápsulas'
+            elif 'comprimido' in nome_lower or not quantidade_padrao.endswith('ampola'):
+                quantidade_padrao = '30 comprimidos'
             
             result.append({
                 'id': m.id,
