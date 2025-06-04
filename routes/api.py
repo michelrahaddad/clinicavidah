@@ -45,7 +45,8 @@ def get_pacientes():
 @api_bp.route('/medicamentos')
 def get_medicamentos():
     """API para autocomplete de medicamentos"""
-    if not (session.get('usuario') or session.get('admin_usuario')):
+    # Verificação mais flexível de autenticação
+    if not (session.get('usuario') or session.get('admin_usuario') or session.get('nome')):
         return jsonify([])
     
     try:
