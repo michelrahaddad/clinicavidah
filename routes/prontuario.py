@@ -13,13 +13,19 @@ def prontuario():
         return redirect(url_for('auth.login'))
     
     try:
+        # Get current doctor ID from session
+        medico_id = session.get('medico_id')
+        if not medico_id:
+            flash('Sessão expirada. Faça login novamente.', 'error')
+            return redirect(url_for('auth.login'))
+            
         # Get search parameters
         busca_paciente = sanitizar_entrada(request.args.get('busca_paciente', ''))
         filtro_tipo = request.args.get('tipo', '')
         filtro_data_inicio = request.args.get('data_inicio', '')
         filtro_data_fim = request.args.get('data_fim', '')
         
-        logging.info(f"Prontuario search - busca_paciente: '{busca_paciente}', filtro_tipo: '{filtro_tipo}', data_inicio: '{filtro_data_inicio}', data_fim: '{filtro_data_fim}'")
+        logging.info(f"Prontuario search - busca_paciente: '{busca_paciente}', filtro_tipo: '{filtro_tipo}', data_inicio: '{filtro_data_inicio}', data_fim: '{filtro_data_fim}', medico_id: {medico_id}")
         
         resultados = []
         
@@ -28,8 +34,8 @@ def prontuario():
         
         for tipo in tipos_busca:
             if tipo == 'receita':
-                # Search in prescriptions
-                query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico)
+                # Search in prescriptions - only for current doctor
+                query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico).filter(Receita.id_medico == medico_id)
                 
                 if busca_paciente:
                     # Split search terms and create flexible search
@@ -63,8 +69,8 @@ def prontuario():
                         continue
             
             elif tipo == 'exame_lab':
-                # Search in lab exams
-                query = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico)
+                # Search in lab exams - only for current doctor
+                query = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico).filter(ExameLab.id_medico == medico_id)
                 
                 if busca_paciente:
                     # Split search terms and create flexible search
@@ -96,8 +102,8 @@ def prontuario():
                         continue
             
             elif tipo == 'exame_img':
-                # Search in imaging exams
-                query = db.session.query(ExameImg, Medico.nome.label('medico_nome')).join(Medico)
+                # Search in imaging exams - only for current doctor
+                query = db.session.query(ExameImg, Medico.nome.label('medico_nome')).join(Medico).filter(ExameImg.id_medico == medico_id)
                 
                 if busca_paciente:
                     # Split search terms and create flexible search
