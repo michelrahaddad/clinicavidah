@@ -146,32 +146,41 @@ function hideMedicamentSuggestions(input) {
 
 function preencherCamposMedicamentoInteligente(principioInput, medicamento) {
     const row = principioInput.closest('.medicamento-row');
-    if (!row) return;
+    if (!row) {
+        console.log('Row não encontrada');
+        return;
+    }
+    
+    console.log('Preenchendo campos para medicamento:', medicamento);
     
     // Preencher campos baseado no histórico
     const concentracaoInput = row.querySelector('input[id^="concentracao_"]');
-    const viaInput = row.querySelector('input[id^="via_"]');
-    const frequenciaInput = row.querySelector('input[id^="frequencia_"]');
+    const viaSelect = row.querySelector('select[id^="via_"]');
+    const frequenciaSelect = row.querySelector('select[id^="frequencia_"]');
     const quantidadeInput = row.querySelector('input[id^="quantidade_"]');
     
     if (concentracaoInput && medicamento.concentracao) {
         concentracaoInput.value = medicamento.concentracao;
         animateFieldFill(concentracaoInput);
+        console.log('Concentração preenchida:', medicamento.concentracao);
     }
     
-    if (viaInput && medicamento.via) {
-        viaInput.value = medicamento.via;
-        animateFieldFill(viaInput);
+    if (viaSelect && medicamento.via) {
+        viaSelect.value = medicamento.via;
+        animateFieldFill(viaSelect);
+        console.log('Via preenchida:', medicamento.via);
     }
     
-    if (frequenciaInput && medicamento.frequencia) {
-        frequenciaInput.value = medicamento.frequencia;
-        animateFieldFill(frequenciaInput);
+    if (frequenciaSelect && medicamento.frequencia) {
+        frequenciaSelect.value = medicamento.frequencia;
+        animateFieldFill(frequenciaSelect);
+        console.log('Frequência preenchida:', medicamento.frequencia);
     }
     
     if (quantidadeInput && medicamento.quantidade) {
         quantidadeInput.value = medicamento.quantidade;
         animateFieldFill(quantidadeInput);
+        console.log('Quantidade preenchida:', medicamento.quantidade);
     }
     
     // Exibir notificação de preenchimento automático
