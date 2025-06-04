@@ -48,6 +48,16 @@
                                    class="form-control glass-input" 
                                    value="{{ exame.data_exame if refazer and exame else '' }}"
                                    required>
+                            <script>
+                                // Força a data atual imediatamente após o campo ser renderizado
+                                (function() {
+                                    const campo = document.getElementById('data_exame');
+                                    if (campo && !campo.value) {
+                                        const hoje = new Date().toISOString().split('T')[0];
+                                        campo.value = hoje;
+                                    }
+                                })();
+                            </script>
                         </div>
                     </div>
                 </div>
