@@ -9,7 +9,7 @@ def require_admin(f):
     """Decorator to require admin authentication"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'admin' not in session:
+        if 'admin_data' not in session:
             flash('Acesso não autorizado. Faça login como administrador.', 'error')
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
