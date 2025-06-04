@@ -46,6 +46,8 @@ def salvar_receita():
         nome_paciente = sanitizar_entrada(request.form.get('nome_paciente', ''))
         cpf = sanitizar_entrada(request.form.get('cpf', ''))
         idade = sanitizar_entrada(request.form.get('idade', ''))
+        endereco = sanitizar_entrada(request.form.get('endereco', ''))
+        cidade = sanitizar_entrada(request.form.get('cidade', ''))
         
         # Get new medication fields
         principios_ativos = [sanitizar_entrada(m) for m in request.form.getlist('principio_ativo[]') if m.strip()]
@@ -134,10 +136,10 @@ def salvar_receita():
             # Generate PDF directly using WeasyPrint
             pdf_html = render_template('receita_pdf.html',
                                      nome_paciente=nome_paciente,
-                                     cpf_paciente=paciente.cpf if paciente else cpf,
-                                     idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else idade,
-                                     endereco_paciente=paciente.endereco if paciente else None,
-                                     cidade_uf_paciente=paciente.cidade_uf if paciente else None,
+                                     cpf_paciente=cpf if cpf else '000.000.000-00',
+                                     idade_paciente=f"{idade} anos" if idade else 'Não informado',
+                                     endereco_paciente=endereco if endereco else 'Não informado',
+                                     cidade_uf_paciente=cidade if cidade else 'XX',
                                      medicamentos=medicamentos_completos,
                                      posologias=frequencias,
                                      duracoes=['Conforme prescrição'] * len(medicamentos_completos),
