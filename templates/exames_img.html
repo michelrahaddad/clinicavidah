@@ -359,10 +359,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Sistema de Exames de Imagem carregado');
     console.log('Busca de exames configurada');
-});
-
-// Função para adicionar exame personalizado
-function adicionarExamePersonalizado() {
+    
+    // Definir função para adicionar exame personalizado no escopo global
+    window.adicionarExamePersonalizado = function() {
     const nomeExame = document.getElementById('nomeNovoExame').value.trim();
     const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
     
@@ -417,6 +416,7 @@ function adicionarExamePersonalizado() {
         
         console.log('Exame personalizado de imagem adicionado:', nomeExame);
     }, 300);
-}
+    };
+});
 </script>
 {% endblock %}
