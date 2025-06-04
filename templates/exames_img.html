@@ -61,16 +61,15 @@
                         <i class="fas fa-x-ray me-2"></i>
                         Exames de Imagem
                     </h5>
-                    <div class="d-flex gap-2">
-                        <div class="input-group" style="width: 300px;">
+                    <div class="d-flex gap-2 align-items-center">
+                        <div class="input-group" style="width: 250px;">
                             <input type="text" id="buscarExame" class="form-control glass-input" 
-                                   placeholder="Buscar exame específico..." style="border-radius: 10px 0 0 10px;">
-                            <button class="btn btn-outline-primary" type="button" style="border-radius: 0 10px 10px 0;">
-                                <i class="fas fa-search"></i>
-                            </button>
+                                   placeholder="Buscar exame..." 
+                                   style="border-radius: 8px; font-size: 14px; height: 38px;">
                         </div>
-                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalExamesPersonalizados">
-                            <i class="fas fa-cog"></i> Exames Personalizados
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalExamesPersonalizados"
+                                style="border-radius: 8px; padding: 8px 16px;">
+                            <i class="fas fa-cog me-1"></i>Exames Personalizados
                         </button>
                     </div>
                 </div>
@@ -302,66 +301,8 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Configurar data atual
-    const dataExame = document.getElementById('data_exame');
-    if (dataExame && !dataExame.value) {
-        const hoje = new Date().toISOString().split('T')[0];
-        dataExame.value = hoje;
-    }
-    
-    // Configurar busca de exames
-    const buscarExame = document.getElementById('buscarExame');
-    if (buscarExame) {
-        buscarExame.addEventListener('input', function() {
-            const termo = this.value.toLowerCase();
-            console.log('Buscando por:', termo);
-            
-            // Buscar em todas as seções de exames
-            const secoes = document.querySelectorAll('.col-md-6, .col-md-4, .col-sm-6, .col-12');
-            
-            secoes.forEach(secao => {
-                const labels = secao.querySelectorAll('.form-check-label');
-                let temMatch = false;
-                
-                labels.forEach(label => {
-                    const texto = label.textContent.toLowerCase();
-                    const formCheck = label.closest('.form-check');
-                    
-                    if (texto.includes(termo) || termo === '') {
-                        if (formCheck) formCheck.style.display = 'block';
-                        temMatch = true;
-                    } else {
-                        if (formCheck) formCheck.style.display = 'none';
-                    }
-                });
-                
-                // Mostrar/ocultar seção inteira se necessário
-                const tituloSecao = secao.querySelector('h6, h5');
-                if (tituloSecao && tituloSecao.closest('.card')) {
-                    const card = tituloSecao.closest('.card');
-                    if (termo && !temMatch) {
-                        card.style.display = 'none';
-                    } else {
-                        card.style.display = 'block';
-                    }
-                } else {
-                    // Para seções sem card
-                    if (termo && !temMatch) {
-                        secao.style.display = 'none';
-                    } else {
-                        secao.style.display = 'block';
-                    }
-                }
-            });
-        });
-    }
-    
-    console.log('Sistema de Exames de Imagem carregado');
-    console.log('Busca de exames configurada');
-    
-    // Definir função para adicionar exame personalizado no escopo global
-    window.adicionarExamePersonalizado = function() {
+// Função global para adicionar exame personalizado
+function adicionarExamePersonalizado() {
     const nomeExame = document.getElementById('nomeNovoExame').value.trim();
     const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
     
@@ -416,7 +357,68 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Exame personalizado de imagem adicionado:', nomeExame);
     }, 300);
-    };
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar data atual
+    const dataExame = document.getElementById('data_exame');
+    if (dataExame && !dataExame.value) {
+        const hoje = new Date().toISOString().split('T')[0];
+        dataExame.value = hoje;
+    }
+    
+    // Configurar busca de exames
+    const buscarExame = document.getElementById('buscarExame');
+    if (buscarExame) {
+        buscarExame.addEventListener('input', function() {
+            const termo = this.value.toLowerCase();
+            console.log('Buscando por:', termo);
+            
+            // Buscar em todas as labels de exames
+            const allLabels = document.querySelectorAll('.form-check-label');
+            
+            allLabels.forEach(label => {
+                const texto = label.textContent.toLowerCase();
+                const formCheck = label.closest('.form-check');
+                const colContainer = label.closest('.col-12, .col-md-4, .col-sm-6');
+                
+                if (texto.includes(termo) || termo === '') {
+                    if (formCheck) formCheck.style.display = 'block';
+                    if (colContainer) colContainer.style.display = 'block';
+                } else {
+                    if (formCheck) formCheck.style.display = 'none';
+                    if (colContainer) colContainer.style.display = 'none';
+                }
+            });
+            
+            // Mostrar/ocultar seções inteiras baseado na busca
+            const sections = document.querySelectorAll('.col-md-6');
+            sections.forEach(section => {
+                const visibleChecks = section.querySelectorAll('.form-check:not([style*="display: none"])');
+                const sectionTitle = section.querySelector('h6');
+                
+                if (termo && visibleChecks.length === 0) {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = 'block';
+                }
+            });
+            
+            // Verificar card principal de exames cardiológicos
+            const cardioCard = document.querySelector('.card.glass-card[style*="border: 2px solid #dc3545"]');
+            if (cardioCard) {
+                const visibleCardioChecks = cardioCard.querySelectorAll('.form-check:not([style*="display: none"])');
+                if (termo && visibleCardioChecks.length === 0) {
+                    cardioCard.style.display = 'none';
+                } else {
+                    cardioCard.style.display = 'block';
+                }
+            }
+        });
+    }
+    
+    console.log('Sistema de Exames de Imagem carregado');
+    console.log('Busca de exames configurada');
 });
 </script>
 {% endblock %}
