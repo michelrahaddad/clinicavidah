@@ -135,7 +135,7 @@ def neural_stats():
             'top_exames_img': top_exames_img
         }
         
-        return render_template('admin/estatisticas_neurais.html', **stats)
+        return render_template('admin/estatisticas_neurais_simple.html', **stats)
         
     except Exception as e:
         logging.error(f'Neural statistics error: {e}')
