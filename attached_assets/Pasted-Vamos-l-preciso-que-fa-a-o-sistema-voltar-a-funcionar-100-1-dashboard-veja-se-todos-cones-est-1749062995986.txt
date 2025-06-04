@@ -1,0 +1,23 @@
+Vamos lá ,preciso que faça o sistema voltar a funcionar 100 %
+
+1-dashboard -veja se todos ícones estão funcionando  e direcionando para suas respectivas paginas
+
+2-receita médica ,verifique todos ícones ,apis ,sistema de autocomplete ,acesso a banco de dados , geração de pdf ,veja esta 100 % e corrija bugs.veja se o botão de retorno direciona para dashboard
+
+3-Novo paciente, verifique todos itens de completas ,apis,salvamento de dados ,veja se o botão de retorno direciona para dashboard,veja se após salvar dados  volta a pagina original
+
+3-Prontuario,verifique todos iones,apis,sistema de autocomplete ,acesso a banco de dados ,veja se esta 100 % funcionaste corrija bugs,veja se o botão de retorno direciona para dashboard,
+
+4-exames laboratoriais, verifique todos iones,apis ,sistema autcomplete ,geracao de pdf ,veja se esta 100 % ,laboratorio personalizado, veja se esta 100 % ,corrija bugs,veja se o botão de retorno direciona para dashboard, veja se após gerar pdf volta a pagina original
+
+5--exames imagem, verifique todos iones,apis ,sistema autcomplete ,geracao de pdf ,veja se esta 100 % ,laboratorio personalizado, veja se esta 100 % ,corrija bugs,veja se o botão de retorno direciona para dashboard,veja se após gerar pdf volta a pagina original
+
+6—relatório medico, verifique todos iones,apis ,sistema autcomplete ,geracao de pdf ,veja se esta 100 % ,, veja se esta 100 % ,corrija bugs,veja se o botão de retorno direciona para dashboard,veja se após gerar pdf volta a pagina original
+
+7-atestado medico, verifique todos iones,apis ,sistema autcomplete ,geracao de pdf ,veja se esta 100 % ,, veja se esta 100 % ,corrija bugs,veja se o botão de retorno direciona para dashboard,veja se após gerar pdf volta a pagina original
+
+8-alto custo, verifique todos iones,apis ,sistema autcomplete ,geracao de pdf ,veja se esta 100 % ,, veja se esta 100 % ,corrija bugs,veja se o botão de retorno direciona para dashboard,veja se após gerar pdf volta a pagina original
+
+9-estatisca neural, veja se todos dados estão integrados,api funcionaste,veja se o botão de retorno direciona para dashboard,veja se após gerar pdf volta a pagina original
+
+Apos todos estes testes ,faca um teste 100 % do sistema corrijndo todos bugs 
