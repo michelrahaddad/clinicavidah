@@ -94,23 +94,20 @@ def salvar_relatorio_medico():
                                      assinatura=medico.assinatura if medico else None,
                                      data=data)
             
-            # Store PDF data in session for later download via GET
-            session['pdf_temp'] = {
-                'html': pdf_html,
-                'filename': f'relatorio_medico_{nome_paciente.replace(" ", "_")}_{data}.pdf',
-                'type': 'relatorio_medico'
-            }
+            # Generate PDF directly and return as response
+            pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
             
-            flash('Relatório médico salvo com sucesso!', 'success')
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'attachment; filename=relatorio_medico_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            flash('Relatório médico salvo e PDF gerado com sucesso!', 'success')
             logging.info(f'Medical report created for patient: {nome_paciente}')
             
-            # Return JavaScript that opens PDF in new window
-            return f'''
-            <script>
-                window.open('/download_pdf', '_blank');
-                window.location.href = '/relatorio_medico';
-            </script>
-            '''
+            return response
             
         except Exception as pdf_error:
             logging.error(f'Medical report PDF generation error: {pdf_error}')

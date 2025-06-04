@@ -90,23 +90,20 @@ def salvar_exames_img():
                                      assinatura=medico.assinatura if medico else None,
                                      data=data)
             
-            # Store PDF data in session for later download via GET
-            session['pdf_temp'] = {
-                'html': pdf_html,
-                'filename': f'exames_img_{nome_paciente.replace(" ", "_")}_{data}.pdf',
-                'type': 'exames_img'
-            }
+            # Generate PDF directly and return as response
+            pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
             
-            flash('Exames de imagem salvos com sucesso!', 'success')
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'attachment; filename=exames_img_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            flash('Exames de imagem salvos e PDF gerado com sucesso!', 'success')
             logging.info(f'Imaging exams created for patient: {nome_paciente}')
             
-            # Return JavaScript that opens PDF in new window
-            return f'''
-            <script>
-                window.open('/download_pdf', '_blank');
-                window.location.href = '/exames_img';
-            </script>
-            '''
+            return response
             
         except Exception as pdf_error:
             logging.error(f'Imaging exams PDF generation error: {pdf_error}')
@@ -167,7 +164,7 @@ def gerar_pdf_reimprimir_exame_img(exame):
                                  data=data_atual,
                                  assinatura=medico.assinatura if medico else None)
         
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'

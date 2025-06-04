@@ -130,13 +130,14 @@ def salvar_formulario_alto_custo():
                                  assinatura=medico.assinatura if medico else None,
                                  data=datetime.now().strftime('%d/%m/%Y'))
         
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'inline; filename=formulario_alto_custo_{nome_paciente}_{data}.pdf'
-        response.headers['X-PDF-Success'] = 'true'
-        response.headers['X-Redirect-URL'] = url_for('formulario_alto_custo.formulario_alto_custo')
+        response.headers['Content-Disposition'] = f'attachment; filename=formulario_alto_custo_{nome_paciente}_{data}.pdf'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
         
         flash('Formulário de alto custo salvo e PDF gerado com sucesso!', 'success')
         logging.info(f'High-cost form created for patient: {nome_paciente}')

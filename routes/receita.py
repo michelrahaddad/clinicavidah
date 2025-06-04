@@ -196,7 +196,7 @@ def gerar_pdf_reimprimir_receita(receita_obj):
                                  assinatura=medico.assinatura if medico else None,
                                  zip=zip)
         
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'

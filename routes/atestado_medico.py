@@ -108,13 +108,14 @@ def salvar_atestado_medico():
                                  assinatura=medico.assinatura if medico else None,
                                  data=datetime.now().strftime('%d/%m/%Y'))
         
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'inline; filename=atestado_medico_{nome_paciente}_{data}.pdf'
-        response.headers['X-PDF-Success'] = 'true'
-        response.headers['X-Redirect-URL'] = url_for('atestado_medico.atestado_medico')
+        response.headers['Content-Disposition'] = f'attachment; filename=atestado_medico_{nome_paciente}_{data}.pdf'
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
         
         flash('Atestado médico salvo e PDF gerado com sucesso!', 'success')
         logging.info(f'Medical certificate created for patient: {nome_paciente}')
