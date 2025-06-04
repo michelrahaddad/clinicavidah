@@ -32,12 +32,18 @@ def prontuario():
                 query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico)
                 
                 if busca_paciente:
-                    query = query.filter(Receita.nome_paciente.ilike(f'%{busca_paciente}%'))
+                    # Split search terms and create flexible search
+                    search_terms = busca_paciente.strip().split()
+                    for term in search_terms:
+                        if len(term) >= 2:  # Only search terms with 2+ characters
+                            query = query.filter(Receita.nome_paciente.ilike(f'%{term}%'))
                 
                 if filtro_data_inicio and filtro_data_fim:
                     query = query.filter(Receita.data.between(filtro_data_inicio, filtro_data_fim))
                 
                 receitas = query.order_by(Receita.data.desc(), Receita.created_at.desc()).all()
+                
+                logging.info(f"Found {len(receitas)} receitas for search term '{busca_paciente}'")
                 
                 for receita, medico_nome in receitas:
                     try:

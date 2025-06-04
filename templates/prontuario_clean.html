@@ -41,15 +41,13 @@
                             <option value="exame_img" {% if filtro_tipo == 'exame_img' %}selected{% endif %}>Exames de Imagem</option>
                         </select>
                     </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                        <div class="btn-group w-100">
-                            <button type="submit" class="btn btn-primary neural-btn">
-                                <i class="fas fa-search me-2"></i>Buscar
-                            </button>
-                            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary neural-btn">
-                                <i class="fas fa-times me-2"></i>Limpar
-                            </a>
-                        </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary neural-btn flex-fill">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                        <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary neural-btn flex-fill">
+                            <i class="fas fa-times me-2"></i>Limpar
+                        </a>
                     </div>
                 </div>
             </form>
@@ -96,17 +94,17 @@
                             <td>{{ resultado.medico_nome }}</td>
                             <td>
                                 {% if resultado.tipo == 'receita' %}
-                                    <a href="{{ url_for('receita.gerar_receita_pdf', receita_id=resultado.id_registro) }}" 
+                                    <a href="{{ url_for('receita.gerar_pdf_receita', receita_id=resultado.id_registro) }}" 
                                        class="btn btn-sm btn-outline-info neural-btn" target="_blank">
                                         <i class="fas fa-file-pdf me-1"></i>PDF
                                     </a>
                                 {% elif resultado.tipo == 'exame_lab' %}
-                                    <a href="{{ url_for('exames_lab.gerar_exame_pdf', exame_id=resultado.id_registro) }}" 
+                                    <a href="{{ url_for('exames_lab.gerar_pdf_exame', exame_id=resultado.id_registro) }}" 
                                        class="btn btn-sm btn-outline-info neural-btn" target="_blank">
                                         <i class="fas fa-file-pdf me-1"></i>PDF
                                     </a>
                                 {% elif resultado.tipo == 'exame_img' %}
-                                    <a href="{{ url_for('exames_img.gerar_exame_pdf', exame_id=resultado.id_registro) }}" 
+                                    <a href="{{ url_for('exames_img.gerar_pdf_exame', exame_id=resultado.id_registro) }}" 
                                        class="btn btn-sm btn-outline-info neural-btn" target="_blank">
                                         <i class="fas fa-file-pdf me-1"></i>PDF
                                     </a>
