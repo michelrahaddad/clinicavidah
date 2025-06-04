@@ -65,63 +65,77 @@ def get_medicamentos():
         
         result = []
         for m in medicamentos:
-            # Extrai dados da posologia para preencher automaticamente
+            # Dados padrão
             via_padrao = 'Oral'
-            frequencia_padrao = '1x'
-            quantidade_padrao = '30 comprimidos'
+            frequencia_padrao = '3x'  # Padrão 3x ao dia
+            quantidade_padrao = '30 comprimidos'  # Padrão sempre 30 comprimidos
             
-            # Analisa a forma farmacêutica e define via de administração
-            if m.forma_farmaceutica:
-                if 'Injetável' in m.forma_farmaceutica:
-                    via_padrao = 'Intramuscular'
-                    quantidade_padrao = '1 ampola'
-                elif 'Inalação' in m.forma_farmaceutica:
-                    via_padrao = 'Nasal'  # Usando valor que existe no select
-                    quantidade_padrao = '1 frasco'
-                elif 'Tópico' in m.forma_farmaceutica:
-                    via_padrao = 'Tópica'
-                    quantidade_padrao = '1 tubo'
-                elif 'Cápsula' in m.forma_farmaceutica:
-                    quantidade_padrao = '30 cápsulas'
-            
-            # Analisa o nome para determinar via mais específica
             nome_lower = m.nome.lower()
+            principio_lower = m.principio_ativo.lower()
+            
+            # Mapeamento específico baseado na planilha real
+            if 'dipirona' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '3x'  # A cada 8 horas = 3x ao dia
+                quantidade_padrao = '30 comprimidos'
+            elif 'paracetamol' in principio_lower:
+                via_padrao = 'Oral' 
+                frequencia_padrao = '4x'  # A cada 6 horas = 4x ao dia
+                quantidade_padrao = '30 comprimidos'
+            elif 'losartana' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '1x'  # 1x ao dia
+                quantidade_padrao = '30 comprimidos'
+            elif 'omeprazol' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '1x'  # 1x ao dia em jejum
+                quantidade_padrao = '30 comprimidos'
+            elif 'metformina' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '2x'  # 2x ao dia
+                quantidade_padrao = '30 comprimidos'
+            elif 'amoxicilina' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '2x'  # De 12 em 12 horas
+                quantidade_padrao = '30 comprimidos'
+            elif 'ibuprofeno' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '2x'  # A cada 6-8 horas
+                quantidade_padrao = '30 comprimidos'
+            elif 'sinvastatina' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '1x'  # 1x ao dia à noite
+                quantidade_padrao = '30 comprimidos'
+            elif 'atenolol' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '1x'  # 1x ao dia
+                quantidade_padrao = '30 comprimidos'
+            elif 'captopril' in principio_lower:
+                via_padrao = 'Oral'
+                frequencia_padrao = '3x'  # 2-3x ao dia
+                quantidade_padrao = '30 comprimidos'
+            
+            # Detecta medicamentos injetáveis
             if 'injetável' in nome_lower or 'ampola' in nome_lower:
                 if 'endovenosa' in nome_lower or 'iv' in nome_lower:
                     via_padrao = 'Endovenosa'
                 else:
                     via_padrao = 'Intramuscular'
                 quantidade_padrao = '1 ampola'
+            elif 'sublingual' in nome_lower:
+                via_padrao = 'Sublingual'
+            elif 'tópic' in nome_lower or 'pomada' in nome_lower:
+                via_padrao = 'Tópica'
+                quantidade_padrao = '1 tubo'
             elif 'inalat' in nome_lower or 'spray' in nome_lower:
                 via_padrao = 'Nasal'
                 quantidade_padrao = '1 frasco'
-            elif 'tópic' in nome_lower or 'pomada' in nome_lower or 'creme' in nome_lower:
-                via_padrao = 'Tópica'
-                quantidade_padrao = '1 tubo'
-            elif 'sublingual' in nome_lower:
-                via_padrao = 'Sublingual'
-            
-            # Determina frequência baseada no medicamento específico
-            if any(word in nome_lower for word in ['losartana', 'omeprazol', 'levotiroxina', 'sinvastatina', 'atenolol']):
-                frequencia_padrao = '1x'
-            elif any(word in nome_lower for word in ['metformina', 'captopril', 'ibuprofeno', 'diclofenaco']):
-                frequencia_padrao = '2x'
-            elif any(word in nome_lower for word in ['dipirona', 'paracetamol', 'amoxicilina', 'cefalexina']):
-                frequencia_padrao = '3x'
-            elif any(word in nome_lower for word in ['dipirona', 'tylenol']):
-                frequencia_padrao = '3x'
-            
-            # Ajusta quantidade baseada no tipo de medicamento
-            if 'cápsula' in nome_lower:
-                quantidade_padrao = '30 cápsulas'
-            elif 'comprimido' in nome_lower or not quantidade_padrao.endswith('ampola'):
-                quantidade_padrao = '30 comprimidos'
             
             result.append({
                 'id': m.id,
                 'nome': m.nome,
                 'principio_ativo': m.principio_ativo,
-                'concentracao': m.concentracao,
+                'concentracao': m.concentracao or '500mg',  # Padrão se não tiver
                 'via_padrao': via_padrao,
                 'frequencia_padrao': frequencia_padrao,
                 'quantidade_padrao': quantidade_padrao,

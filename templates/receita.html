@@ -377,51 +377,63 @@ function showMedicamentSuggestions(medicaments, input) {
         });
         
         div.addEventListener('click', () => {
+            console.log('Medicamento selecionado:', med);
+            
             // Preenche o princípio ativo
             input.value = med.principio_ativo || med.nome;
             
-            // Localiza todos os campos do medicamento na mesma linha
-            const row = input.closest('.medicamento-row');
-            if (!row) return;
+            // Localiza a linha do medicamento
+            const medicamentoContainer = input.closest('.medicamento-item');
+            if (!medicamentoContainer) {
+                console.error('Container do medicamento não encontrado');
+                return;
+            }
             
-            // Busca pelos IDs específicos se existirem, senão busca por name
-            const dataIndex = input.getAttribute('data-index') || '0';
+            // Busca todos os campos dentro deste container específico
+            const concentracaoInput = medicamentoContainer.querySelector('input[name="concentracao[]"]');
+            const viaSelect = medicamentoContainer.querySelector('select[name="via[]"]');
+            const frequenciaSelect = medicamentoContainer.querySelector('select[name="frequencia[]"]');
+            const quantidadeInput = medicamentoContainer.querySelector('input[name="quantidade[]"]');
             
-            let concentracaoInput = document.getElementById(`concentracao_${dataIndex}`) || 
-                                  row.querySelector('input[name="concentracao[]"]');
-            let viaSelect = document.getElementById(`via_${dataIndex}`) || 
-                           row.querySelector('select[name="via[]"]');
-            let frequenciaSelect = document.getElementById(`frequencia_${dataIndex}`) || 
-                                  row.querySelector('select[name="frequencia[]"]');
-            let quantidadeInput = document.getElementById(`quantidade_${dataIndex}`) || 
-                                 row.querySelector('input[name="quantidade[]"]');
+            console.log('Elementos encontrados:', {
+                concentracaoInput: !!concentracaoInput,
+                viaSelect: !!viaSelect,
+                frequenciaSelect: !!frequenciaSelect,
+                quantidadeInput: !!quantidadeInput
+            });
             
-            // Preenche automaticamente todos os campos com dados do banco
+            // Preenche concentração
             if (concentracaoInput && med.concentracao) {
                 concentracaoInput.value = med.concentracao;
-                console.log('Concentração preenchida:', med.concentracao);
+                console.log('✓ Concentração preenchida:', med.concentracao);
             }
             
+            // Preenche via de administração
             if (viaSelect && med.via_padrao) {
-                // Mapeia via_padrao para valores corretos do select
-                let viaValue = med.via_padrao;
-                if (med.via_padrao === 'Inalatória') viaValue = 'Inalatória';
-                if (med.via_padrao === 'Intramuscular') viaValue = 'Intramuscular';
-                if (med.via_padrao === 'Endovenosa') viaValue = 'Endovenosa';
-                if (med.via_padrao === 'Tópica') viaValue = 'Tópica';
+                viaSelect.value = med.via_padrao;
+                console.log('✓ Via preenchida:', med.via_padrao);
                 
-                viaSelect.value = viaValue;
-                console.log('Via preenchida:', viaValue);
+                // Verifica se o valor foi realmente definido
+                if (viaSelect.value !== med.via_padrao) {
+                    console.warn('Valor de via não encontrado nas opções:', med.via_padrao);
+                }
             }
             
+            // Preenche frequência
             if (frequenciaSelect && med.frequencia_padrao) {
                 frequenciaSelect.value = med.frequencia_padrao;
-                console.log('Frequência preenchida:', med.frequencia_padrao);
+                console.log('✓ Frequência preenchida:', med.frequencia_padrao);
+                
+                // Verifica se o valor foi realmente definido
+                if (frequenciaSelect.value !== med.frequencia_padrao) {
+                    console.warn('Valor de frequência não encontrado nas opções:', med.frequencia_padrao);
+                }
             }
             
-            if (quantidadeInput && med.quantidade_padrao) {
-                quantidadeInput.value = med.quantidade_padrao;
-                console.log('Quantidade preenchida:', med.quantidade_padrao);
+            // Preenche quantidade (sempre 30 comprimidos como padrão)
+            if (quantidadeInput) {
+                quantidadeInput.value = med.quantidade_padrao || '30 comprimidos';
+                console.log('✓ Quantidade preenchida:', med.quantidade_padrao || '30 comprimidos');
             }
             
             clearSuggestions('medicament');
