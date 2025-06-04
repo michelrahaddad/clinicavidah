@@ -41,12 +41,16 @@ def dashboard():
         }
         
         # Log dashboard access
-        admin_data = session.get('admin_data', {})
-        if isinstance(admin_data, dict):
-            admin_name = admin_data.get("nome", "Unknown")
-        else:
+        try:
+            admin_data = session.get('admin_data', {})
+            if admin_data and isinstance(admin_data, dict):
+                admin_name = admin_data.get("nome", "Unknown")
+            else:
+                admin_name = "Unknown"
+            logging.info(f'Dashboard accessed by: {admin_name}')
+        except Exception as e:
+            logging.error(f'Error accessing admin session data: {e}')
             admin_name = "Unknown"
-        logging.info(f'Dashboard accessed by: {admin_name}')
         
         return render_template('admin/dashboard.html', **stats)
     except Exception as e:
@@ -495,14 +499,13 @@ def api_add_admin():
             return jsonify({'success': False, 'message': 'Usuário ou email já existe'})
         
         # Create new admin
-        new_admin = Administrador(
-            usuario=usuario,
-            nome=nome,
-            email=email,
-            senha=generate_password_hash(senha),
-            ativo=True,
-            created_at=now_brasilia().replace(tzinfo=None)
-        )
+        new_admin = Administrador()
+        new_admin.usuario = usuario
+        new_admin.nome = nome
+        new_admin.email = email
+        new_admin.senha = generate_password_hash(senha)
+        new_admin.ativo = True
+        new_admin.created_at = now_brasilia().replace(tzinfo=None)
         
         db.session.add(new_admin)
         db.session.commit()
@@ -541,12 +544,11 @@ def api_add_medico():
             return jsonify({'success': False, 'message': 'CRM já cadastrado'})
         
         # Create new doctor
-        new_medico = Medico(
-            nome=nome,
-            crm=crm,
-            senha=generate_password_hash(senha),
-            created_at=now_brasilia().replace(tzinfo=None)
-        )
+        new_medico = Medico()
+        new_medico.nome = nome
+        new_medico.crm = crm
+        new_medico.senha = generate_password_hash(senha)
+        new_medico.created_at = now_brasilia().replace(tzinfo=None)
         
         db.session.add(new_medico)
         db.session.commit()
