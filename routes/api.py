@@ -45,6 +45,10 @@ def get_pacientes():
 @api_bp.route('/medicamentos')
 def get_medicamentos():
     """API para autocomplete de medicamentos com dados reais do banco"""
+    # Permitir acesso se usuário ou admin logado
+    if not (session.get('usuario') or session.get('admin_usuario')):
+        return jsonify([])
+    
     try:
         term = request.args.get('q', '').strip()
         
