@@ -191,9 +191,50 @@
         </div>
 
         <div class="p-3">
-            <button onclick="history.back()" class="btn btn-back mb-4">
-                <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
-            </button>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <button onclick="history.back()" class="btn btn-back">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
+                </button>
+                
+                <!-- Navigation buttons for other document types -->
+                <div class="navigation-buttons d-flex gap-2">
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}&tipo=receita" 
+                       class="btn btn-nav {{ 'active' if tipo_filtro == 'receita' or not tipo_filtro else '' }}" 
+                       title="Ver Receitas">
+                        <i class="fas fa-pills"></i>
+                    </a>
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}&tipo=exame_lab" 
+                       class="btn btn-nav {{ 'active' if tipo_filtro == 'exame_lab' else '' }}" 
+                       title="Ver Exames Lab">
+                        <i class="fas fa-flask"></i>
+                    </a>
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}&tipo=exame_img" 
+                       class="btn btn-nav {{ 'active' if tipo_filtro == 'exame_img' else '' }}" 
+                       title="Ver Exames Imagem">
+                        <i class="fas fa-x-ray"></i>
+                    </a>
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}&tipo=relatorio" 
+                       class="btn btn-nav {{ 'active' if tipo_filtro == 'relatorio' else '' }}" 
+                       title="Ver Relatórios">
+                        <i class="fas fa-file-medical"></i>
+                    </a>
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}&tipo=atestado" 
+                       class="btn btn-nav {{ 'active' if tipo_filtro == 'atestado' else '' }}" 
+                       title="Ver Atestados">
+                        <i class="fas fa-certificate"></i>
+                    </a>
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}&tipo=alto_custo" 
+                       class="btn btn-nav {{ 'active' if tipo_filtro == 'alto_custo' else '' }}" 
+                       title="Ver Alto Custo">
+                        <i class="fas fa-dollar-sign"></i>
+                    </a>
+                    <a href="/prontuario/detalhes?paciente={{ paciente_nome|urlencode }}&data={{ data_formatada|urlencode }}" 
+                       class="btn btn-nav {{ 'active' if not tipo_filtro else '' }}" 
+                       title="Ver Todos">
+                        <i class="fas fa-th-list"></i>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <!-- Receitas -->
