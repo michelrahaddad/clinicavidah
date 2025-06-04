@@ -413,6 +413,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('Sistema de Exames de Imagem carregado');
     console.log('Busca de exames configurada');
+    
+    // Debug final - verificar se todos os elementos existem
+    setTimeout(() => {
+        const busca = document.getElementById('buscarExame');
+        const checks = document.querySelectorAll('.form-check');
+        console.log('=== DEBUG FINAL ===');
+        console.log('Campo buscarExame existe:', !!busca);
+        console.log('Número de checkboxes:', checks.length);
+        console.log('=================');
+    }, 1000);
 });
 </script>
 {% endblock %}
