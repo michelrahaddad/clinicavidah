@@ -41,22 +41,46 @@ def salvar_receita():
         return redirect(url_for('auth.login'))
     
     try:
-        # Get form data
+        # Get form data with new field structure
         data = datetime.now().strftime('%Y-%m-%d')
         nome_paciente = sanitizar_entrada(request.form.get('nome_paciente', ''))
-        medicamentos = [sanitizar_entrada(m) for m in request.form.getlist('medicamento[]')]
-        posologias = [sanitizar_entrada(p) for p in request.form.getlist('posologia[]')]
-        duracoes = [sanitizar_entrada(d) for d in request.form.getlist('duracao[]')]
-        vias = [sanitizar_entrada(v) for v in request.form.getlist('via[]')]
+        cpf = sanitizar_entrada(request.form.get('cpf', ''))
+        idade = sanitizar_entrada(request.form.get('idade', ''))
+        
+        # Get new medication fields
+        principios_ativos = [sanitizar_entrada(m) for m in request.form.getlist('principio_ativo[]') if m.strip()]
+        concentracoes = [sanitizar_entrada(c) for c in request.form.getlist('concentracao[]') if c.strip()]
+        vias = [sanitizar_entrada(v) for v in request.form.getlist('via[]') if v.strip()]
+        frequencias = [sanitizar_entrada(f) for f in request.form.getlist('frequencia[]') if f.strip()]
+        quantidades = [sanitizar_entrada(q) for q in request.form.getlist('quantidade[]') if q.strip()]
         
         # Validation
         if not nome_paciente:
             flash('Nome do paciente é obrigatório.', 'error')
             return render_template('receita.html')
         
-        is_valid, message = validar_medicamentos(medicamentos, posologias, duracoes, vias)
-        if not is_valid:
-            flash(message, 'error')
+        # Validate medications with new structure
+        if not principios_ativos or len(principios_ativos) == 0:
+            flash('É necessário pelo menos um medicamento.', 'error')
+            return render_template('receita.html')
+        
+        # Check if all medication fields are filled
+        min_length = len(principios_ativos)
+        if not (len(concentracoes) >= min_length and len(vias) >= min_length and 
+                len(frequencias) >= min_length and len(quantidades) >= min_length):
+            flash('Todos os campos de medicamento devem ser preenchidos.', 'error')
+            return render_template('receita.html')
+        
+        # Combine medication data for storage
+        medicamentos_completos = []
+        for i in range(min_length):
+            if (i < len(principios_ativos) and i < len(concentracoes) and 
+                i < len(vias) and i < len(frequencias) and i < len(quantidades)):
+                medicamento = f"{principios_ativos[i]} {concentracoes[i]} - {vias[i]} - {frequencias[i]} - {quantidades[i]}"
+                medicamentos_completos.append(medicamento)
+        
+        if not medicamentos_completos:
+            flash('É necessário pelo menos um medicamento completo.', 'error')
             return render_template('receita.html')
         
         # Insert patient if not exists
@@ -78,11 +102,11 @@ def salvar_receita():
         
         receita_obj = Receita(
             nome_paciente=nome_paciente,
-            medicamentos=','.join(medicamentos),
-            posologias=','.join(posologias),
-            duracoes=','.join(duracoes),
+            medicamentos=','.join(medicamentos_completos),
+            posologias=','.join(frequencias),  # Store frequencies as posologies
+            duracoes=','.join(['Conforme prescrição'] * len(medicamentos_completos)),  # Default duration
             vias=','.join(vias),
-            medico_nome=medico.nome,
+            medico_nome=medico.nome if medico else 'Médico Sistema',
             data=data,
             id_paciente=paciente_id,
             id_medico=medico_id
@@ -110,13 +134,13 @@ def salvar_receita():
             # Generate PDF directly using WeasyPrint
             pdf_html = render_template('receita_pdf.html',
                                      nome_paciente=nome_paciente,
-                                     cpf_paciente=paciente.cpf if paciente else None,
-                                     idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
+                                     cpf_paciente=paciente.cpf if paciente else cpf,
+                                     idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else idade,
                                      endereco_paciente=paciente.endereco if paciente else None,
                                      cidade_uf_paciente=paciente.cidade_uf if paciente else None,
-                                     medicamentos=medicamentos,
-                                     posologias=posologias,
-                                     duracoes=duracoes,
+                                     medicamentos=medicamentos_completos,
+                                     posologias=frequencias,
+                                     duracoes=['Conforme prescrição'] * len(medicamentos_completos),
                                      vias=vias,
                                      medico=medico.nome if medico else "Médico não encontrado",
                                      crm=medico.crm if medico else "CRM não disponível",
