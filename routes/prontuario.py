@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
-from models import Prontuario, Receita, ExameLab, ExameImg, Medico
+from models import Prontuario, Receita, ExameLab, ExameImg, Medico, RelatorioMedico, AtestadoMedico, FormularioAltoCusto
 from app import db
 from utils.forms import sanitizar_entrada
 import logging
@@ -128,10 +128,103 @@ def prontuario():
                         logging.warning(f"Error processing imaging exam {exame.id}: {e}")
                         continue
         
+        # Search Medical Reports
+        if not tipo or tipo == 'relatorio':
+            query = db.session.query(RelatorioMedico, Medico.nome.label('medico_nome')).join(Medico)
+            
+            if busca_paciente:
+                search_terms = busca_paciente.strip().split()
+                for term in search_terms:
+                    if len(term) >= 2:
+                        query = query.filter(RelatorioMedico.nome_paciente.ilike(f'%{term}%'))
+            
+            if filtro_data_inicio and filtro_data_fim:
+                query = query.filter(RelatorioMedico.data.between(filtro_data_inicio, filtro_data_fim))
+            
+            relatorios = query.order_by(RelatorioMedico.data.desc(), RelatorioMedico.created_at.desc()).all()
+            
+            for relatorio, medico_nome in relatorios:
+                try:
+                    detalhes_registro = f"CID: {relatorio.cid_codigo} - {relatorio.cid_descricao[:50]}{'...' if len(relatorio.cid_descricao) > 50 else ''}"
+                    
+                    resultados.append({
+                        'tipo': 'relatorio',
+                        'data': relatorio.data,
+                        'id_registro': relatorio.id,
+                        'nome_paciente': relatorio.nome_paciente,
+                        'medico_nome': medico_nome,
+                        'detalhes_registro': detalhes_registro
+                    })
+                except Exception as e:
+                    logging.warning(f"Error processing medical report {relatorio.id}: {e}")
+                    continue
+        
+        # Search Medical Certificates
+        if not tipo or tipo == 'atestado':
+            query = db.session.query(AtestadoMedico, Medico.nome.label('medico_nome')).join(Medico)
+            
+            if busca_paciente:
+                search_terms = busca_paciente.strip().split()
+                for term in search_terms:
+                    if len(term) >= 2:
+                        query = query.filter(AtestadoMedico.nome_paciente.ilike(f'%{term}%'))
+            
+            if filtro_data_inicio and filtro_data_fim:
+                query = query.filter(AtestadoMedico.data.between(filtro_data_inicio, filtro_data_fim))
+            
+            atestados = query.order_by(AtestadoMedico.data.desc(), AtestadoMedico.created_at.desc()).all()
+            
+            for atestado, medico_nome in atestados:
+                try:
+                    detalhes_registro = f"Afastamento: {atestado.dias_afastamento} dias - CID: {atestado.cid_codigo}"
+                    
+                    resultados.append({
+                        'tipo': 'atestado',
+                        'data': atestado.data,
+                        'id_registro': atestado.id,
+                        'nome_paciente': atestado.nome_paciente,
+                        'medico_nome': medico_nome,
+                        'detalhes_registro': detalhes_registro
+                    })
+                except Exception as e:
+                    logging.warning(f"Error processing medical certificate {atestado.id}: {e}")
+                    continue
+        
+        # Search High Cost Forms
+        if not tipo or tipo == 'alto_custo':
+            query = db.session.query(FormularioAltoCusto, Medico.nome.label('medico_nome')).join(Medico)
+            
+            if busca_paciente:
+                search_terms = busca_paciente.strip().split()
+                for term in search_terms:
+                    if len(term) >= 2:
+                        query = query.filter(FormularioAltoCusto.nome_paciente.ilike(f'%{term}%'))
+            
+            if filtro_data_inicio and filtro_data_fim:
+                query = query.filter(FormularioAltoCusto.data.between(filtro_data_inicio, filtro_data_fim))
+            
+            formularios = query.order_by(FormularioAltoCusto.data.desc(), FormularioAltoCusto.created_at.desc()).all()
+            
+            for formulario, medico_nome in formularios:
+                try:
+                    detalhes_registro = f"Medicamento: {formulario.medicamento[:50]}{'...' if len(formulario.medicamento) > 50 else ''} - CID: {formulario.cid_codigo}"
+                    
+                    resultados.append({
+                        'tipo': 'alto_custo',
+                        'data': formulario.data,
+                        'id_registro': formulario.id,
+                        'nome_paciente': formulario.nome_paciente,
+                        'medico_nome': medico_nome,
+                        'detalhes_registro': detalhes_registro
+                    })
+                except Exception as e:
+                    logging.warning(f"Error processing high cost form {formulario.id}: {e}")
+                    continue
+        
         # Sort all results by date (newest first)
         resultados.sort(key=lambda x: x['data'], reverse=True)
         
-        return render_template('prontuario_clean.html', 
+        return render_template('prontuario_modern.html', 
                              resultados=resultados,
                              busca_paciente=busca_paciente,
                              filtro_tipo=filtro_tipo,
@@ -142,3 +235,41 @@ def prontuario():
         logging.error(f'Prontuario error: {e}')
         flash('Erro ao carregar prontuário.', 'error')
         return render_template('prontuario_clean.html', resultados=[])
+
+@prontuario_bp.route('/api/autocomplete_pacientes')
+def autocomplete_pacientes():
+    """API endpoint for patient name autocomplete"""
+    if 'usuario' not in session:
+        return {'suggestions': []}
+    
+    term = request.args.get('term', '').strip()
+    if len(term) < 2:
+        return {'suggestions': []}
+    
+    try:
+        # Get unique patient names from all tables
+        receitas_names = db.session.query(Receita.nome_paciente).filter(
+            Receita.nome_paciente.ilike(f'%{term}%')
+        ).distinct().limit(10).all()
+        
+        exames_lab_names = db.session.query(ExameLab.nome_paciente).filter(
+            ExameLab.nome_paciente.ilike(f'%{term}%')
+        ).distinct().limit(10).all()
+        
+        exames_img_names = db.session.query(ExameImg.nome_paciente).filter(
+            ExameImg.nome_paciente.ilike(f'%{term}%')
+        ).distinct().limit(10).all()
+        
+        # Combine and deduplicate
+        all_names = set()
+        for result in receitas_names + exames_lab_names + exames_img_names:
+            all_names.add(result[0])
+        
+        # Sort and limit to 8 suggestions
+        suggestions = sorted(list(all_names))[:8]
+        
+        return {'suggestions': suggestions}
+        
+    except Exception as e:
+        logging.error(f"Autocomplete error: {str(e)}")
+        return {'suggestions': []}
