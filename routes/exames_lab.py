@@ -93,7 +93,9 @@ def salvar_exames_lab():
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=exames_lab_{nome_paciente}_{data}.pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=exames_lab_{nome_paciente}_{data}.pdf'
+        response.headers['X-PDF-Success'] = 'true'
+        response.headers['X-Redirect-URL'] = url_for('exames_lab.exames_lab')
         
         flash('Exames laboratoriais salvos e PDF gerado com sucesso!', 'success')
         logging.info(f'Lab exams created for patient: {nome_paciente}')
