@@ -10,6 +10,38 @@ from datetime import datetime
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
+@api_bp.route('/pacientes')
+def get_pacientes():
+    """API para autocomplete de pacientes"""
+    # Permitir acesso se usuário ou admin logado
+    if not (session.get('usuario') or session.get('admin_usuario')):
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
+        
+        pacientes = Paciente.query.filter(
+            Paciente.nome.ilike(f'%{term}%')
+        ).limit(10).all()
+        
+        result = []
+        for p in pacientes:
+            result.append({
+                'id': p.id,
+                'nome': p.nome,
+                'cpf': p.cpf or '',
+                'idade': str(p.idade) if p.idade else '',
+                'endereco': p.endereco or '',
+                'cidade': p.cidade_uf or ''
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        logging.error(f"Erro na API de pacientes: {e}")
+        return jsonify([])
+
 @api_bp.route('/buscar_pacientes')
 @rate_limit(max_requests=50, per_minutes=5)
 @require_auth
