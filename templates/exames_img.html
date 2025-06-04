@@ -363,59 +363,84 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Configurar botão de adicionar exame personalizado
+    // Configurar botão de adicionar exame personalizado com função global
+    window.adicionarExamePersonalizado = function() {
+        console.log('Função adicionarExamePersonalizado chamada');
+        
+        const nomeInput = document.getElementById('nomeNovoExame');
+        const categoriaInput = document.getElementById('categoriaNovoExame');
+        
+        if (!nomeInput || !categoriaInput) {
+            console.error('Campos não encontrados');
+            alert('Erro: Campos do formulário não encontrados.');
+            return;
+        }
+        
+        const nomeExame = nomeInput.value.trim();
+        console.log('Nome do exame:', nomeExame);
+        
+        if (!nomeExame) {
+            alert('Por favor, digite o nome do exame.');
+            nomeInput.focus();
+            return;
+        }
+        
+        const container = document.getElementById('examesPersonalizadosContainer');
+        if (!container) {
+            console.error('Container não encontrado');
+            alert('Erro: Container de exames não encontrado.');
+            return;
+        }
+        
+        // Criar novo exame
+        const timestamp = Date.now();
+        const novoExameHtml = `
+            <div class="col-12 mb-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                           value="${nomeExame}" id="exame_custom_${timestamp}" checked>
+                    <label class="form-check-label text-light" for="exame_custom_${timestamp}">
+                        ${nomeExame} <small class="text-muted">(Personalizado)</small>
+                    </label>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', novoExameHtml);
+        console.log('Exame adicionado ao container');
+        
+        // Limpar campos
+        nomeInput.value = '';
+        categoriaInput.value = '';
+        
+        // Fechar modal
+        try {
+            const modalElement = document.getElementById('modalExamesPersonalizados');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                } else {
+                    // Criar nova instância se não existir
+                    const newModal = new bootstrap.Modal(modalElement);
+                    newModal.hide();
+                }
+            }
+        } catch (e) {
+            console.log('Erro ao fechar modal:', e);
+        }
+        
+        alert(`Exame "${nomeExame}" adicionado com sucesso!`);
+        console.log('Processo concluído');
+    };
+    
+    // Adicionar event listener ao botão
     const btnAdicionar = document.getElementById('btn-adicionar-exame-img');
     if (btnAdicionar) {
-        btnAdicionar.addEventListener('click', function() {
-            console.log('=== BOTÃO CLICADO ===');
-            
-            const nomeExame = document.getElementById('nomeNovoExame').value.trim();
-            console.log('Nome digitado:', nomeExame);
-            
-            if (!nomeExame) {
-                alert('Por favor, digite o nome do exame.');
-                return;
-            }
-            
-            const container = document.getElementById('examesPersonalizadosContainer');
-            if (container) {
-                const timestamp = Date.now();
-                const novoDiv = document.createElement('div');
-                novoDiv.className = 'col-12 mb-2';
-                novoDiv.innerHTML = `
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="exames[]" 
-                               value="${nomeExame}" id="custom_${timestamp}" checked>
-                        <label class="form-check-label text-light" for="custom_${timestamp}">
-                            ${nomeExame} <small class="text-muted">(Personalizado)</small>
-                        </label>
-                    </div>
-                `;
-                
-                container.appendChild(novoDiv);
-                console.log('Exame adicionado:', nomeExame);
-                
-                // Limpar campos
-                document.getElementById('nomeNovoExame').value = '';
-                document.getElementById('categoriaNovoExame').value = '';
-                
-                // Fechar modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
-                if (modal) modal.hide();
-                
-                // Scroll
-                setTimeout(() => {
-                    novoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-                
-                alert(`Exame "${nomeExame}" adicionado!`);
-            } else {
-                alert('Erro: Container não encontrado.');
-            }
-        });
-        console.log('Event listener adicionado ao botão');
+        btnAdicionar.onclick = window.adicionarExamePersonalizado;
+        console.log('Event listener configurado');
     } else {
-        console.error('Botão não encontrado!');
+        console.error('Botão não encontrado');
     }
 
     console.log('Sistema de Exames de Imagem carregado');
