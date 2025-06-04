@@ -449,7 +449,48 @@ document.addEventListener('DOMContentLoaded', function() {
         dataInput.value = `${ano}-${mes}-${dia}`;
     }
     
+    // Funcionalidade de busca de exames
+    const searchInput = document.getElementById('examSearch');
+    const allExamLabels = document.querySelectorAll('.form-check-label');
+    const allExamDivs = document.querySelectorAll('.form-check');
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            console.log('Buscando por:', searchTerm);
+            
+            allExamDivs.forEach(function(examDiv) {
+                const label = examDiv.querySelector('.form-check-label');
+                if (label) {
+                    const examName = label.textContent.toLowerCase();
+                    if (searchTerm === '' || examName.includes(searchTerm)) {
+                        examDiv.style.display = 'block';
+                        examDiv.parentElement.style.display = 'block';
+                    } else {
+                        examDiv.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Mostrar/ocultar seções inteiras se não há resultados
+            const sections = document.querySelectorAll('.col-md-6.mb-4');
+            sections.forEach(function(section) {
+                const visibleExams = section.querySelectorAll('.form-check[style*="block"], .form-check:not([style*="none"])');
+                const hiddenExams = section.querySelectorAll('.form-check[style*="none"]');
+                
+                if (searchTerm === '') {
+                    section.style.display = 'block';
+                } else if (hiddenExams.length === section.querySelectorAll('.form-check').length) {
+                    section.style.display = 'none';
+                } else {
+                    section.style.display = 'block';
+                }
+            });
+        });
+    }
+    
     console.log('Sistema de Exames Laboratoriais carregado');
+    console.log('Busca de exames configurada');
 });
 </script>
 {% endblock %}
