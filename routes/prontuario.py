@@ -234,7 +234,7 @@ def prontuario():
     except Exception as e:
         logging.error(f'Prontuario error: {e}')
         flash('Erro ao carregar prontuário.', 'error')
-        return render_template('prontuario_clean.html', resultados=[])
+        return render_template('prontuario_modern.html', resultados=[])
 
 @prontuario_bp.route('/api/autocomplete_pacientes')
 def autocomplete_pacientes():
@@ -260,9 +260,21 @@ def autocomplete_pacientes():
             ExameImg.nome_paciente.ilike(f'%{term}%')
         ).distinct().limit(10).all()
         
+        relatorios_names = db.session.query(RelatorioMedico.nome_paciente).filter(
+            RelatorioMedico.nome_paciente.ilike(f'%{term}%')
+        ).distinct().limit(10).all()
+        
+        atestados_names = db.session.query(AtestadoMedico.nome_paciente).filter(
+            AtestadoMedico.nome_paciente.ilike(f'%{term}%')
+        ).distinct().limit(10).all()
+        
+        alto_custo_names = db.session.query(FormularioAltoCusto.nome_paciente).filter(
+            FormularioAltoCusto.nome_paciente.ilike(f'%{term}%')
+        ).distinct().limit(10).all()
+        
         # Combine and deduplicate
         all_names = set()
-        for result in receitas_names + exames_lab_names + exames_img_names:
+        for result in receitas_names + exames_lab_names + exames_img_names + relatorios_names + atestados_names + alto_custo_names:
             all_names.add(result[0])
         
         # Sort and limit to 8 suggestions

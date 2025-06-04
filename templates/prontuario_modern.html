@@ -207,6 +207,31 @@
             font-weight: 600;
         }
 
+        .badge-relatorio {
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-atestado {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-alto-custo {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #000;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
         .btn-pdf {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
@@ -326,9 +351,12 @@
                         <label for="filtro_tipo" class="form-label">Tipo de Registro</label>
                         <select class="form-select" name="filtro_tipo" id="filtro_tipo">
                             <option value="">Todos os tipos</option>
-                            <option value="receita" {{ 'selected' if filtro_tipo == 'receita' }}>Receitas</option>
+                            <option value="receita" {{ 'selected' if filtro_tipo == 'receita' }}>Receitas Médicas</option>
                             <option value="exame_lab" {{ 'selected' if filtro_tipo == 'exame_lab' }}>Exames Laboratoriais</option>
                             <option value="exame_img" {{ 'selected' if filtro_tipo == 'exame_img' }}>Exames de Imagem</option>
+                            <option value="relatorio" {{ 'selected' if filtro_tipo == 'relatorio' }}>Relatórios Médicos</option>
+                            <option value="atestado" {{ 'selected' if filtro_tipo == 'atestado' }}>Atestados Médicos</option>
+                            <option value="alto_custo" {{ 'selected' if filtro_tipo == 'alto_custo' }}>Formulários Alto Custo</option>
                         </select>
                     </div>
                     
@@ -382,6 +410,7 @@
                         <tr>
                             <th><i class="fas fa-user me-2"></i>Paciente</th>
                             <th><i class="fas fa-file-alt me-2"></i>Tipo</th>
+                            <th><i class="fas fa-info-circle me-2"></i>Detalhes</th>
                             <th><i class="fas fa-calendar me-2"></i>Data</th>
                             <th><i class="fas fa-user-md me-2"></i>Médico</th>
                             <th><i class="fas fa-tools me-2"></i>Ações</th>
@@ -406,27 +435,96 @@
                                     <span class="badge badge-exame-img">
                                         <i class="fas fa-x-ray me-1"></i>Exame Img
                                     </span>
+                                {% elif resultado.tipo == 'relatorio' %}
+                                    <span class="badge badge-relatorio">
+                                        <i class="fas fa-file-medical me-1"></i>Relatório
+                                    </span>
+                                {% elif resultado.tipo == 'atestado' %}
+                                    <span class="badge badge-atestado">
+                                        <i class="fas fa-certificate me-1"></i>Atestado
+                                    </span>
+                                {% elif resultado.tipo == 'alto_custo' %}
+                                    <span class="badge badge-alto-custo">
+                                        <i class="fas fa-dollar-sign me-1"></i>Alto Custo
+                                    </span>
                                 {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ resultado.detalhes_registro or 'Sem detalhes' }}</small>
                             </td>
                             <td>{{ resultado.data }}</td>
                             <td>{{ resultado.medico_nome }}</td>
                             <td>
-                                {% if resultado.tipo == 'receita' %}
-                                    <a href="{{ url_for('receita.gerar_pdf_receita', receita_id=resultado.id_registro) }}" 
-                                       class="btn btn-pdf" target="_blank">
-                                        <i class="fas fa-file-pdf me-1"></i>PDF
-                                    </a>
-                                {% elif resultado.tipo == 'exame_lab' %}
-                                    <a href="{{ url_for('exames_lab.gerar_pdf_exame_lab', exame_id=resultado.id_registro) }}" 
-                                       class="btn btn-pdf" target="_blank">
-                                        <i class="fas fa-file-pdf me-1"></i>PDF
-                                    </a>
-                                {% elif resultado.tipo == 'exame_img' %}
-                                    <a href="{{ url_for('exames_img.gerar_pdf_exame_img', exame_id=resultado.id_registro) }}" 
-                                       class="btn btn-pdf" target="_blank">
-                                        <i class="fas fa-file-pdf me-1"></i>PDF
-                                    </a>
-                                {% endif %}
+                                <div class="d-flex gap-1">
+                                    <!-- Edit Button -->
+                                    {% if resultado.tipo == 'receita' %}
+                                        <a href="{{ url_for('receita.receita') }}?edit_id={{ resultado.id_registro }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('receita.gerar_pdf_reimprimir_receita', receita_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-outline-info" target="_blank" title="Reimprimir com data atual">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                        <a href="{{ url_for('receita.gerar_pdf_receita', receita_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF original">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    {% elif resultado.tipo == 'exame_lab' %}
+                                        <a href="{{ url_for('exames_lab.exames_lab') }}?edit_id={{ resultado.id_registro }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('exames_lab.gerar_pdf_reimprimir_exame_lab', exame_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-outline-info" target="_blank" title="Reimprimir com data atual">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                        <a href="{{ url_for('exames_lab.gerar_pdf_exame_lab', exame_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF original">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    {% elif resultado.tipo == 'exame_img' %}
+                                        <a href="{{ url_for('exames_img.exames_img') }}?edit_id={{ resultado.id_registro }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('exames_img.gerar_pdf_reimprimir_exame_img', exame_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-outline-info" target="_blank" title="Reimprimir com data atual">
+                                            <i class="fas fa-print"></i>
+                                        </a>
+                                        <a href="{{ url_for('exames_img.gerar_pdf_exame_img', exame_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF original">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    {% elif resultado.tipo == 'relatorio' %}
+                                        <a href="{{ url_for('relatorios.relatorios') }}?edit_id={{ resultado.id_registro }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('relatorios.gerar_pdf_relatorio', relatorio_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    {% elif resultado.tipo == 'atestado' %}
+                                        <a href="{{ url_for('atestados.atestados') }}?edit_id={{ resultado.id_registro }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('atestados.gerar_pdf_atestado', atestado_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    {% elif resultado.tipo == 'alto_custo' %}
+                                        <a href="{{ url_for('alto_custo.alto_custo') }}?edit_id={{ resultado.id_registro }}" 
+                                           class="btn btn-sm btn-outline-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ url_for('alto_custo.gerar_pdf_alto_custo', formulario_id=resultado.id_registro) }}" 
+                                           class="btn btn-sm btn-pdf" target="_blank" title="PDF">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                         {% endfor %}
