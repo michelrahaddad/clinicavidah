@@ -5,6 +5,17 @@ from app import db
 from utils.forms import sanitizar_entrada
 import logging
 
+def sanitizar_entrada(valor):
+    """Sanitiza entrada de usuário"""
+    if not valor:
+        return ""
+    
+    # Remove caracteres perigosos
+    import re
+    valor = re.sub(r'[<>"\']', '', str(valor))
+    return valor.strip()
+
+
 prontuario_bp = Blueprint('prontuario', __name__)
 
 @prontuario_bp.route('/prontuario', methods=['GET'])
@@ -343,15 +354,11 @@ def autocomplete_pacientes():
         # Sort and limit to 8 suggestions
         suggestions = sorted(list(all_names))[:8]
         
-    from sqlalchemy import or_
-from flask import jsonify
         return jsonify({'suggestions': suggestions})
         
     except Exception as e:
         logging.error(f"Autocomplete error: {str(e)}")
-    from sqlalchemy import or_
-from flask import jsonify
-    return jsonify({'suggestions': []})
+        return jsonify({'suggestions': []})
 
 @prontuario_bp.route('/prontuario/detalhes', methods=['GET'])
 def prontuario_detalhes():

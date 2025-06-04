@@ -8,6 +8,17 @@ from app import db
 from datetime import datetime
 import logging
 
+def sanitizar_entrada(valor):
+    """Sanitiza entrada de usuário"""
+    if not valor:
+        return ""
+    
+    # Remove caracteres perigosos
+    import re
+    valor = re.sub(r'[<>"']', '', str(valor))
+    return valor.strip()
+
+
 agenda_bp = Blueprint('agenda', __name__)
 
 @agenda_bp.route('/agenda', methods=['GET', 'POST'])
@@ -25,11 +36,11 @@ def agenda():
             # Validation
             if not paciente or not data:
                 flash('Nome do paciente e data são obrigatórios.', 'error')
-                return render_template('agenda.html'))
+                return render_template('agenda.html')
             
             if not validar_data(data):
                 flash('Data inválida. Use o formato AAAA-MM-DD.', 'error')
-                return render_template('agenda.html'))
+                return render_template('agenda.html')
             
             # Insert patient if not exists
             paciente_id = insert_patient_if_not_exists(paciente)
@@ -108,7 +119,7 @@ def excluir_agendamento(id):
         logging.error(f'Delete appointment error: {e}')
         flash('Erro ao excluir agendamento.', 'error')
     
-    return render_template('agenda.html'))
+    return render_template('agenda.html')
 
 @agenda_bp.route('/agenda/editar/<int:id>', methods=['POST'])
 def editar_agendamento(id):
@@ -124,11 +135,11 @@ def editar_agendamento(id):
         # Validation
         if not paciente or not data:
             flash('Nome do paciente e data são obrigatórios.', 'error')
-            return render_template('agenda.html'))
+            return render_template('agenda.html')
         
         if not validar_data(data):
             flash('Data inválida. Use o formato AAAA-MM-DD.', 'error')
-            return render_template('agenda.html'))
+            return render_template('agenda.html')
         
         # Update appointment
         agendamento = Agendamento.query.filter_by(id=id, id_medico=session['usuario']['id']).first()
@@ -146,4 +157,4 @@ def editar_agendamento(id):
         logging.error(f'Edit appointment error: {e}')
         flash('Erro ao editar agendamento.', 'error')
     
-    return render_template('agenda.html'))
+    return render_template('agenda.html')

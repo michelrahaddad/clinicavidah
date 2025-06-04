@@ -9,6 +9,17 @@ from datetime import datetime
 import logging
 import weasyprint
 
+def sanitizar_entrada(valor):
+    """Sanitiza entrada de usuário"""
+    if not valor:
+        return ""
+    
+    # Remove caracteres perigosos
+    import re
+    valor = re.sub(r'[<>"\']', '', str(valor))
+    return valor.strip()
+
+
 receita_bp = Blueprint('receita', __name__)
 
 @receita_bp.route('/receita', methods=['GET'])

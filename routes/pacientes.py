@@ -5,6 +5,17 @@ from app import db
 from utils.db import insert_patient_if_not_exists
 import logging
 
+def sanitizar_entrada(valor):
+    """Sanitiza entrada de usuário"""
+    if not valor:
+        return ""
+    
+    # Remove caracteres perigosos
+    import re
+    valor = re.sub(r'[<>"\']', '', str(valor))
+    return valor.strip()
+
+
 pacientes_bp = Blueprint('pacientes', __name__)
 
 @pacientes_bp.route('/novo_paciente', methods=['GET', 'POST'])
