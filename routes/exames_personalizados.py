@@ -25,8 +25,14 @@ def adicionar_exame_personalizado():
         if tipo_exame not in ['laboratorial', 'imagem']:
             return jsonify({'success': False, 'message': 'Tipo de exame inválido'}), 400
         
-        # Check if exam already exists for this doctor
-        medico_id = session['usuario']['id']
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
         exame_existente = db.session.execute(
             text("SELECT id FROM exames_personalizados WHERE nome = :nome AND tipo = :tipo AND id_medico = :medico_id AND ativo = true"),
             {'nome': nome_exame, 'tipo': tipo_exame, 'medico_id': medico_id}
