@@ -20,7 +20,7 @@ def test_prontuario_usability():
     # Teste 1: Login válido
     print("\n1. Testando login...")
     login_data = {
-        'nome': 'Dr. Carlos Silva',
+        'nome': 'Dr. João Silva',
         'crm': '123456-SP',
         'senha': 'senha123'
     }

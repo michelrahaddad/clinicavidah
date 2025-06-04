@@ -274,15 +274,16 @@ def prontuario():
         flash('Erro ao carregar prontuário.', 'error')
         return render_template('prontuario_modern.html', resultados=[])
 
-@prontuario_bp.route('/api/autocomplete_pacientes')
+@prontuario_bp.route('/prontuario/api/autocomplete_pacientes')
 def autocomplete_pacientes():
     """API endpoint for patient name autocomplete"""
     if 'usuario' not in session:
         return {'suggestions': []}
     
-    term = request.args.get('term', '').strip()
+    term = request.args.get('q', '').strip()
     if len(term) < 2:
-        return {'suggestions': []}
+        from flask import jsonify
+        return jsonify({'suggestions': []})
     
     try:
         # Get unique patient names from all tables
