@@ -6,15 +6,17 @@ dashboard_bp = Blueprint('dashboard', __name__)
 
 @dashboard_bp.route('/dashboard')
 def dashboard():
-    """Display main dashboard with explicit authentication check"""
-    # Explicit authentication check for test detection
+    """Display main dashboard with strict authentication"""
+    # Strict authentication check - always redirect if not authenticated
     if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
-    # Additional check for empty session
-    if not session.get('usuario') and not session.get('admin_usuario'):
-        return redirect(url_for('auth.login'))
+    # Double check for empty or invalid sessions
+    usuario = session.get('usuario')
+    admin = session.get('admin_usuario')
     
+    if not usuario and not admin:
+        return redirect(url_for('auth.login'))
     try:
         # Handle both admin and doctor sessions safely
         usuario_data = session.get('usuario')

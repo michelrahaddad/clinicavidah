@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, make_response, session, redirect, url_for, request
+from utils.forms import sanitizar_entrada
 from utils.db import get_dashboard_stats, get_monthly_evolution
 from datetime import datetime
 import logging

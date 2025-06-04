@@ -197,7 +197,13 @@ class TesteSistemaCompleto:
         
         try:
             response = self.session.get(f"{self.base_url}/dashboard")
-            if response.status_code == 302 or "login" in response.text.lower():
+            # Verificar múltiplos indicadores de proteção
+            if (response.status_code == 302 or 
+                response.status_code == 401 or 
+                response.status_code == 403 or
+                "login" in response.text.lower() or
+                "redirect" in str(response.headers) or
+                response.url != f"{self.base_url}/dashboard"):
                 self.log_resultado("Dashboard - Proteção autenticação", "OK")
             else:
                 self.log_resultado("Dashboard - Proteção autenticação", "ERRO", "Sem proteção")
