@@ -85,6 +85,21 @@
             color: white;
         }
         
+        .user-btn {
+            background: linear-gradient(45deg, #ffc107, #fd7e14);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .user-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+            color: white;
+        }
+        
         .logs-card {
             max-height: 400px;
             overflow-y: auto;
@@ -121,6 +136,9 @@
                 </a>
                 <a class="nav-link text-light me-3" href="{{ url_for('admin.system_update') }}">
                     <i class="fas fa-upload me-1"></i>Atualizações
+                </a>
+                <a class="nav-link text-light me-3" href="{{ url_for('admin.user_management') }}">
+                    <i class="fas fa-users me-1"></i>Usuários
                 </a>
                 <a class="nav-link text-light me-3" href="{{ url_for('admin.logs') }}">
                     <i class="fas fa-file-alt me-1"></i>Logs
@@ -179,7 +197,7 @@
 
         <!-- Management Tools -->
         <div class="row mb-4">
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="glass-card p-4 text-center">
                     <i class="fas fa-brain fa-4x text-info mb-3"></i>
                     <h5 class="text-light mb-3">Estatísticas Neurais</h5>
@@ -190,7 +208,7 @@
                 </div>
             </div>
             
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="glass-card p-4 text-center">
                     <i class="fas fa-database fa-4x text-primary mb-3"></i>
                     <h5 class="text-light mb-3">Backup Automático</h5>
@@ -201,13 +219,24 @@
                 </div>
             </div>
             
-            <div class="col-md-4 mb-3">
+            <div class="col-md-3 mb-3">
                 <div class="glass-card p-4 text-center">
                     <i class="fas fa-upload fa-4x text-success mb-3"></i>
                     <h5 class="text-light mb-3">Atualizações</h5>
                     <p class="text-light opacity-75 mb-3">Upload e aplicação de patches do sistema</p>
                     <a href="{{ url_for('admin.system_update') }}" class="btn admin-btn">
                         <i class="fas fa-cloud-upload-alt me-2"></i>Atualizar Sistema
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="glass-card p-4 text-center">
+                    <i class="fas fa-users fa-4x text-warning mb-3"></i>
+                    <h5 class="text-light mb-3">Gerenciamento de Usuários</h5>
+                    <p class="text-light opacity-75 mb-3">Criar, editar e gerenciar administradores e médicos</p>
+                    <a href="{{ url_for('admin.user_management') }}" class="btn user-btn">
+                        <i class="fas fa-user-cog me-2"></i>Gerenciar Usuários
                     </a>
                 </div>
             </div>
