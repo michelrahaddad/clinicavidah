@@ -40,12 +40,12 @@ def salvar_receita():
         # Validation
         if not nome_paciente:
             flash('Nome do paciente é obrigatório.', 'error')
-            return render_template('receita.html')
+            return redirect(url_for('receita.receita'))
         
         is_valid, message = validar_medicamentos(medicamentos, posologias, duracoes, vias)
         if not is_valid:
             flash(message, 'error')
-            return render_template('receita.html')
+            return redirect(url_for('receita.receita'))
         
         # Insert patient if not exists
         paciente_id = insert_patient_if_not_exists(nome_paciente)
@@ -140,7 +140,7 @@ def salvar_receita():
     except Exception as e:
         logging.error(f'Prescription error: {e}')
         flash('Erro ao salvar receita. Tente novamente.', 'error')
-        return render_template('receita.html'))
+        return redirect(url_for('receita.receita'))
 
 @receita_bp.route('/receita/refazer/<int:id>', methods=['GET'])
 def refazer_receita(id):
@@ -170,7 +170,7 @@ def refazer_receita(id):
     except Exception as e:
         logging.error(f'Refill prescription error: {e}')
         flash('Erro ao carregar receita.', 'error')
-        return render_template('receita.html'))
+        return redirect(url_for('prontuario.prontuario'))
 
 def gerar_pdf_reimprimir_receita(receita_obj):
     """Generate PDF for existing prescription with current date"""
@@ -211,7 +211,7 @@ def gerar_pdf_reimprimir_receita(receita_obj):
     except Exception as e:
         logging.error(f'Error generating prescription PDF: {e}')
         flash('Erro ao gerar PDF da receita.', 'error')
-        return render_template('receita.html'))
+        return redirect(url_for('prontuario.prontuario'))
 
 
 @receita_bp.route('/gerar_pdf_receita/<int:receita_id>')
@@ -257,7 +257,7 @@ def gerar_pdf_receita(receita_id):
     except Exception as e:
         logging.error(f'Error generating prescription PDF: {e}')
         flash('Erro ao gerar PDF da receita.', 'error')
-        return render_template('receita.html'))
+        return redirect(url_for('receita.receita'))
 
 @receita_bp.route('/receita/reimprimir/<int:receita_id>')
 def reimprimir_receita(receita_id):
@@ -270,13 +270,13 @@ def reimprimir_receita(receita_id):
         medico_id = session.get('medico_id')
         if not medico_id:
             flash('Sessão expirada. Faça login novamente.', 'error')
-            return render_template('receita.html'))
+            return redirect(url_for('auth.login'))
         
         # Get prescription and verify ownership
         receita_obj = db.session.query(Receita).filter_by(id=receita_id, id_medico=medico_id).first()
         if not receita_obj:
             flash('Receita não encontrada.', 'error')
-            return render_template('receita.html'))
+            return redirect(url_for('prontuario.prontuario'))
         
         medico = db.session.query(Medico).get(medico_id)
         data_atual = datetime.now().strftime('%d/%m/%Y')
@@ -306,7 +306,7 @@ def reimprimir_receita(receita_id):
     except Exception as e:
         logging.error(f'Reprint prescription error: {e}')
         flash('Erro ao reimprimir receita.', 'error')
-        return render_template('receita.html'))
+        return redirect(url_for('prontuario.prontuario'))
 @receita_bp.route('/refazer_receita/<int:id>')
 def refazer_receita_novo(id):
     """Refaz uma receita existente usando novo nome de função"""
@@ -319,7 +319,7 @@ def refazer_receita_novo(id):
         # Verificar se o médico logado é o autor da receita
         if receita.medico_nome != session['usuario']:
             flash('Você não tem permissão para refazer esta receita.', 'error')
-            return render_template('receita.html'))
+            return redirect(url_for('receita.receita'))
         
         # Redirecionar para a página de receita com dados preenchidos
         return redirect(url_for('receita.receita', 
@@ -332,5 +332,5 @@ def refazer_receita_novo(id):
     except Exception as e:
         logging.error(f'Erro ao refazer receita {id}: {e}')
         flash('Erro ao carregar receita para refazer.', 'error')
-        return render_template('receita.html'))
+        return redirect(url_for('receita.receita'))
 

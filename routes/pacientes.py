@@ -110,8 +110,8 @@ def novo_paciente():
                 'nome': nome_paciente
             }
             
-            # Redirect to prontuario with patient name
-            return redirect(url_for('prontuario.prontuario', paciente=nome_paciente))
+            # Stay on the same page after successful registration
+            return render_template('novo_paciente.html')
             
         except Exception as e:
             logging.error(f'Patient registration error: {e}')
