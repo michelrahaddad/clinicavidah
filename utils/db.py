@@ -34,7 +34,11 @@ def get_dashboard_stats(medico_id=None):
         
         # If no medico_id provided, get from session
         if not medico_id and 'usuario' in session:
-            medico_id = session['usuario']['id']
+            usuario_data = session['usuario']
+            if isinstance(usuario_data, dict):
+                medico_id = usuario_data.get('id')
+            else:
+                medico_id = None
         
         if medico_id:
             # Statistics for specific doctor

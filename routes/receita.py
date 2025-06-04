@@ -52,8 +52,16 @@ def salvar_receita():
         # Get complete patient data for PDF
         paciente = Paciente.query.get(paciente_id)
         
-        # Save prescription
-        medico = Medico.query.get(session['usuario']['id'])
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
+        
+        medico = Medico.query.get(medico_id)
         
         receita_obj = Receita(
             nome_paciente=nome_paciente,
@@ -64,7 +72,7 @@ def salvar_receita():
             medico_nome=medico.nome,
             data=data,
             id_paciente=paciente_id,
-            id_medico=session['usuario']['id']
+            id_medico=medico_id
         )
         
         db.session.add(receita_obj)
@@ -75,7 +83,7 @@ def salvar_receita():
             tipo='receita',
             id_registro=receita_obj.id,
             id_paciente=paciente_id,
-            id_medico=session['usuario']['id'],
+            id_medico=medico_id,
             data=data
         )
         
