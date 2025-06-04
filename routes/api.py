@@ -48,6 +48,92 @@ def get_medicamentos():
     # Permitir acesso se usuário ou admin logado
     if not (session.get('usuario') or session.get('admin_usuario')):
         return jsonify([])
+
+@api_bp.route('/medicamentos_historico')
+def get_medicamentos_historico():
+    """API para autocomplete inteligente baseado no histórico de prescrições"""
+    # Permitir acesso se usuário ou admin logado
+    if not (session.get('usuario') or session.get('admin_usuario')):
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip().lower()
+        if len(term) < 2:
+            return jsonify([])
+        
+        # Obter ID do médico
+        usuario_data = session.get('usuario') or session.get('admin_usuario')
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - usar qualquer médico
+            medico_id = 1
+        
+        # Buscar medicamentos no histórico do médico, ordenados por frequência de uso
+        query = """
+            SELECT principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito
+            FROM medicamentos_historico 
+            WHERE principio_ativo ILIKE %s AND id_medico = %s
+            ORDER BY vezes_prescrito DESC, ultima_prescricao DESC
+            LIMIT 10
+        """
+        
+        result = db.session.execute(query, (f'%{term}%', medico_id)).fetchall()
+        
+        medicamentos = []
+        for row in result:
+            medicamentos.append({
+                'principio_ativo': row[0],
+                'concentracao': row[1] or '',
+                'via': row[2] or '',
+                'frequencia': row[3] or '',
+                'quantidade': row[4] or '',
+                'vezes_prescrito': row[5] or 0
+            })
+        
+        return jsonify(medicamentos)
+    except Exception as e:
+        logging.error(f"Erro na API de medicamentos histórico: {e}")
+        return jsonify([])
+
+@api_bp.route('/medicamento_dados/<principio_ativo>')
+def get_medicamento_dados(principio_ativo):
+    """API para obter dados completos de um medicamento baseado no histórico"""
+    # Permitir acesso se usuário ou admin logado
+    if not (session.get('usuario') or session.get('admin_usuario')):
+        return jsonify({})
+    
+    try:
+        # Obter ID do médico
+        usuario_data = session.get('usuario') or session.get('admin_usuario')
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            medico_id = 1
+        
+        # Buscar o medicamento mais prescrito pelo médico
+        query = """
+            SELECT concentracao, via, frequencia, quantidade
+            FROM medicamentos_historico 
+            WHERE principio_ativo ILIKE %s AND id_medico = %s
+            ORDER BY vezes_prescrito DESC, ultima_prescricao DESC
+            LIMIT 1
+        """
+        
+        result = db.session.execute(query, (principio_ativo.lower(), medico_id)).fetchone()
+        
+        if result:
+            return jsonify({
+                'concentracao': result[0] or '',
+                'via': result[1] or '',
+                'frequencia': result[2] or '',
+                'quantidade': result[3] or ''
+            })
+        else:
+            return jsonify({})
+    except Exception as e:
+        logging.error(f"Erro na API de dados do medicamento: {e}")
+        return jsonify({})
     
     try:
         term = request.args.get('q', '').strip()

@@ -20,6 +20,45 @@ def sanitizar_entrada(valor):
     return valor.strip()
 
 
+def salvar_medicamentos_historico(principios_ativos, concentracoes, vias, frequencias, quantidades, medico_id):
+    """Salva medicamentos no histórico para autocomplete inteligente"""
+    from datetime import datetime
+    
+    for i in range(len(principios_ativos)):
+        principio = principios_ativos[i].strip().lower()
+        concentracao = concentracoes[i] if i < len(concentracoes) else ''
+        via = vias[i] if i < len(vias) else ''
+        frequencia = frequencias[i] if i < len(frequencias) else ''
+        quantidade = quantidades[i] if i < len(quantidades) else ''
+        
+        if not principio:
+            continue
+            
+        # Verificar se já existe este medicamento para este médico
+        try:
+            # Usar SQL direto para melhor performance
+            existing = db.session.execute(
+                "SELECT id, vezes_prescrito FROM medicamentos_historico WHERE principio_ativo = %s AND id_medico = %s AND concentracao = %s AND via = %s",
+                (principio, medico_id, concentracao, via)
+            ).fetchone()
+            
+            if existing:
+                # Atualizar contagem e data
+                db.session.execute(
+                    "UPDATE medicamentos_historico SET vezes_prescrito = %s, ultima_prescricao = %s WHERE id = %s",
+                    (existing[1] + 1, datetime.now(), existing[0])
+                )
+            else:
+                # Inserir novo registro
+                db.session.execute(
+                    "INSERT INTO medicamentos_historico (principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito, ultima_prescricao, created_at, id_medico) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (principio, concentracao, via, frequencia, quantidade, 1, datetime.now(), datetime.now(), medico_id)
+                )
+        except Exception as e:
+            logging.error(f"Erro ao salvar medicamento no histórico: {e}")
+            continue
+
+
 receita_bp = Blueprint('receita', __name__)
 
 @receita_bp.route('/receita', methods=['GET'])

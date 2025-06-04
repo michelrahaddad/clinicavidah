@@ -570,4 +570,21 @@ document.addEventListener('click', function(e) {
     }
 });
 </script>
+
+<!-- Sistema Inteligente de Autocomplete -->
+<script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
+
+<script>
+// Atualizar função de adicionar medicamento para usar o sistema inteligente
+const originalAdicionarMedicamento = adicionarMedicamento;
+adicionarMedicamento = function() {
+    originalAdicionarMedicamento();
+    // Reinicializar autocomplete inteligente para novos campos
+    setTimeout(() => {
+        if (window.reinicializarAutocompleteInteligente) {
+            window.reinicializarAutocompleteInteligente();
+        }
+    }, 100);
+};
+</script>
 {% endblock %}
