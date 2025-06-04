@@ -11,8 +11,23 @@ def estatisticas_neurais():
         return redirect(url_for('auth.login'))
     
     try:
-        medico_id = session['usuario']['id']
-        medico_nome = session['usuario']['nome']
+        # Handle both admin and doctor sessions
+        if 'admin_data' in session:
+            # Admin access
+            medico_nome = session['admin_data']['nome']
+            medico_id = None  # Admin sees all stats
+        elif 'usuario' in session:
+            # Doctor access
+            usuario_data = session['usuario']
+            if isinstance(usuario_data, dict):
+                medico_id = usuario_data.get('id')
+                medico_nome = usuario_data.get('nome')
+            else:
+                # Handle string session data
+                medico_nome = str(usuario_data)
+                medico_id = None
+        else:
+            return redirect(url_for('auth.login'))
         
         # Get comprehensive statistics
         stats = get_dashboard_stats(medico_id)

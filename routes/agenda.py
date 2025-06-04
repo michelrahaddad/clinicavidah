@@ -32,13 +32,23 @@ def agenda():
             # Insert patient if not exists
             paciente_id = insert_patient_if_not_exists(paciente)
             
+            # Get medico ID safely
+            usuario_data = session['usuario']
+            if isinstance(usuario_data, dict):
+                medico_id = usuario_data.get('id')
+            else:
+                # Fallback - find medico by name
+                from models import Medico
+                medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+                medico_id = medico.id if medico else 1
+            
             # Create appointment
             agendamento = Agendamento(
                 data=data,
                 paciente=paciente,
                 motivo=motivo,
                 id_paciente=paciente_id,
-                id_medico=session['usuario']['id']
+                id_medico=medico_id
             )
             
             db.session.add(agendamento)
