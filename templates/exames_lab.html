@@ -513,32 +513,10 @@ function adicionarExamePersonalizado() {
     
     // Aguardar um pouco para o modal fechar completamente
     setTimeout(() => {
-        // Encontrar seção de exames personalizados ou criar uma nova
-        let secaoPersonalizados = document.getElementById('secao-exames-personalizados');
+        // Usar o container existente de exames personalizados (no final da página)
+        const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
         
-        if (!secaoPersonalizados) {
-            // Criar nova seção para exames personalizados
-            const containerExames = document.querySelector('form .row');
-            if (containerExames) {
-                const novaSecao = document.createElement('div');
-                novaSecao.className = 'col-md-6 mb-4';
-                novaSecao.id = 'secao-exames-personalizados';
-                novaSecao.innerHTML = `
-                    <h6 class="text-warning mb-3">
-                        <i class="fas fa-user-cog me-2"></i>Exames Personalizados
-                    </h6>
-                    <div class="row" id="lista-exames-personalizados">
-                    </div>
-                `;
-                containerExames.appendChild(novaSecao);
-                console.log('Nova seção de exames personalizados criada');
-                secaoPersonalizados = novaSecao;
-            }
-        }
-        
-        // Adicionar o exame à seção
-        const listaPersonalizados = document.getElementById('lista-exames-personalizados');
-        if (listaPersonalizados) {
+        if (containerPersonalizados) {
             const timestamp = Date.now();
             const novoExameDiv = document.createElement('div');
             novoExameDiv.className = 'col-12 mb-2';
@@ -552,11 +530,14 @@ function adicionarExamePersonalizado() {
                     </label>
                 </div>
             `;
-            listaPersonalizados.appendChild(novoExameDiv);
-            console.log('Exame adicionado à lista:', nomeExame);
+            containerPersonalizados.appendChild(novoExameDiv);
+            console.log('Exame adicionado ao container correto:', nomeExame);
             
-            // Rolar para a seção para mostrar o novo exame
-            secaoPersonalizados.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Rolar para a seção de exames personalizados
+            const secaoPersonalizados = containerPersonalizados.closest('.col-md-6');
+            if (secaoPersonalizados) {
+                secaoPersonalizados.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
         
         // Limpar campos do modal
