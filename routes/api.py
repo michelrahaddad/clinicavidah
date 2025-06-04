@@ -52,49 +52,56 @@ def get_medicamentos():
 @api_bp.route('/medicamentos_historico')
 def get_medicamentos_historico():
     """API para autocomplete inteligente baseado no histórico de prescrições"""
-    # Permitir acesso se usuário ou admin logado
-    if not (session.get('usuario') or session.get('admin_usuario')):
-        return jsonify([])
-    
     try:
-        term = request.args.get('q', '').strip().lower()
-        if len(term) < 2:
+        term = request.args.get('q', '').strip()
+        logging.info(f"=== API AUTOCOMPLETE ===")
+        logging.info(f"Termo buscado: '{term}'")
+        logging.info(f"Sessão usuario: {session.get('usuario')}")
+        logging.info(f"Sessão admin: {session.get('admin_usuario')}")
+        
+        # Permitir acesso se usuário ou admin logado
+        if not (session.get('usuario') or session.get('admin_usuario')):
+            logging.warning("Sem usuário logado")
             return jsonify([])
         
-        # Obter ID do médico
-        usuario_data = session.get('usuario') or session.get('admin_usuario')
-        if isinstance(usuario_data, dict):
-            medico_id = usuario_data.get('id')
-        else:
-            # Fallback - usar qualquer médico
-            medico_id = 1
+        if len(term) < 2:
+            logging.info("Termo muito curto")
+            return jsonify([])
         
-        # Buscar medicamentos no histórico do médico, ordenados por frequência de uso
+        # Buscar TODOS os medicamentos no histórico (sem filtro de médico primeiro)
         from sqlalchemy import text
         query = text("""
-            SELECT principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito
+            SELECT principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito, id_medico
             FROM medicamentos_historico 
-            WHERE principio_ativo ILIKE :term AND id_medico = :medico_id
+            WHERE LOWER(principio_ativo) LIKE LOWER(:term)
             ORDER BY vezes_prescrito DESC, ultima_prescricao DESC
             LIMIT 10
         """)
         
-        result = db.session.execute(query, {'term': f'%{term}%', 'medico_id': medico_id}).fetchall()
+        result = db.session.execute(query, {'term': f'%{term}%'}).fetchall()
+        logging.info(f"Registros encontrados na busca: {len(result)}")
         
         medicamentos = []
         for row in result:
-            medicamentos.append({
+            medicamento = {
                 'principio_ativo': row[0],
                 'concentracao': row[1] or '',
                 'via': row[2] or '',
                 'frequencia': row[3] or '',
                 'quantidade': row[4] or '',
-                'vezes_prescrito': row[5] or 0
-            })
+                'vezes_prescrito': row[5] or 0,
+                'id_medico': row[6]
+            }
+            medicamentos.append(medicamento)
+            logging.info(f"Medicamento encontrado: {medicamento}")
         
+        logging.info(f"Total retornado: {len(medicamentos)}")
         return jsonify(medicamentos)
+        
     except Exception as e:
         logging.error(f"Erro na API de medicamentos histórico: {e}")
+        import traceback
+        logging.error(f"Traceback completo: {traceback.format_exc()}")
         return jsonify([])
 
 @api_bp.route('/medicamento_dados/<principio_ativo>')
