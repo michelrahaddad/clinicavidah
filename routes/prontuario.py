@@ -428,7 +428,10 @@ def prontuario_detalhes():
             ).all()
             
             for relatorio in relatorios:
-                cid_desc = str(relatorio.cid_descricao) if hasattr(relatorio, 'cid_descricao') and relatorio.cid_descricao is not None else ''
+                try:
+                    cid_desc = str(relatorio.cid_descricao) if relatorio.cid_descricao else ''
+                except:
+                    cid_desc = ''
                 detalhes = f"CID: {relatorio.cid_codigo} - {cid_desc[:50]}{'...' if len(cid_desc) > 50 else ''}"
                 
                 documentos['relatorio'].append({
@@ -463,7 +466,10 @@ def prontuario_detalhes():
             ).all()
             
             for formulario in formularios:
-                medicamento_text = str(formulario.medicamento) if hasattr(formulario, 'medicamento') and formulario.medicamento is not None else ''
+                try:
+                    medicamento_text = str(formulario.medicamento) if formulario.medicamento else ''
+                except:
+                    medicamento_text = ''
                 detalhes = f"Medicamento: {medicamento_text[:50]}{'...' if len(medicamento_text) > 50 else ''}"
                 
                 documentos['alto_custo'].append({
