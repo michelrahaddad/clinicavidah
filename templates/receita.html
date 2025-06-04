@@ -11,7 +11,7 @@
         </div>
     </div>
     
-    <form action="{{ url_for('receita.salvar_receita') }}" method="post">
+    <form action="{{ url_for('receita.salvar_receita') }}" method="post" id="receita-form">
         <input type="hidden" name="refazer" value="{{ refazer|default(false) }}">
         
         <div class="card glass-card">
