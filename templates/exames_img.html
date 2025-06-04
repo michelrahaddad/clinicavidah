@@ -345,28 +345,57 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Campo data_exame não encontrado!');
     }
     
-    // Configurar busca de exames - versão limpa e funcional
+    // Configurar busca de exames - versão corrigida
     const buscarExame = document.getElementById('buscarExame');
     
     if (buscarExame) {
+        console.log('Campo de busca encontrado');
+        
         buscarExame.addEventListener('input', function() {
             const termo = this.value.toLowerCase().trim();
+            console.log('Termo de busca:', termo);
             
             // Buscar em todos os checkboxes de exames
             const allFormChecks = document.querySelectorAll('.form-check');
+            console.log('Número de checkboxes encontrados:', allFormChecks.length);
+            
+            let resultados = 0;
             
             allFormChecks.forEach(formCheck => {
                 const label = formCheck.querySelector('.form-check-label');
                 if (label) {
-                    const texto = label.textContent.toLowerCase();
+                    const texto = label.textContent.toLowerCase().trim();
                     
                     if (termo === '' || texto.includes(termo)) {
                         formCheck.style.display = 'block';
+                        formCheck.parentElement.style.display = 'block'; // Mostrar container pai também
+                        resultados++;
                     } else {
                         formCheck.style.display = 'none';
                     }
                 }
             });
+            
+            console.log('Resultados encontrados:', resultados);
+            
+            // Mostrar/ocultar seções inteiras se necessário
+            if (termo !== '') {
+                const sections = document.querySelectorAll('.card.glass-card');
+                sections.forEach(section => {
+                    const visibleChecks = section.querySelectorAll('.form-check[style*="block"], .form-check:not([style*="none"])');
+                    if (visibleChecks.length === 0) {
+                        section.style.display = 'none';
+                    } else {
+                        section.style.display = 'block';
+                    }
+                });
+            } else {
+                // Mostrar todas as seções quando não há busca
+                const sections = document.querySelectorAll('.card.glass-card');
+                sections.forEach(section => {
+                    section.style.display = 'block';
+                });
+            }
         });
         
         // Limpar busca com ESC
@@ -376,6 +405,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.dispatchEvent(new Event('input'));
             }
         });
+        
+        console.log('Event listeners de busca configurados');
+    } else {
+        console.error('Campo buscarExame não encontrado!');
     }
 
     console.log('Sistema de Exames de Imagem carregado');
