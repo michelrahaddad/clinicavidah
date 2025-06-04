@@ -21,7 +21,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-md-6">
                         <div class="mb-3">
                             <label for="nome_paciente" class="form-label text-light">
                                 <i class="fas fa-user me-2"></i>Nome do Paciente *
@@ -29,9 +29,24 @@
                             <input type="text" 
                                    name="nome_paciente" 
                                    id="nome_paciente"
-                                   class="form-control glass-input" 
+                                   class="form-control glass-input autocomplete-paciente" 
                                    placeholder="Digite o nome completo do paciente"
                                    value="{{ exame.nome_paciente if refazer and exame else (request.args.get('paciente', '') or nome_paciente) }}"
+                                   autocomplete="off"
+                                   required>
+                            <div id="suggestions-container" class="autocomplete-suggestions"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="data_exame" class="form-label text-light">
+                                <i class="fas fa-calendar me-2"></i>Data do Exame
+                            </label>
+                            <input type="date" 
+                                   name="data_exame" 
+                                   id="data_exame"
+                                   class="form-control glass-input" 
+                                   value="{{ exame.data_exame if refazer and exame else '' }}"
                                    required>
                         </div>
                     </div>
@@ -46,9 +61,18 @@
                         <i class="fas fa-x-ray me-2"></i>
                         Exames de Imagem
                     </h5>
-                    <button type="button" class="btn btn-warning" >
-                        <i class="fas fa-cog"></i> Exames Personalizados
-                    </button>
+                    <div class="d-flex gap-2">
+                        <div class="input-group" style="width: 300px;">
+                            <input type="text" id="buscarExame" class="form-control glass-input" 
+                                   placeholder="Buscar exame específico..." style="border-radius: 10px 0 0 10px;">
+                            <button class="btn btn-outline-primary" type="button" style="border-radius: 0 10px 10px 0;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalExamesPersonalizados">
+                            <i class="fas fa-cog"></i> Exames Personalizados
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="card-body">
@@ -251,7 +275,7 @@
                                        placeholder="Ex: Neurológico">
                             </div>
                         </div>
-                        <button type="button" class="btn btn-success neural-btn" >
+                        <button type="button" class="btn btn-success neural-btn" onclick="adicionarExamePersonalizado()">
                             <i class="fas fa-plus me-2"></i>Adicionar Exame
                         </button>
                     </div>
@@ -273,4 +297,126 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar data atual
+    const dataExame = document.getElementById('data_exame');
+    if (dataExame && !dataExame.value) {
+        const hoje = new Date().toISOString().split('T')[0];
+        dataExame.value = hoje;
+    }
+    
+    // Configurar busca de exames
+    const buscarExame = document.getElementById('buscarExame');
+    if (buscarExame) {
+        buscarExame.addEventListener('input', function() {
+            const termo = this.value.toLowerCase();
+            console.log('Buscando por:', termo);
+            
+            // Buscar em todas as seções de exames
+            const secoes = document.querySelectorAll('.col-md-6, .col-md-4, .col-sm-6, .col-12');
+            
+            secoes.forEach(secao => {
+                const labels = secao.querySelectorAll('.form-check-label');
+                let temMatch = false;
+                
+                labels.forEach(label => {
+                    const texto = label.textContent.toLowerCase();
+                    const formCheck = label.closest('.form-check');
+                    
+                    if (texto.includes(termo) || termo === '') {
+                        if (formCheck) formCheck.style.display = 'block';
+                        temMatch = true;
+                    } else {
+                        if (formCheck) formCheck.style.display = 'none';
+                    }
+                });
+                
+                // Mostrar/ocultar seção inteira se necessário
+                const tituloSecao = secao.querySelector('h6, h5');
+                if (tituloSecao && tituloSecao.closest('.card')) {
+                    const card = tituloSecao.closest('.card');
+                    if (termo && !temMatch) {
+                        card.style.display = 'none';
+                    } else {
+                        card.style.display = 'block';
+                    }
+                } else {
+                    // Para seções sem card
+                    if (termo && !temMatch) {
+                        secao.style.display = 'none';
+                    } else {
+                        secao.style.display = 'block';
+                    }
+                }
+            });
+        });
+    }
+    
+    console.log('Sistema de Exames de Imagem carregado');
+    console.log('Busca de exames configurada');
+});
+
+// Função para adicionar exame personalizado
+function adicionarExamePersonalizado() {
+    const nomeExame = document.getElementById('nomeNovoExame').value.trim();
+    const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
+    
+    console.log('Tentando adicionar exame de imagem:', nomeExame, 'categoria:', categoria);
+    
+    if (!nomeExame) {
+        alert('Por favor, digite o nome do exame.');
+        return;
+    }
+    
+    // Fechar o modal primeiro
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
+    if (modal) {
+        modal.hide();
+    }
+    
+    // Aguardar um pouco para o modal fechar completamente
+    setTimeout(() => {
+        // Usar o container existente de exames personalizados
+        const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
+        
+        if (containerPersonalizados) {
+            const timestamp = Date.now();
+            const novoExameDiv = document.createElement('div');
+            novoExameDiv.className = 'col-12 mb-2';
+            novoExameDiv.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                           value="${nomeExame}" 
+                           id="exame_custom_${timestamp}" checked>
+                    <label class="form-check-label text-light" for="exame_custom_${timestamp}">
+                        ${nomeExame} <small class="text-muted">(Personalizado)</small>
+                    </label>
+                </div>
+            `;
+            containerPersonalizados.appendChild(novoExameDiv);
+            console.log('Exame de imagem adicionado ao container correto:', nomeExame);
+            
+            // Rolar para a seção de exames personalizados
+            const secaoPersonalizados = containerPersonalizados.closest('.card');
+            if (secaoPersonalizados) {
+                secaoPersonalizados.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        // Limpar campos do modal
+        document.getElementById('nomeNovoExame').value = '';
+        document.getElementById('categoriaNovoExame').value = '';
+        
+        // Mostrar mensagem de sucesso
+        alert(`Exame "${nomeExame}" adicionado com sucesso e já está selecionado!`);
+        
+        console.log('Exame personalizado de imagem adicionado:', nomeExame);
+    }, 300);
+}
+</script>
 {% endblock %}
