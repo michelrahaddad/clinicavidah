@@ -15,7 +15,7 @@ def sanitizar_entrada(valor):
     
     # Remove caracteres perigosos
     import re
-    valor = re.sub(r'[<>"']', '', str(valor))
+    valor = re.sub(r'[<>"\']', '', str(valor))
     return valor.strip()
 
 
