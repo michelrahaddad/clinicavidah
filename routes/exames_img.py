@@ -45,16 +45,24 @@ def salvar_exames_img():
         # Insert patient if not exists
         paciente_id = insert_patient_if_not_exists(nome_paciente)
         
-        # Save imaging exams
-        medico = Medico.query.get(session['usuario']['id'])
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
+        
+        medico = Medico.query.get(medico_id)
         
         exame_obj = ExameImg(
             nome_paciente=nome_paciente,
             exames=','.join(exames),
-            medico_nome=medico.nome,
+            medico_nome=medico.nome if medico else "Médico não encontrado",
             data=data,
             id_paciente=paciente_id,
-            id_medico=session['usuario']['id']
+            id_medico=medico_id
         )
         
         db.session.add(exame_obj)
@@ -65,7 +73,7 @@ def salvar_exames_img():
             tipo='exame_img',
             id_registro=exame_obj.id,
             id_paciente=paciente_id,
-            id_medico=session['usuario']['id'],
+            id_medico=medico_id,
             data=data
         )
         
@@ -76,9 +84,9 @@ def salvar_exames_img():
         pdf_html = render_template('exames_img_pdf.html',
                                  nome_paciente=nome_paciente,
                                  exames=exames,
-                                 medico=medico.nome,
-                                 crm=medico.crm,
-                                 assinatura=medico.assinatura,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
+                                 assinatura=medico.assinatura if medico else None,
                                  data=data)
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
@@ -126,16 +134,25 @@ def refazer_exame_img(id):
 def gerar_pdf_reimprimir_exame_img(exame):
     """Generate PDF for existing imaging exam with current date"""
     try:
-        medico = Medico.query.get(session['usuario']['id'])
+        # Get medico ID safely
+        usuario_data = session['usuario']
+        if isinstance(usuario_data, dict):
+            medico_id = usuario_data.get('id')
+        else:
+            # Fallback - find medico by name
+            medico = Medico.query.filter_by(nome=str(usuario_data)).first()
+            medico_id = medico.id if medico else 1
+        
+        medico = Medico.query.get(medico_id)
         data_atual = datetime.now().strftime('%d/%m/%Y')
         
         pdf_html = render_template('exames_img_pdf.html',
                                  nome_paciente=exame.nome_paciente,
                                  exames=exame.exames.split(','),
-                                 medico=medico.nome,
-                                 crm=medico.crm,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
                                  data=data_atual,
-                                 assinatura=medico.assinatura)
+                                 assinatura=medico.assinatura if medico else None)
         
         pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
         
