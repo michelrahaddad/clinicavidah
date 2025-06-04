@@ -52,9 +52,12 @@ def get_medicamentos():
         if len(term) < 2:
             return jsonify([])
         
-        # Busca direta no banco
+        # Busca por nome ou princípio ativo
         medicamentos = Medicamento.query.filter(
-            Medicamento.nome.ilike(f'%{term}%')
+            or_(
+                Medicamento.nome.ilike(f'%{term}%'),
+                Medicamento.principio_ativo.ilike(f'%{term}%')
+            )
         ).limit(10).all()
         
         logging.info(f"Encontrados {len(medicamentos)} medicamentos")
@@ -64,8 +67,9 @@ def get_medicamentos():
             med_data = {
                 'id': m.id,
                 'nome': m.nome,
-                'tipo': getattr(m, 'tipo', '') or '',
-                'concentracao': getattr(m, 'concentracao', '') or ''
+                'principio_ativo': getattr(m, 'principio_ativo', '') or m.nome,
+                'concentracao': getattr(m, 'concentracao', '') or '',
+                'tipo': getattr(m, 'tipo', '') or ''
             }
             result.append(med_data)
             logging.info(f"Medicamento: {med_data}")
