@@ -246,6 +246,186 @@
     </div>
 </div>
 
+<script>
+// Inicialização do autocomplete de pacientes
+document.addEventListener('DOMContentLoaded', function() {
+    setupPatientAutocomplete();
+    setupMedicamentAutocomplete();
+});
+
+function setupPatientAutocomplete() {
+    const nomeInput = document.getElementById('nome_paciente');
+    if (!nomeInput) return;
+    
+    nomeInput.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            clearSuggestions('patient');
+            return;
+        }
+        
+        fetch('/api/pacientes?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+                showPatientSuggestions(data, nomeInput);
+            })
+            .catch(error => console.error('Erro ao buscar pacientes:', error));
+    });
+}
+
+function showPatientSuggestions(patients, input) {
+    clearSuggestions('patient');
+    
+    if (patients.length === 0) return;
+    
+    const suggestions = document.createElement('div');
+    suggestions.className = 'autocomplete-suggestions patient-suggestions';
+    suggestions.style.cssText = `
+        position: absolute;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    `;
+    
+    patients.forEach(patient => {
+        const div = document.createElement('div');
+        div.style.cssText = `
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        `;
+        div.innerHTML = `
+            <strong>${patient.nome}</strong><br>
+            <small style="color: #666;">CPF: ${patient.cpf || 'Não informado'} | Idade: ${patient.idade || 'Não informada'}</small>
+        `;
+        
+        div.addEventListener('mouseenter', () => {
+            div.style.backgroundColor = 'rgba(102, 126, 234, 0.1)';
+        });
+        
+        div.addEventListener('mouseleave', () => {
+            div.style.backgroundColor = 'transparent';
+        });
+        
+        div.addEventListener('click', () => {
+            selectPatient(patient);
+            clearSuggestions('patient');
+        });
+        
+        suggestions.appendChild(div);
+    });
+    
+    input.parentNode.style.position = 'relative';
+    input.parentNode.appendChild(suggestions);
+}
+
+function selectPatient(patient) {
+    const nomeInput = document.getElementById('nome_paciente');
+    const cpfInput = document.getElementById('cpf');
+    const idadeInput = document.getElementById('idade');
+    const enderecoInput = document.getElementById('endereco');
+    const cidadeInput = document.getElementById('cidade');
+    
+    if (nomeInput) nomeInput.value = patient.nome;
+    if (cpfInput) cpfInput.value = patient.cpf || '';
+    if (idadeInput) idadeInput.value = patient.idade || '';
+    if (enderecoInput) enderecoInput.value = patient.endereco || '';
+    if (cidadeInput) cidadeInput.value = patient.cidade || '';
+}
+
+function setupMedicamentAutocomplete() {
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('medicamento-input')) {
+            const query = e.target.value;
+            if (query.length < 2) {
+                clearSuggestions('medicament');
+                return;
+            }
+            
+            fetch('/api/medicamentos?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    showMedicamentSuggestions(data, e.target);
+                })
+                .catch(error => console.error('Erro ao buscar medicamentos:', error));
+        }
+    });
+}
+
+function showMedicamentSuggestions(medicaments, input) {
+    clearSuggestions('medicament');
+    
+    if (medicaments.length === 0) return;
+    
+    const suggestions = document.createElement('div');
+    suggestions.className = 'autocomplete-suggestions medicament-suggestions';
+    suggestions.style.cssText = `
+        position: absolute;
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 100%;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    `;
+    
+    medicaments.forEach(med => {
+        const div = document.createElement('div');
+        div.style.cssText = `
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        `;
+        div.textContent = med.nome;
+        
+        div.addEventListener('mouseenter', () => {
+            div.style.backgroundColor = 'rgba(40, 167, 69, 0.1)';
+        });
+        
+        div.addEventListener('mouseleave', () => {
+            div.style.backgroundColor = 'transparent';
+        });
+        
+        div.addEventListener('click', () => {
+            input.value = med.nome;
+            clearSuggestions('medicament');
+        });
+        
+        suggestions.appendChild(div);
+    });
+    
+    input.parentNode.style.position = 'relative';
+    input.parentNode.appendChild(suggestions);
+}
+
+function clearSuggestions(type) {
+    const className = type + '-suggestions';
+    const existingSuggestions = document.querySelector('.' + className);
+    if (existingSuggestions) {
+        existingSuggestions.remove();
+    }
+}
+
+// Limpar sugestões quando clicar fora
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.autocomplete-suggestions')) {
+        clearSuggestions('patient');
+        clearSuggestions('medicament');
+    }
+});
+</script>
+
 
 
 <style>

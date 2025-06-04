@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session, make_response, redirect, url_for
-from models import Paciente, Receita, ExameLab, ExameImg, Prontuario, Cid10, ExamePersonalizado
+from models import Paciente, Receita, ExameLab, ExameImg, Prontuario, Cid10, ExamePersonalizado, Medicamento
 from app import db
 from sqlalchemy import func, or_, text
 import csv
@@ -40,6 +40,35 @@ def get_pacientes():
         return jsonify(result)
     except Exception as e:
         logging.error(f"Erro na API de pacientes: {e}")
+        return jsonify([])
+
+@api_bp.route('/medicamentos')
+def get_medicamentos():
+    """API para autocomplete de medicamentos"""
+    if not (session.get('usuario') or session.get('admin_usuario')):
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
+        
+        medicamentos = Medicamento.query.filter(
+            Medicamento.nome.ilike(f'%{term}%')
+        ).limit(10).all()
+        
+        result = []
+        for m in medicamentos:
+            result.append({
+                'id': m.id,
+                'nome': m.nome,
+                'tipo': m.tipo or '',
+                'concentracao': m.concentracao or ''
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        logging.error(f"Erro na API de medicamentos: {e}")
         return jsonify([])
 
 @api_bp.route('/buscar_pacientes')
