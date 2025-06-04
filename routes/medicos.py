@@ -8,6 +8,9 @@ medicos_bp = Blueprint('medicos', __name__)
 
 @medicos_bp.route('/cadastrar_medico', methods=['GET', 'POST'])
 def cadastrar_medico():
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+
     """Register new doctor"""
     if request.method == 'POST':
         try:

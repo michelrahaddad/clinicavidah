@@ -18,6 +18,9 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def admin_login():
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+
     """Admin login page"""
     if request.method == 'POST':
         usuario = sanitizar_entrada(request.form.get('usuario', ''))
@@ -54,6 +57,9 @@ def admin_login():
 
 @admin_bp.route('/logout')
 def admin_logout():
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+
     """Admin logout"""
     if 'admin' in session:
         log_admin_action('logout', session['admin']['usuario'], 'Logout realizado')

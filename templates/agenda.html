@@ -125,7 +125,7 @@
                                     <ul class="dropdown-menu dropdown-menu-dark">
                                         <li>
                                             <button class="dropdown-item" 
-                                                    onclick="editarAgendamento({{ agendamento.id }}, '{{ agendamento.data }}', '{{ agendamento.paciente }}', '{{ agendamento.motivo or '' }}')">
+                                                    >
                                                 <i class="fas fa-edit me-2"></i>Editar
                                             </button>
                                         </li>
@@ -135,7 +135,7 @@
                                                   style="display: inline;">
                                                 <button type="submit" 
                                                         class="dropdown-item text-danger"
-                                                        onclick="return confirm('Tem certeza que deseja excluir este agendamento?')">
+                                                        >
                                                     <i class="fas fa-trash me-2"></i>Excluir
                                                 </button>
                                             </form>
@@ -209,27 +209,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-function editarAgendamento(id, data, paciente, motivo) {
-    document.getElementById('edit_data').value = data;
-    document.getElementById('edit_paciente').value = paciente;
-    document.getElementById('edit_motivo').value = motivo;
-    document.getElementById('editForm').action = '/agenda/editar/' + id;
-    
-    const modal = new bootstrap.Modal(document.getElementById('editModal'));
-    modal.show();
-}
 
-// Add hover effects to appointment cards
-document.querySelectorAll('.appointment-card').forEach(card => {
-    card.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-5px)';
-        this.style.transition = 'all 0.3s ease';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0)';
-    });
-});
-</script>
 {% endblock %}

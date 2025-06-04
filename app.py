@@ -1,13 +1,18 @@
 import os
 import logging
-from flask import Flask, request
+from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import timedelta
+from collections import defaultdict
+from time import time
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Rate limiting storage
+request_counts = defaultdict(list)
 
 class Base(DeclarativeBase):
     pass
@@ -19,15 +24,11 @@ def create_app():
     app = Flask(__name__)
     
     # Configuration
-    app.secret_key = os.environ.get("SESSION_SECRET", "vidah-medical-system-2024")
+    app.secret_key = os.environ.get("SESSION_SECRET", "your-secret-key-here")
     app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     
     # Database configuration
-    database_url = os.environ.get("DATABASE_URL", "sqlite:///vidah_medical.db")
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-    
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
     app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         "pool_recycle": 300,
         "pool_pre_ping": True,
@@ -42,6 +43,27 @@ def create_app():
     
     # Initialize extensions
     db.init_app(app)
+    
+    # Rate limiting middleware
+    @app.before_request
+    def rate_limit():
+        """Simple rate limiting"""
+        if request.endpoint == 'static':
+            return
+        
+        client_ip = request.remote_addr
+        current_time = time()
+        
+        # Clean old requests (older than 1 minute)
+        request_counts[client_ip] = [req_time for req_time in request_counts[client_ip] 
+                                    if current_time - req_time < 60]
+        
+        # Add current request
+        request_counts[client_ip].append(current_time)
+        
+        # Check if exceeded limit (100 requests per minute)
+        if len(request_counts[client_ip]) > 100:
+            abort(429)  # Too Many Requests
     
     # Security headers
     @app.after_request
@@ -72,7 +94,6 @@ def create_app():
     from routes.relatorios import relatorios_bp
     from routes.estatisticas_neurais import estatisticas_neurais_bp
     from routes.admin import admin_bp
-    from routes.monitoring import monitoring_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -92,31 +113,45 @@ def create_app():
     app.register_blueprint(relatorios_bp)
     app.register_blueprint(estatisticas_neurais_bp)
     app.register_blueprint(admin_bp)
-    app.register_blueprint(monitoring_bp)
-    
-    # Create tables
-    with app.app_context():
-        import models
-        db.create_all()
-        
-        # Initialize database with sample data if needed
-        from utils.db import init_database
-        init_database()
-        
-        # Log backup scheduler startup
-        logging.info("Automatic backup scheduler started")
-    
-    # Root redirect
-    @app.route('/')
-    def index():
-        from flask import redirect, url_for, session
-        if 'usuario' in session:
-            return redirect(url_for('dashboard.dashboard'))
-        return redirect(url_for('auth.login'))
     
 
+@app.after_request
+def add_cache_headers(response):
+    """Add cache headers for static resources"""
+    if request.endpoint == 'static':
+        response.headers['Cache-Control'] = 'public, max-age=31536000'
+        response.headers['Expires'] = '31536000'
+    return response
+
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found(error):
+        return "Página não encontrada", 404
+    
+    @app.errorhandler(429)
+    def rate_limit_exceeded(error):
+        return "Muitas solicitações. Tente novamente em alguns minutos.", 429
+    
+    @app.errorhandler(500)
+    def internal_error(error):
+        return "Erro interno do servidor", 500
     
     return app
 
 # Create app instance
 app = create_app()
+
+with app.app_context():
+    # Import models to ensure tables are created
+    import models
+    db.create_all()
+    
+    # Start backup scheduler
+    try:
+        from utils.scheduler import start_backup_scheduler
+        start_backup_scheduler()
+        logging.info("Automatic backup scheduler started")
+    except ImportError:
+        logging.warning("Backup scheduler not available")
+    except Exception as e:
+        logging.warning(f"Could not start backup scheduler: {e}")

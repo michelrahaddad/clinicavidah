@@ -12,6 +12,9 @@ recovery_tokens = {}
 
 @password_recovery_bp.route('/esqueci-senha', methods=['GET', 'POST'])
 def forgot_password():
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+
     """Handle password recovery request"""
     if request.method == 'POST':
         try:
@@ -50,6 +53,9 @@ def forgot_password():
 
 @password_recovery_bp.route('/redefinir-senha/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+
     """Reset password with token"""
     # Verificar se token é válido
     if token not in recovery_tokens:

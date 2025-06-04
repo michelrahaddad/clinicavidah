@@ -244,52 +244,9 @@
     </div>
 </div>
 
-<script>
-// Auto-focus on patient name input
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('nome_paciente').focus();
-    
-    // Add some visual feedback
-    const form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>CADASTRANDO...';
-        submitBtn.disabled = true;
-    });
-});
-</script>
+
 {% endblock %}
 
 {% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // CPF formatting
-    const cpfInput = document.getElementById('cpf_paciente');
-    if (cpfInput) {
-        cpfInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            value = value.replace(/(\d{3})(\d)/, '$1.$2');
-            value = value.replace(/(\d{3})(\d)/, '$1.$2');
-            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-            e.target.value = value;
-        });
-    }
-    
-    // Phone formatting
-    const phoneInput = document.getElementById('telefone_paciente');
-    if (phoneInput) {
-        phoneInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length >= 11) {
-                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-            } else if (value.length >= 6) {
-                value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
-            } else if (value.length >= 2) {
-                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
-            }
-            e.target.value = value;
-        });
-    }
-});
-</script>
+
 {% endblock %}

@@ -462,7 +462,7 @@
                         <button type="submit" class="btn btn-search btn-modern">
                             <i class="fas fa-search me-2"></i>Buscar
                         </button>
-                        <button type="button" class="btn btn-clear btn-modern" onclick="clearFilters()">
+                        <button type="button" class="btn btn-clear btn-modern" >
                             <i class="fas fa-times me-2"></i>Limpar
                         </button>
                     </div>
@@ -506,7 +506,7 @@
                                 <div class="d-flex flex-wrap gap-2 align-items-center">
                                     {% if grupo.contadores.receita > 0 %}
                                         <div class="document-counter-badge" 
-                                             onclick="showDocumentDetails('{{ grupo.nome_paciente }}', '{{ grupo.data }}', 'receita')"
+                                             
                                              title="{{ grupo.contadores.receita }} Receita(s)">
                                             <i class="fas fa-pills"></i>
                                             <span class="counter">{{ grupo.contadores.receita }}</span>
@@ -515,7 +515,7 @@
                                     
                                     {% if grupo.contadores.exame_lab > 0 %}
                                         <div class="document-counter-badge lab" 
-                                             onclick="showDocumentDetails('{{ grupo.nome_paciente }}', '{{ grupo.data }}', 'exame_lab')"
+                                             
                                              title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratoriais">
                                             <i class="fas fa-flask"></i>
                                             <span class="counter">{{ grupo.contadores.exame_lab }}</span>
@@ -524,7 +524,7 @@
                                     
                                     {% if grupo.contadores.exame_img > 0 %}
                                         <div class="document-counter-badge img" 
-                                             onclick="showDocumentDetails('{{ grupo.nome_paciente }}', '{{ grupo.data }}', 'exame_img')"
+                                             
                                              title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
                                             <i class="fas fa-x-ray"></i>
                                             <span class="counter">{{ grupo.contadores.exame_img }}</span>
@@ -533,7 +533,7 @@
                                     
                                     {% if grupo.contadores.relatorio > 0 %}
                                         <div class="document-counter-badge relatorio" 
-                                             onclick="showDocumentDetails('{{ grupo.nome_paciente }}', '{{ grupo.data }}', 'relatorio')"
+                                             
                                              title="{{ grupo.contadores.relatorio }} Relatório(s)">
                                             <i class="fas fa-file-medical"></i>
                                             <span class="counter">{{ grupo.contadores.relatorio }}</span>
@@ -542,7 +542,7 @@
                                     
                                     {% if grupo.contadores.atestado > 0 %}
                                         <div class="document-counter-badge atestado" 
-                                             onclick="showDocumentDetails('{{ grupo.nome_paciente }}', '{{ grupo.data }}', 'atestado')"
+                                             
                                              title="{{ grupo.contadores.atestado }} Atestado(s)">
                                             <i class="fas fa-certificate"></i>
                                             <span class="counter">{{ grupo.contadores.atestado }}</span>
@@ -551,7 +551,7 @@
                                     
                                     {% if grupo.contadores.alto_custo > 0 %}
                                         <div class="document-counter-badge alto-custo" 
-                                             onclick="showDocumentDetails('{{ grupo.nome_paciente }}', '{{ grupo.data }}', 'alto_custo')"
+                                             
                                              title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
                                             <i class="fas fa-dollar-sign"></i>
                                             <span class="counter">{{ grupo.contadores.alto_custo }}</span>
@@ -562,7 +562,7 @@
                             <td>{{ grupo.medico_nome }}</td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary" 
-                                        onclick="showAllDocuments('{{ grupo.nome_paciente }}', '{{ grupo.data }}')"
+                                        
                                         title="Ver todos os documentos">
                                     <i class="fas fa-eye"></i> Ver Detalhes
                                 </button>
@@ -584,152 +584,7 @@
         {% endif %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Autocomplete functionality
-        let currentFocus = -1;
-        let debounceTimer;
-        
-        const searchInput = document.getElementById('busca_paciente');
-        const suggestionsContainer = document.getElementById('suggestions');
-        
-        searchInput.addEventListener('input', function() {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
-                const term = this.value.trim();
-                
-                if (term.length < 2) {
-                    hideSuggestions();
-                    return;
-                }
-                
-                fetch(`/prontuario/api/autocomplete_pacientes?term=${encodeURIComponent(term)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        showSuggestions(data.suggestions);
-                    })
-                    .catch(error => {
-                        console.error('Autocomplete error:', error);
-                        hideSuggestions();
-                    });
-            }, 300);
-        });
-        
-        searchInput.addEventListener('keydown', function(e) {
-            const suggestions = suggestionsContainer.querySelectorAll('.autocomplete-suggestion');
-            
-            if (e.keyCode === 40) { // Down arrow
-                e.preventDefault();
-                currentFocus++;
-                addActive(suggestions);
-            } else if (e.keyCode === 38) { // Up arrow
-                e.preventDefault();
-                currentFocus--;
-                addActive(suggestions);
-            } else if (e.keyCode === 13) { // Enter
-                e.preventDefault();
-                if (currentFocus > -1 && suggestions[currentFocus]) {
-                    suggestions[currentFocus].click();
-                }
-            } else if (e.keyCode === 27) { // Escape
-                hideSuggestions();
-            }
-        });
-        
-        function showSuggestions(suggestions) {
-            suggestionsContainer.innerHTML = '';
-            currentFocus = -1;
-            
-            if (suggestions.length === 0) {
-                hideSuggestions();
-                return;
-            }
-            
-            suggestions.forEach(suggestion => {
-                const div = document.createElement('div');
-                div.className = 'autocomplete-suggestion';
-                div.textContent = suggestion;
-                div.addEventListener('click', function() {
-                    searchInput.value = suggestion;
-                    hideSuggestions();
-                    // Trigger search automatically
-                    document.getElementById('searchForm').submit();
-                });
-                suggestionsContainer.appendChild(div);
-            });
-            
-            suggestionsContainer.style.display = 'block';
-        }
-        
-        function hideSuggestions() {
-            suggestionsContainer.style.display = 'none';
-            currentFocus = -1;
-        }
-        
-        function addActive(suggestions) {
-            if (!suggestions) return false;
-            removeActive(suggestions);
-            
-            if (currentFocus >= suggestions.length) currentFocus = 0;
-            if (currentFocus < 0) currentFocus = suggestions.length - 1;
-            
-            if (suggestions[currentFocus]) {
-                suggestions[currentFocus].classList.add('selected');
-            }
-        }
-        
-        function removeActive(suggestions) {
-            for (let i = 0; i < suggestions.length; i++) {
-                suggestions[i].classList.remove('selected');
-            }
-        }
-        
-        // Hide suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.autocomplete-container')) {
-                hideSuggestions();
-            }
-        });
-        
-        // Clear filters function
-        function clearFilters() {
-            document.getElementById('busca_paciente').value = '';
-            document.getElementById('filtro_tipo').value = '';
-            document.getElementById('filtro_data_inicio').value = '';
-            document.getElementById('filtro_data_fim').value = '';
-            hideSuggestions();
-            // Redirect to clear URL parameters
-            window.location.href = '/prontuario';
-        }
-        
-        // Auto-search when typing (with debounce)
-        searchInput.addEventListener('input', function() {
-            clearTimeout(window.autoSearchTimer);
-            window.autoSearchTimer = setTimeout(() => {
-                if (this.value.trim().length >= 3) {
-                    document.getElementById('loadingSpinner').style.display = 'block';
-                    document.getElementById('searchForm').submit();
-                }
-            }, 1000);
-        });
-        
-        // Show loading on form submit
-        document.getElementById('searchForm').addEventListener('submit', function() {
-            document.getElementById('loadingSpinner').style.display = 'block';
-        });
-
-        // Document counter badge functionality
-        function showDocumentDetails(paciente, data, tipo) {
-            // Navigate to detailed organized view for specific document type
-            const url = `/prontuario/detalhes?paciente=${encodeURIComponent(paciente)}&data=${encodeURIComponent(data)}&tipo=${encodeURIComponent(tipo)}`;
-            window.location.href = url;
-        }
-
-        function showAllDocuments(paciente, data) {
-            // Navigate to detailed organized view for all documents of this patient and date
-            const url = `/prontuario/detalhes?paciente=${encodeURIComponent(paciente)}&data=${encodeURIComponent(data)}`;
-            window.location.href = url;
-        }
-    </script>
+    
+    
 </body>
 </html>

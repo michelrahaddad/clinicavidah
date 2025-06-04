@@ -243,7 +243,7 @@
 
         <div class="p-3">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <button onclick="history.back()" class="btn btn-back">
+                <button  class="btn btn-back">
                     <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
                 </button>
                 
@@ -316,11 +316,11 @@
                        class="btn btn-action btn-pdf" target="_blank">
                         <i class="fas fa-file-pdf me-1"></i>PDF Original
                     </a>
-                    <button onclick="reprintWithCurrentDate('receita', {{ receita.id_registro }})" 
+                    <button  
                             class="btn btn-action btn-reprint">
                         <i class="fas fa-print me-1"></i>Reimprimir Hoje
                     </button>
-                    <button onclick="editDate('receita', {{ receita.id_registro }}, '{{ receita.data }}')" 
+                    <button  
                             class="btn btn-action btn-date">
                         <i class="fas fa-calendar me-1"></i>Alterar Data
                     </button>
@@ -358,11 +358,11 @@
                        class="btn btn-action btn-pdf" target="_blank">
                         <i class="fas fa-file-pdf me-1"></i>PDF Original
                     </a>
-                    <button onclick="reprintWithCurrentDate('exame_lab', {{ exame.id_registro }})" 
+                    <button  
                             class="btn btn-action btn-reprint">
                         <i class="fas fa-print me-1"></i>Reimprimir Hoje
                     </button>
-                    <button onclick="editDate('exame_lab', {{ exame.id_registro }}, '{{ exame.data }}')" 
+                    <button  
                             class="btn btn-action btn-date">
                         <i class="fas fa-calendar me-1"></i>Alterar Data
                     </button>
@@ -400,11 +400,11 @@
                        class="btn btn-action btn-pdf" target="_blank">
                         <i class="fas fa-file-pdf me-1"></i>PDF Original
                     </a>
-                    <button onclick="reprintWithCurrentDate('exame_img', {{ exame.id_registro }})" 
+                    <button  
                             class="btn btn-action btn-reprint">
                         <i class="fas fa-print me-1"></i>Reimprimir Hoje
                     </button>
-                    <button onclick="editDate('exame_img', {{ exame.id_registro }}, '{{ exame.data }}')" 
+                    <button  
                             class="btn btn-action btn-date">
                         <i class="fas fa-calendar me-1"></i>Alterar Data
                     </button>
@@ -513,58 +513,7 @@
         {% endif %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function reprintWithCurrentDate(tipo, id) {
-            if (confirm('Deseja reimprimir este documento com a data atual?')) {
-                let url = '';
-                switch(tipo) {
-                    case 'receita':
-                        url = `/receita/reimprimir/${id}`;
-                        break;
-                    case 'exame_lab':
-                        url = `/exames_lab/reimprimir/${id}`;
-                        break;
-                    case 'exame_img':
-                        url = `/exames_img/reimprimir/${id}`;
-                        break;
-                }
-                if (url) {
-                    window.open(url, '_blank');
-                }
-            }
-        }
-
-        function editDate(tipo, id, currentDate) {
-            const newDate = prompt('Digite a nova data (YYYY-MM-DD):', currentDate);
-            if (newDate && newDate !== currentDate) {
-                if (confirm(`Alterar data de ${currentDate} para ${newDate}?`)) {
-                    fetch(`/prontuario/api/update_date`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            tipo: tipo,
-                            id: id,
-                            nova_data: newDate
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert('Data alterada com sucesso!');
-                            location.reload();
-                        } else {
-                            alert('Erro ao alterar data: ' + data.error);
-                        }
-                    })
-                    .catch(error => {
-                        alert('Erro na comunicação: ' + error);
-                    });
-                }
-            }
-        }
-    </script>
+    
+    
 </body>
 </html>

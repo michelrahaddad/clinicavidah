@@ -429,7 +429,7 @@ def prontuario_detalhes():
             
             for relatorio in relatorios:
                 try:
-                    cid_desc = str(relatorio.cid_descricao) if relatorio.cid_descricao else ''
+                    cid_desc = str(relatorio.cid_descricao) if hasattr(relatorio, 'cid_descricao') and relatorio.cid_descricao else ''
                 except:
                     cid_desc = ''
                 detalhes = f"CID: {relatorio.cid_codigo} - {cid_desc[:50]}{'...' if len(cid_desc) > 50 else ''}"
