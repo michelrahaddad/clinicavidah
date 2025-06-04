@@ -363,21 +363,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Configurar botão de adicionar exame personalizado
+    // Debug completo do sistema de exames personalizados
+    console.log('=== DEBUG SISTEMA EXAMES PERSONALIZADOS ===');
+    
     const btnAdicionarExame = document.getElementById('btnAdicionarExame');
+    const campoNome = document.getElementById('nomeNovoExame');
+    const campoCategoria = document.getElementById('categoriaNovoExame');
+    const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
+    const modalExames = document.getElementById('modalExamesPersonalizados');
+    
+    console.log('Botão encontrado:', btnAdicionarExame);
+    console.log('Campo nome encontrado:', campoNome);
+    console.log('Campo categoria encontrado:', campoCategoria);
+    console.log('Container encontrado:', containerPersonalizados);
+    console.log('Modal encontrado:', modalExames);
+    
     if (btnAdicionarExame) {
-        btnAdicionarExame.addEventListener('click', function() {
-            const nomeExame = document.getElementById('nomeNovoExame').value.trim();
+        btnAdicionarExame.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('=== CLIQUE NO BOTÃO DETECTADO ===');
+            
+            const nomeExame = campoNome ? campoNome.value.trim() : '';
+            console.log('Nome do exame:', nomeExame);
             
             if (!nomeExame) {
                 alert('Por favor, digite o nome do exame.');
                 return;
             }
             
-            // Criar novo exame na seção de Exames Personalizados
-            const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
-            
             if (containerPersonalizados) {
+                console.log('Container encontrado, adicionando exame...');
+                
                 const timestamp = Date.now();
                 const novoExameDiv = document.createElement('div');
                 novoExameDiv.className = 'col-12 mb-2';
@@ -393,26 +409,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 
                 containerPersonalizados.appendChild(novoExameDiv);
+                console.log('Exame adicionado ao DOM');
                 
-                // Limpar campos do modal
-                document.getElementById('nomeNovoExame').value = '';
-                document.getElementById('categoriaNovoExame').value = '';
+                // Limpar campos
+                if (campoNome) campoNome.value = '';
+                if (campoCategoria) campoCategoria.value = '';
+                console.log('Campos limpos');
                 
-                // Fechar o modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
-                if (modal) {
-                    modal.hide();
+                // Fechar modal
+                try {
+                    const modal = bootstrap.Modal.getInstance(modalExames);
+                    if (modal) {
+                        modal.hide();
+                        console.log('Modal fechado');
+                    }
+                } catch (error) {
+                    console.error('Erro ao fechar modal:', error);
                 }
                 
-                // Rolar para o exame adicionado
+                // Scroll suave
                 setTimeout(() => {
                     novoExameDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 500);
+                    console.log('Scroll executado');
+                }, 300);
                 
                 alert(`Exame "${nomeExame}" adicionado com sucesso!`);
+                console.log('=== PROCESSO CONCLUÍDO ===');
+                
             } else {
+                console.error('Container não encontrado!');
                 alert('Erro: Container de exames personalizados não encontrado.');
             }
+        });
+        
+        console.log('Event listener adicionado ao botão');
+    } else {
+        console.error('Botão não encontrado!');
+    }
+    
+    // Adicionar evento ao modal para debug
+    if (modalExames) {
+        modalExames.addEventListener('shown.bs.modal', function() {
+            console.log('Modal de exames personalizados aberto');
+            if (campoNome) campoNome.focus();
         });
     }
     
