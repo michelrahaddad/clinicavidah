@@ -114,6 +114,32 @@ def create_app():
             return redirect(url_for('dashboard.dashboard'))
         return redirect(url_for('auth.login'))
     
+    # PDF download route to bypass Chrome blocking
+    @app.route('/download_pdf')
+    def download_pdf():
+        from flask import session, make_response, redirect, url_for
+        import weasyprint
+        
+        if 'pdf_temp' not in session:
+            return redirect(url_for('dashboard.dashboard'))
+        
+        pdf_data = session.pop('pdf_temp')
+        
+        try:
+            pdf_file = weasyprint.HTML(string=pdf_data['html'], base_url=request.url_root).write_pdf()
+            
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'inline; filename={pdf_data["filename"]}'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            return response
+            
+        except Exception as e:
+            return redirect(url_for('dashboard.dashboard'))
+    
     return app
 
 # Create app instance
