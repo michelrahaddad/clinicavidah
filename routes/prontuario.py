@@ -280,8 +280,10 @@ def autocomplete_pacientes():
         # Sort and limit to 8 suggestions
         suggestions = sorted(list(all_names))[:8]
         
-        return {'suggestions': suggestions}
+        from flask import jsonify
+        return jsonify({'suggestions': suggestions})
         
     except Exception as e:
         logging.error(f"Autocomplete error: {str(e)}")
-        return {'suggestions': []}
+        from flask import jsonify
+        return jsonify({'suggestions': []})
