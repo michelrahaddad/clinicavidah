@@ -301,8 +301,8 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
 <script>
-// Função global para adicionar exame personalizado
-function adicionarExamePersonalizado() {
+// Declarar função no escopo global antes do DOM carregar
+window.adicionarExamePersonalizado = function() {
     const nomeExame = document.getElementById('nomeNovoExame').value.trim();
     const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
     
@@ -367,52 +367,53 @@ document.addEventListener('DOMContentLoaded', function() {
         dataExame.value = hoje;
     }
     
-    // Configurar busca de exames
+    // Configurar busca de exames - versão simplificada e funcional
     const buscarExame = document.getElementById('buscarExame');
     if (buscarExame) {
         buscarExame.addEventListener('input', function() {
-            const termo = this.value.toLowerCase();
+            const termo = this.value.toLowerCase().trim();
             console.log('Buscando por:', termo);
             
-            // Buscar em todas as labels de exames
-            const allLabels = document.querySelectorAll('.form-check-label');
+            // Selecionar todos os checkboxes de exames
+            const allFormChecks = document.querySelectorAll('.form-check');
+            let totalVisible = 0;
             
-            allLabels.forEach(label => {
-                const texto = label.textContent.toLowerCase();
-                const formCheck = label.closest('.form-check');
-                const colContainer = label.closest('.col-12, .col-md-4, .col-sm-6');
-                
-                if (texto.includes(termo) || termo === '') {
-                    if (formCheck) formCheck.style.display = 'block';
-                    if (colContainer) colContainer.style.display = 'block';
-                } else {
-                    if (formCheck) formCheck.style.display = 'none';
-                    if (colContainer) colContainer.style.display = 'none';
+            allFormChecks.forEach(formCheck => {
+                const label = formCheck.querySelector('.form-check-label');
+                if (label) {
+                    const texto = label.textContent.toLowerCase();
+                    
+                    if (termo === '' || texto.includes(termo)) {
+                        formCheck.style.display = 'block';
+                        totalVisible++;
+                    } else {
+                        formCheck.style.display = 'none';
+                    }
                 }
             });
             
-            // Mostrar/ocultar seções inteiras baseado na busca
-            const sections = document.querySelectorAll('.col-md-6');
-            sections.forEach(section => {
-                const visibleChecks = section.querySelectorAll('.form-check:not([style*="display: none"])');
-                const sectionTitle = section.querySelector('h6');
-                
-                if (termo && visibleChecks.length === 0) {
-                    section.style.display = 'none';
-                } else {
+            // Mostrar resultado da busca no console
+            console.log(`Encontrados ${totalVisible} exames com "${termo}"`);
+            
+            // Resetar display de todas as seções quando não há busca
+            if (termo === '') {
+                const allSections = document.querySelectorAll('.col-md-6, .card');
+                allSections.forEach(section => {
                     section.style.display = 'block';
-                }
-            });
-            
-            // Verificar card principal de exames cardiológicos
-            const cardioCard = document.querySelector('.card.glass-card[style*="border: 2px solid #dc3545"]');
-            if (cardioCard) {
-                const visibleCardioChecks = cardioCard.querySelectorAll('.form-check:not([style*="display: none"])');
-                if (termo && visibleCardioChecks.length === 0) {
-                    cardioCard.style.display = 'none';
-                } else {
-                    cardioCard.style.display = 'block';
-                }
+                });
+            }
+        });
+        
+        // Adicionar evento para limpar busca quando campo estiver vazio
+        buscarExame.addEventListener('keyup', function(e) {
+            if (e.key === 'Escape' || this.value === '') {
+                this.value = '';
+                // Mostrar todos os exames
+                const allFormChecks = document.querySelectorAll('.form-check');
+                allFormChecks.forEach(formCheck => {
+                    formCheck.style.display = 'block';
+                });
+                console.log('Busca limpa - mostrando todos os exames');
             }
         });
     }
