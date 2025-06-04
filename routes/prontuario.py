@@ -227,7 +227,7 @@ def prontuario():
                     logging.warning(f"Error processing high cost form {formulario.id}: {e}")
                     continue
         
-        # Group results by patient and date
+        # Group results by patient and date with counters
         grupos = {}
         for resultado in resultados:
             key = f"{resultado['nome_paciente']}|{resultado['data']}"
@@ -236,9 +236,27 @@ def prontuario():
                     'nome_paciente': resultado['nome_paciente'],
                     'data': resultado['data'],
                     'medico_nome': resultado['medico_nome'],
-                    'documentos': []
+                    'contadores': {
+                        'receita': 0,
+                        'exame_lab': 0,
+                        'exame_img': 0,
+                        'relatorio': 0,
+                        'atestado': 0,
+                        'alto_custo': 0
+                    },
+                    'documentos': {
+                        'receita': [],
+                        'exame_lab': [],
+                        'exame_img': [],
+                        'relatorio': [],
+                        'atestado': [],
+                        'alto_custo': []
+                    }
                 }
-            grupos[key]['documentos'].append(resultado)
+            
+            tipo = resultado['tipo']
+            grupos[key]['contadores'][tipo] += 1
+            grupos[key]['documentos'][tipo].append(resultado)
         
         # Convert to list and sort by date (newest first)
         resultados_agrupados = list(grupos.values())
