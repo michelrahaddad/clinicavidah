@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Prontuário - {{ paciente_nome }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 1200px;
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .patient-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .document-section {
+            margin: 2rem;
+            padding: 1.5rem;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            background: #f8f9fa;
+        }
+
+        .document-section.receita {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #f8fff9, #e8f5e8);
+        }
+
+        .document-section.exame-lab {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #f8fcff, #e3f2fd);
+        }
+
+        .document-section.exame-img {
+            border-color: #fd7e14;
+            background: linear-gradient(135deg, #fff8f0, #ffeaa7);
+        }
+
+        .document-section.relatorio {
+            border-color: #6f42c1;
+            background: linear-gradient(135deg, #faf7ff, #f3e5f5);
+        }
+
+        .document-section.atestado {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fffdf0, #fff3cd);
+        }
+
+        .document-section.alto-custo {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #fff8f8, #f8d7da);
+        }
+
+        .document-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .document-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .document-content {
+            font-size: 0.9rem;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-action {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            border: none;
+            color: white;
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            border: none;
+            color: white;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .icon-receita { background: linear-gradient(135deg, #28a745, #20c997); }
+        .icon-lab { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .icon-img { background: linear-gradient(135deg, #fd7e14, #e55a00); }
+        .icon-relatorio { background: linear-gradient(135deg, #6f42c1, #563d7c); }
+        .icon-atestado { background: linear-gradient(135deg, #ffc107, #e0a800); }
+        .icon-alto-custo { background: linear-gradient(135deg, #dc3545, #c82333); }
+
+        .empty-section {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header-section">
+            <h1><i class="fas fa-file-medical-alt me-3"></i>Prontuário Detalhado</h1>
+            <div class="patient-info">
+                <h3>{{ paciente_nome }}</h3>
+                <p><i class="fas fa-calendar me-2"></i>Data: {{ data_formatada }}</p>
+                <p><i class="fas fa-user-md me-2"></i>Médico: {{ medico_nome }}</p>
+            </div>
+        </div>
+
+        <div class="p-3">
+            <button onclick="history.back()" class="btn btn-back mb-4">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
+            </button>
+        </div>
+
+        <!-- Receitas -->
+        {% if documentos.receita %}
+        <div class="document-section receita">
+            <div class="section-title">
+                <div class="section-icon icon-receita">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <span>Receitas ({{ documentos.receita|length }})</span>
+            </div>
+            {% for receita in documentos.receita %}
+            <div class="document-item">
+                <div class="document-header">
+                    <span><i class="fas fa-pills me-2"></i>Receita #{{ receita.id_registro }}</span>
+                    <small class="text-muted">{{ receita.data }}</small>
+                </div>
+                <div class="document-content">
+                    <strong>Medicamentos:</strong><br>
+                    {{ receita.detalhes_registro }}
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('receita.receita') }}?edit_id={{ receita.id_registro }}" 
+                       class="btn btn-action btn-edit">
+                        <i class="fas fa-edit me-1"></i>Editar
+                    </a>
+                    <a href="{{ url_for('receita.gerar_pdf_receita', receita_id=receita.id_registro) }}" 
+                       class="btn btn-action btn-pdf" target="_blank">
+                        <i class="fas fa-file-pdf me-1"></i>PDF
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Exames Laboratoriais -->
+        {% if documentos.exame_lab %}
+        <div class="document-section exame-lab">
+            <div class="section-title">
+                <div class="section-icon icon-lab">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <span>Exames Laboratoriais ({{ documentos.exame_lab|length }})</span>
+            </div>
+            {% for exame in documentos.exame_lab %}
+            <div class="document-item">
+                <div class="document-header">
+                    <span><i class="fas fa-flask me-2"></i>Exame Lab #{{ exame.id_registro }}</span>
+                    <small class="text-muted">{{ exame.data }}</small>
+                </div>
+                <div class="document-content">
+                    <strong>Exames:</strong><br>
+                    {{ exame.detalhes_registro }}
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('exames_lab.exames_lab') }}?edit_id={{ exame.id_registro }}" 
+                       class="btn btn-action btn-edit">
+                        <i class="fas fa-edit me-1"></i>Editar
+                    </a>
+                    <a href="{{ url_for('exames_lab.gerar_pdf_exame_lab', exame_id=exame.id_registro) }}" 
+                       class="btn btn-action btn-pdf" target="_blank">
+                        <i class="fas fa-file-pdf me-1"></i>PDF
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Exames de Imagem -->
+        {% if documentos.exame_img %}
+        <div class="document-section exame-img">
+            <div class="section-title">
+                <div class="section-icon icon-img">
+                    <i class="fas fa-x-ray"></i>
+                </div>
+                <span>Exames de Imagem ({{ documentos.exame_img|length }})</span>
+            </div>
+            {% for exame in documentos.exame_img %}
+            <div class="document-item">
+                <div class="document-header">
+                    <span><i class="fas fa-x-ray me-2"></i>Exame Img #{{ exame.id_registro }}</span>
+                    <small class="text-muted">{{ exame.data }}</small>
+                </div>
+                <div class="document-content">
+                    <strong>Exames:</strong><br>
+                    {{ exame.detalhes_registro }}
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('exames_img.exames_img') }}?edit_id={{ exame.id_registro }}" 
+                       class="btn btn-action btn-edit">
+                        <i class="fas fa-edit me-1"></i>Editar
+                    </a>
+                    <a href="{{ url_for('exames_img.gerar_pdf_exame_img', exame_id=exame.id_registro) }}" 
+                       class="btn btn-action btn-pdf" target="_blank">
+                        <i class="fas fa-file-pdf me-1"></i>PDF
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Relatórios -->
+        {% if documentos.relatorio %}
+        <div class="document-section relatorio">
+            <div class="section-title">
+                <div class="section-icon icon-relatorio">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <span>Relatórios Médicos ({{ documentos.relatorio|length }})</span>
+            </div>
+            {% for relatorio in documentos.relatorio %}
+            <div class="document-item">
+                <div class="document-header">
+                    <span><i class="fas fa-file-medical me-2"></i>Relatório #{{ relatorio.id_registro }}</span>
+                    <small class="text-muted">{{ relatorio.data }}</small>
+                </div>
+                <div class="document-content">
+                    <strong>Diagnóstico:</strong><br>
+                    {{ relatorio.detalhes_registro }}
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('relatorios.relatorios') }}" 
+                       class="btn btn-action btn-edit">
+                        <i class="fas fa-arrow-right me-1"></i>Ir para Relatórios
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Atestados -->
+        {% if documentos.atestado %}
+        <div class="document-section atestado">
+            <div class="section-title">
+                <div class="section-icon icon-atestado">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <span>Atestados Médicos ({{ documentos.atestado|length }})</span>
+            </div>
+            {% for atestado in documentos.atestado %}
+            <div class="document-item">
+                <div class="document-header">
+                    <span><i class="fas fa-certificate me-2"></i>Atestado #{{ atestado.id_registro }}</span>
+                    <small class="text-muted">{{ atestado.data }}</small>
+                </div>
+                <div class="document-content">
+                    <strong>Atestado:</strong><br>
+                    {{ atestado.detalhes_registro }}
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('atestados.atestados') }}" 
+                       class="btn btn-action btn-edit">
+                        <i class="fas fa-arrow-right me-1"></i>Ir para Atestados
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Alto Custo -->
+        {% if documentos.alto_custo %}
+        <div class="document-section alto-custo">
+            <div class="section-title">
+                <div class="section-icon icon-alto-custo">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <span>Formulários Alto Custo ({{ documentos.alto_custo|length }})</span>
+            </div>
+            {% for formulario in documentos.alto_custo %}
+            <div class="document-item">
+                <div class="document-header">
+                    <span><i class="fas fa-dollar-sign me-2"></i>Alto Custo #{{ formulario.id_registro }}</span>
+                    <small class="text-muted">{{ formulario.data }}</small>
+                </div>
+                <div class="document-content">
+                    <strong>Medicamento:</strong><br>
+                    {{ formulario.detalhes_registro }}
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('alto_custo.alto_custo') }}" 
+                       class="btn btn-action btn-edit">
+                        <i class="fas fa-arrow-right me-1"></i>Ir para Alto Custo
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not documentos.receita and not documentos.exame_lab and not documentos.exame_img and not documentos.relatorio and not documentos.atestado and not documentos.alto_custo %}
+        <div class="empty-section">
+            <i class="fas fa-inbox fa-3x mb-3 text-muted"></i>
+            <h4>Nenhum documento encontrado</h4>
+            <p>Não há documentos para esta data e paciente.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

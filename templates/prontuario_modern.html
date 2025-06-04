@@ -720,14 +720,14 @@
 
         // Document counter badge functionality
         function showDocumentDetails(paciente, data, tipo) {
-            // Navigate to filtered view for specific document type
-            const url = `/prontuario?busca_paciente=${encodeURIComponent(paciente)}&data_inicio=${encodeURIComponent(data)}&data_fim=${encodeURIComponent(data)}&tipo=${encodeURIComponent(tipo)}`;
+            // Navigate to detailed organized view for specific document type
+            const url = `/prontuario/detalhes?paciente=${encodeURIComponent(paciente)}&data=${encodeURIComponent(data)}&tipo=${encodeURIComponent(tipo)}`;
             window.location.href = url;
         }
 
         function showAllDocuments(paciente, data) {
-            // Navigate to filtered view for all documents of this patient and date
-            const url = `/prontuario?busca_paciente=${encodeURIComponent(paciente)}&data_inicio=${encodeURIComponent(data)}&data_fim=${encodeURIComponent(data)}`;
+            // Navigate to detailed organized view for all documents of this patient and date
+            const url = `/prontuario/detalhes?paciente=${encodeURIComponent(paciente)}&data=${encodeURIComponent(data)}`;
             window.location.href = url;
         }
     </script>
