@@ -311,56 +311,6 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
 <script>
-// Função global para adicionar exame personalizado
-function adicionarExamePersonalizado() {
-    const nomeExame = document.getElementById('nomeNovoExame').value.trim();
-    
-    if (!nomeExame) {
-        alert('Por favor, digite o nome do exame.');
-        return;
-    }
-    
-    // Criar novo exame na seção de Exames Personalizados
-    const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
-    
-    if (containerPersonalizados) {
-        const timestamp = Date.now();
-        const novoExameDiv = document.createElement('div');
-        novoExameDiv.className = 'col-12 mb-2';
-        novoExameDiv.innerHTML = `
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="exames[]" 
-                       value="${nomeExame}" 
-                       id="exame_custom_${timestamp}" checked>
-                <label class="form-check-label text-light" for="exame_custom_${timestamp}">
-                    ${nomeExame} <small class="text-muted">(Personalizado)</small>
-                </label>
-            </div>
-        `;
-        
-        containerPersonalizados.appendChild(novoExameDiv);
-        
-        // Limpar campos do modal
-        document.getElementById('nomeNovoExame').value = '';
-        document.getElementById('categoriaNovoExame').value = '';
-        
-        // Fechar o modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
-        if (modal) {
-            modal.hide();
-        }
-        
-        // Rolar para o exame adicionado
-        setTimeout(() => {
-            novoExameDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 500);
-        
-        alert(`Exame "${nomeExame}" adicionado com sucesso!`);
-    } else {
-        alert('Erro: Container de exames personalizados não encontrado.');
-    }
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     // Configurar data atual automaticamente
     const dataExame = document.getElementById('data_exame');
@@ -416,5 +366,63 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Sistema de Exames de Imagem carregado');
     console.log('Busca de exames configurada');
 });
+
+// Função para adicionar exame personalizado
+function adicionarExamePersonalizado() {
+    const nomeExame = document.getElementById('nomeNovoExame').value.trim();
+    const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
+    
+    console.log('Tentando adicionar exame de imagem:', nomeExame, 'categoria:', categoria);
+    
+    if (!nomeExame) {
+        alert('Por favor, digite o nome do exame.');
+        return;
+    }
+    
+    // Fechar o modal primeiro
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalExamesPersonalizados'));
+    if (modal) {
+        modal.hide();
+    }
+    
+    // Aguardar um pouco para o modal fechar completamente
+    setTimeout(() => {
+        // Usar o container existente de exames personalizados
+        const containerPersonalizados = document.getElementById('examesPersonalizadosContainer');
+        
+        if (containerPersonalizados) {
+            const timestamp = Date.now();
+            const novoExameDiv = document.createElement('div');
+            novoExameDiv.className = 'col-12 mb-2';
+            novoExameDiv.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                           value="${nomeExame}" 
+                           id="exame_custom_${timestamp}" checked>
+                    <label class="form-check-label text-light" for="exame_custom_${timestamp}">
+                        ${nomeExame} <small class="text-muted">(Personalizado)</small>
+                    </label>
+                </div>
+            `;
+            containerPersonalizados.appendChild(novoExameDiv);
+            console.log('Exame de imagem adicionado ao container correto:', nomeExame);
+            
+            // Rolar para a seção de exames personalizados
+            const secaoPersonalizados = containerPersonalizados.closest('.col-md-6');
+            if (secaoPersonalizados) {
+                secaoPersonalizados.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        // Limpar campos do modal
+        document.getElementById('nomeNovoExame').value = '';
+        document.getElementById('categoriaNovoExame').value = '';
+        
+        // Mostrar mensagem de sucesso
+        alert(`Exame "${nomeExame}" adicionado com sucesso e já está selecionado!`);
+        
+        console.log('Exame personalizado de imagem adicionado:', nomeExame);
+    }, 300);
+}
 </script>
 {% endblock %}
