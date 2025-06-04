@@ -176,3 +176,17 @@ def gerar_pdf_reimprimir_exame_img(exame):
         logging.error(f'Error generating imaging exam PDF: {e}')
         flash('Erro ao gerar PDF do exame.', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+@exames_img_bp.route('/gerar_pdf_exame_img/<int:exame_id>')
+def gerar_pdf_exame_img(exame_id):
+    """Generate PDF for a specific imaging exam"""
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        exame = ExameImg.query.get_or_404(exame_id)
+        return gerar_pdf_reimprimir_exame_img(exame)
+    except Exception as e:
+        logging.error(f"Error generating imaging exam PDF: {str(e)}")
+        flash('Erro ao gerar PDF do exame de imagem', 'error')
+        return redirect(url_for('prontuario.prontuario'))

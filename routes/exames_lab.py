@@ -179,3 +179,17 @@ def gerar_pdf_reimprimir_exame_lab(exame):
         logging.error(f'Error generating lab exam PDF: {e}')
         flash('Erro ao gerar PDF do exame.', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+@exames_lab_bp.route('/gerar_pdf_exame_lab/<int:exame_id>')
+def gerar_pdf_exame_lab(exame_id):
+    """Generate PDF for a specific lab exam"""
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        exame = ExameLab.query.get_or_404(exame_id)
+        return gerar_pdf_reimprimir_exame_lab(exame)
+    except Exception as e:
+        logging.error(f"Error generating lab exam PDF: {str(e)}")
+        flash('Erro ao gerar PDF do exame laboratorial', 'error')
+        return redirect(url_for('prontuario.prontuario'))
