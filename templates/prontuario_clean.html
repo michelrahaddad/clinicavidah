@@ -99,12 +99,12 @@
                                         <i class="fas fa-file-pdf me-1"></i>PDF
                                     </a>
                                 {% elif resultado.tipo == 'exame_lab' %}
-                                    <a href="{{ url_for('exames_lab.gerar_pdf_exame', exame_id=resultado.id_registro) }}" 
+                                    <a href="{{ url_for('exames_lab.gerar_pdf_exame_lab', exame_id=resultado.id_registro) }}" 
                                        class="btn btn-sm btn-outline-info neural-btn" target="_blank">
                                         <i class="fas fa-file-pdf me-1"></i>PDF
                                     </a>
                                 {% elif resultado.tipo == 'exame_img' %}
-                                    <a href="{{ url_for('exames_img.gerar_pdf_exame', exame_id=resultado.id_registro) }}" 
+                                    <a href="{{ url_for('exames_img.gerar_pdf_exame_img', exame_id=resultado.id_registro) }}" 
                                        class="btn btn-sm btn-outline-info neural-btn" target="_blank">
                                         <i class="fas fa-file-pdf me-1"></i>PDF
                                     </a>

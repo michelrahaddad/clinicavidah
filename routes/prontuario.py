@@ -67,7 +67,11 @@ def prontuario():
                 query = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico)
                 
                 if busca_paciente:
-                    query = query.filter(ExameLab.nome_paciente.ilike(f'%{busca_paciente}%'))
+                    # Split search terms and create flexible search
+                    search_terms = busca_paciente.strip().split()
+                    for term in search_terms:
+                        if len(term) >= 2:  # Only search terms with 2+ characters
+                            query = query.filter(ExameLab.nome_paciente.ilike(f'%{term}%'))
                 
                 if filtro_data_inicio and filtro_data_fim:
                     query = query.filter(ExameLab.data.between(filtro_data_inicio, filtro_data_fim))
@@ -96,7 +100,11 @@ def prontuario():
                 query = db.session.query(ExameImg, Medico.nome.label('medico_nome')).join(Medico)
                 
                 if busca_paciente:
-                    query = query.filter(ExameImg.nome_paciente.ilike(f'%{busca_paciente}%'))
+                    # Split search terms and create flexible search
+                    search_terms = busca_paciente.strip().split()
+                    for term in search_terms:
+                        if len(term) >= 2:  # Only search terms with 2+ characters
+                            query = query.filter(ExameImg.nome_paciente.ilike(f'%{term}%'))
                 
                 if filtro_data_inicio and filtro_data_fim:
                     query = query.filter(ExameImg.data.between(filtro_data_inicio, filtro_data_fim))
