@@ -363,10 +363,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar data atual automaticamente
     const dataExame = document.getElementById('data_exame');
     console.log('Campo de data encontrado:', dataExame);
+    console.log('Valor atual do campo:', dataExame ? dataExame.value : 'campo não encontrado');
+    
     if (dataExame) {
-        const hoje = new Date().toISOString().split('T')[0];
-        dataExame.value = hoje;
-        console.log('Data configurada para:', hoje);
+        // Só preencher se o campo estiver vazio
+        if (!dataExame.value || dataExame.value.trim() === '') {
+            const hoje = new Date().toISOString().split('T')[0];
+            dataExame.value = hoje;
+            console.log('Data configurada automaticamente para:', hoje);
+        } else {
+            console.log('Campo já possui valor:', dataExame.value);
+        }
     } else {
         console.error('Campo data_exame não encontrado!');
     }
