@@ -2,7 +2,7 @@ from sqlalchemy import or_
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response, jsonify
 from utils.db import get_db_connection, insert_patient_if_not_exists
 from utils.forms import validar_medicamentos, sanitizar_entrada
-from models import Medico, Receita, Prontuario, Paciente
+from models import Medico, Receita, Prontuario, Paciente, Medicamento
 from utils.forms import sanitizar_entrada
 from app import db
 from datetime import datetime
@@ -373,4 +373,36 @@ def get_medicamentos():
         return jsonify(result)
     except Exception as e:
         print(f"Erro na API de medicamentos: {e}")
+        return jsonify([])
+
+@receita_bp.route('/api/pacientes')
+def get_pacientes():
+    """API para autocomplete de pacientes"""
+    # Permitir acesso se usuário ou admin logado
+    if not (session.get('usuario') or session.get('admin_usuario')):
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
+        
+        pacientes = Paciente.query.filter(
+            Paciente.nome.ilike(f'%{term}%')
+        ).limit(10).all()
+        
+        result = []
+        for p in pacientes:
+            result.append({
+                'id': p.id,
+                'nome': p.nome,
+                'cpf': p.cpf or '',
+                'idade': str(p.idade) if p.idade else '',
+                'endereco': p.endereco or '',
+                'cidade': p.cidade_uf or ''
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        print(f"Erro na API de pacientes: {e}")
         return jsonify([])
