@@ -135,7 +135,7 @@ def prontuario():
                         continue
         
         # Search Medical Reports
-        if not tipo or tipo == 'relatorio':
+        if 'relatorio' in tipos_busca:
             query = db.session.query(RelatorioMedico, Medico.nome.label('medico_nome')).join(Medico)
             
             if busca_paciente:
@@ -166,7 +166,7 @@ def prontuario():
                     continue
         
         # Search Medical Certificates
-        if not tipo or tipo == 'atestado':
+        if 'atestado' in tipos_busca:
             query = db.session.query(AtestadoMedico, Medico.nome.label('medico_nome')).join(Medico)
             
             if busca_paciente:
@@ -197,7 +197,7 @@ def prontuario():
                     continue
         
         # Search High Cost Forms
-        if not tipo or tipo == 'alto_custo':
+        if 'alto_custo' in tipos_busca:
             query = db.session.query(FormularioAltoCusto, Medico.nome.label('medico_nome')).join(Medico)
             
             if busca_paciente:
@@ -428,7 +428,8 @@ def prontuario_detalhes():
             ).all()
             
             for relatorio in relatorios:
-                detalhes = f"CID: {relatorio.cid_codigo} - {relatorio.cid_descricao[:50]}{'...' if len(relatorio.cid_descricao) > 50 else ''}"
+                cid_desc = relatorio.cid_descricao or ''
+                detalhes = f"CID: {relatorio.cid_codigo} - {cid_desc[:50]}{'...' if len(cid_desc) > 50 else ''}"
                 
                 documentos['relatorio'].append({
                     'id_registro': relatorio.id,
@@ -462,7 +463,8 @@ def prontuario_detalhes():
             ).all()
             
             for formulario in formularios:
-                detalhes = f"Medicamento: {formulario.medicamento[:50]}{'...' if len(formulario.medicamento) > 50 else ''}"
+                medicamento_text = formulario.medicamento or ''
+                detalhes = f"Medicamento: {medicamento_text[:50]}{'...' if len(medicamento_text) > 50 else ''}"
                 
                 documentos['alto_custo'].append({
                     'id_registro': formulario.id,
