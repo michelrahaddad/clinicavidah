@@ -19,6 +19,8 @@ def prontuario():
         filtro_data_inicio = request.args.get('data_inicio', '')
         filtro_data_fim = request.args.get('data_fim', '')
         
+        logging.info(f"Prontuario search - busca_paciente: '{busca_paciente}', filtro_tipo: '{filtro_tipo}', data_inicio: '{filtro_data_inicio}', data_fim: '{filtro_data_fim}'")
+        
         resultados = []
         
         # Search in different record types based on filters

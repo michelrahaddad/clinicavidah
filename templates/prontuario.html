@@ -20,29 +20,45 @@
             </h5>
         </div>
         <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-8">
-                    <label for="busca_paciente" class="form-label text-light">Nome do Paciente</label>
-                    <div class="position-relative">
+            <form method="GET" action="{{ url_for('prontuario.prontuario') }}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="busca_paciente" class="form-label text-light">Nome do Paciente</label>
                         <input type="text" 
+                               name="busca_paciente"
                                id="busca_paciente"
                                class="form-control glass-input" 
                                placeholder="Digite o nome do paciente para buscar..."
+                               value="{{ busca_paciente or '' }}"
                                autocomplete="off">
-                        <div id="paciente-suggestions" class="patient-suggestions"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="tipo" class="form-label text-light">Tipo de Registro</label>
+                        <select name="tipo" id="tipo" class="form-select glass-input">
+                            <option value="">Todos os tipos</option>
+                            <option value="receita" {% if filtro_tipo == 'receita' %}selected{% endif %}>Receitas</option>
+                            <option value="exame_lab" {% if filtro_tipo == 'exame_lab' %}selected{% endif %}>Exames Laboratoriais</option>
+                            <option value="exame_img" {% if filtro_tipo == 'exame_img' %}selected{% endif %}>Exames de Imagem</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="btn-group w-100">
+                            <button type="submit" class="btn btn-primary neural-btn">
+                                <i class="fas fa-search me-2"></i>Buscar
+                            </button>
+                            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary neural-btn">
+                                <i class="fas fa-times me-2"></i>Limpar
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="button" id="limpar-busca" class="btn btn-outline-secondary neural-btn">
-                        <i class="fas fa-times me-2"></i>Limpar
-                    </button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
     
-    <!-- Patient History -->
-    <div id="patient-history" class="card glass-card" style="display: none;">
+    <!-- Results -->
+    {% if resultados %}
+    <div class="card glass-card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0 text-light">
                 <i class="fas fa-user me-2"></i>
