@@ -383,7 +383,7 @@ function showMedicamentSuggestions(medicaments, input) {
             input.value = med.principio_ativo || med.nome;
             
             // Localiza a linha do medicamento
-            const medicamentoContainer = input.closest('.medicamento-item');
+            const medicamentoContainer = input.closest('.medicamento-row');
             if (!medicamentoContainer) {
                 console.error('Container do medicamento não encontrado');
                 return;
