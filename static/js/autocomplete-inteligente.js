@@ -59,7 +59,9 @@ function setupMedicamentAutoCompleteInteligente() {
 }
 
 function showMedicamentSuggestionsInteligente(input, medicamentos) {
+    console.log('=== INICIO showMedicamentSuggestionsInteligente ===');
     console.log('Mostrando sugestões para:', medicamentos.length, 'medicamentos');
+    console.log('Input recebido:', input);
     
     // Remove suggestions existentes
     hideMedicamentSuggestions(input);
@@ -123,20 +125,37 @@ function showMedicamentSuggestionsInteligente(input, medicamentos) {
             div.style.transform = 'translateX(0)';
         });
         
-        div.addEventListener('click', (e) => {
+        // Múltiplos eventos para garantir captura
+        div.addEventListener('click', function(e) {
+            console.log('=== CLIQUE DETECTADO ===');
             e.preventDefault();
             e.stopPropagation();
             console.log('Medicamento clicado:', med);
             input.value = principio;
             suggestions.remove();
             // Auto-preencher campos baseado no histórico
-            setTimeout(() => {
-                preencherCamposMedicamentoInteligente(input, med);
-            }, 100);
+            preencherCamposMedicamentoInteligente(input, med);
+            return false;
         });
         
-        div.addEventListener('mousedown', (e) => {
+        div.addEventListener('mousedown', function(e) {
+            console.log('=== MOUSEDOWN DETECTADO ===');
             e.preventDefault();
+            console.log('Medicamento mousedown:', med);
+            input.value = principio;
+            suggestions.remove();
+            preencherCamposMedicamentoInteligente(input, med);
+            return false;
+        });
+        
+        div.addEventListener('touchstart', function(e) {
+            console.log('=== TOUCHSTART DETECTADO ===');
+            e.preventDefault();
+            console.log('Medicamento touch:', med);
+            input.value = principio;
+            suggestions.remove();
+            preencherCamposMedicamentoInteligente(input, med);
+            return false;
         });
         
         suggestions.appendChild(div);
