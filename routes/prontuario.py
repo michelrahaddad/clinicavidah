@@ -480,3 +480,80 @@ def prontuario_detalhes():
         logging.error(f'Prontuario detalhes error: {e}')
         flash('Erro ao carregar detalhes do prontuário.', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+@prontuario_bp.route('/prontuario/api/update_date', methods=['POST'])
+def update_date():
+    """API endpoint to update document date"""
+    if 'usuario' not in session:
+        return jsonify({'success': False, 'error': 'Sessão expirada'})
+    
+    try:
+        # Get current doctor ID from session
+        medico_id = session.get('medico_id')
+        if not medico_id:
+            return jsonify({'success': False, 'error': 'Sessão expirada'})
+        
+        data = request.get_json()
+        tipo = data.get('tipo')
+        doc_id = data.get('id')
+        nova_data = data.get('nova_data')
+        
+        if not all([tipo, doc_id, nova_data]):
+            return jsonify({'success': False, 'error': 'Parâmetros inválidos'})
+        
+        # Validate date format
+        try:
+            from datetime import datetime
+            datetime.strptime(nova_data, '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'success': False, 'error': 'Formato de data inválido'})
+        
+        # Update the appropriate table based on document type
+        if tipo == 'receita':
+            receita = db.session.query(Receita).filter_by(id=doc_id, id_medico=medico_id).first()
+            if receita:
+                receita.data = nova_data
+                db.session.commit()
+                return jsonify({'success': True})
+        
+        elif tipo == 'exame_lab':
+            exame = db.session.query(ExameLab).filter_by(id=doc_id, id_medico=medico_id).first()
+            if exame:
+                exame.data = nova_data
+                db.session.commit()
+                return jsonify({'success': True})
+        
+        elif tipo == 'exame_img':
+            exame = db.session.query(ExameImg).filter_by(id=doc_id, id_medico=medico_id).first()
+            if exame:
+                exame.data = nova_data
+                db.session.commit()
+                return jsonify({'success': True})
+        
+        elif tipo == 'relatorio':
+            relatorio = db.session.query(RelatorioMedico).filter_by(id=doc_id, id_medico=medico_id).first()
+            if relatorio:
+                relatorio.data = nova_data
+                db.session.commit()
+                return jsonify({'success': True})
+        
+        elif tipo == 'atestado':
+            atestado = db.session.query(AtestadoMedico).filter_by(id=doc_id, id_medico=medico_id).first()
+            if atestado:
+                atestado.data = nova_data
+                db.session.commit()
+                return jsonify({'success': True})
+        
+        elif tipo == 'alto_custo':
+            formulario = db.session.query(FormularioAltoCusto).filter_by(id=doc_id, id_medico=medico_id).first()
+            if formulario:
+                formulario.data = nova_data
+                db.session.commit()
+                return jsonify({'success': True})
+        
+        return jsonify({'success': False, 'error': 'Documento não encontrado'})
+        
+    except Exception as e:
+        logging.error(f'Update date error: {e}')
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)})
