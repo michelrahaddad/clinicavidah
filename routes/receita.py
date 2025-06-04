@@ -113,23 +113,22 @@ def salvar_receita():
             
             logging.info('HTML template rendered successfully')
             
-            # Store PDF data in session for later download via GET
-            session['pdf_temp'] = {
-                'html': pdf_html,
-                'filename': f'receita_{nome_paciente.replace(" ", "_")}_{data}.pdf',
-                'type': 'receita'
-            }
+            # Generate PDF directly and return as response to avoid session size limit
+            html_doc = weasyprint.HTML(string=pdf_html, base_url=request.url_root)
+            pdf_file = html_doc.write_pdf()
+            logging.info('PDF file generated successfully')
             
-            flash('Receita salva com sucesso!', 'success')
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'attachment; filename=receita_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            flash('Receita salva e PDF gerado com sucesso!', 'success')
             logging.info(f'Prescription created for patient: {nome_paciente}')
             
-            # Return JavaScript that opens PDF in new window
-            return f'''
-            <script>
-                window.open('/download_pdf', '_blank');
-                window.location.href = '/nova_receita';
-            </script>
-            '''
+            return response
             
         except Exception as pdf_error:
             logging.error(f'PDF generation error: {pdf_error}')
