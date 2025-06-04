@@ -312,6 +312,43 @@
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/autocomplete-inteligente.js') }}"></script>
 <script>
+// Função global para adicionar exame - DEVE estar fora do DOMContentLoaded
+function adicionarExameImediato() {
+    try {
+        const nome = document.getElementById('nomeNovoExame').value.trim();
+        if (!nome) {
+            alert('Digite o nome do exame');
+            return;
+        }
+        
+        const container = document.getElementById('examesPersonalizadosContainer');
+        const id = 'custom_' + Date.now();
+        
+        container.innerHTML += `
+            <div class="col-12 mb-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="exames[]" 
+                           value="${nome}" id="${id}" checked>
+                    <label class="form-check-label text-light" for="${id}">
+                        ${nome} <small class="text-muted">(Personalizado)</small>
+                    </label>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('nomeNovoExame').value = '';
+        document.getElementById('categoriaNovoExame').value = '';
+        
+        const modal = document.getElementById('modalExamesPersonalizados');
+        const modalInstance = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal);
+        modalInstance.hide();
+        
+        alert('Exame adicionado!');
+    } catch(e) {
+        alert('Erro: ' + e.message);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Configurar data atual automaticamente
     const dataExame = document.getElementById('data_exame');
@@ -363,43 +400,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // Função global simples para adicionar exame
-    window.adicionarExameImediato = function() {
-        try {
-            const nome = document.getElementById('nomeNovoExame').value.trim();
-            if (!nome) {
-                alert('Digite o nome do exame');
-                return;
-            }
-            
-            const container = document.getElementById('examesPersonalizadosContainer');
-            const id = 'custom_' + Date.now();
-            
-            container.innerHTML += `
-                <div class="col-12 mb-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="exames[]" 
-                               value="${nome}" id="${id}" checked>
-                        <label class="form-check-label text-light" for="${id}">
-                            ${nome} <small class="text-muted">(Personalizado)</small>
-                        </label>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('nomeNovoExame').value = '';
-            document.getElementById('categoriaNovoExame').value = '';
-            
-            const modal = document.getElementById('modalExamesPersonalizados');
-            const modalInstance = bootstrap.Modal.getInstance(modal) || new bootstrap.Modal(modal);
-            modalInstance.hide();
-            
-            alert('Exame adicionado!');
-        } catch(e) {
-            alert('Erro: ' + e.message);
-        }
-    };
 
     console.log('Sistema de Exames de Imagem carregado');
     console.log('Busca de exames configurada');
