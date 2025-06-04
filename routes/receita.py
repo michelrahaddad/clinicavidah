@@ -13,7 +13,7 @@ receita_bp = Blueprint('receita', __name__)
 @receita_bp.route('/receita', methods=['GET'])
 def receita():
     """Display prescription form"""
-    if 'usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     # Get last registered patient for auto-fill
@@ -25,7 +25,7 @@ def receita():
 @receita_bp.route('/salvar_receita', methods=['POST'])
 def salvar_receita():
     """Save prescription and generate PDF"""
-    if 'usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:

@@ -44,10 +44,16 @@ def prontuario():
         # Search in different record types based on filters
         tipos_busca = [filtro_tipo] if filtro_tipo else ['receita', 'exame_lab', 'exame_img']
         
+        # Check if user is admin
+        is_admin = admin_data or 'admin_usuario' in session
+        
         for tipo in tipos_busca:
             if tipo == 'receita':
-                # Search in prescriptions - only for current doctor
-                query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico).filter(Receita.id_medico == medico_id)
+                # Search in prescriptions - admin sees all, doctors see only their own
+                if is_admin:
+                    query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico)
+                else:
+                    query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico).filter(Receita.id_medico == medico_id)
                 
                 if busca_paciente:
                     # Split search terms and create flexible search
@@ -81,8 +87,11 @@ def prontuario():
                         continue
             
             elif tipo == 'exame_lab':
-                # Search in lab exams - only for current doctor
-                query = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico).filter(ExameLab.id_medico == medico_id)
+                # Search in lab exams - admin sees all, doctors see only their own
+                if is_admin:
+                    query = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico)
+                else:
+                    query = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico).filter(ExameLab.id_medico == medico_id)
                 
                 if busca_paciente:
                     # Split search terms and create flexible search
@@ -114,8 +123,11 @@ def prontuario():
                         continue
             
             elif tipo == 'exame_img':
-                # Search in imaging exams - only for current doctor
-                query = db.session.query(ExameImg, Medico.nome.label('medico_nome')).join(Medico).filter(ExameImg.id_medico == medico_id)
+                # Search in imaging exams - admin sees all, doctors see only their own
+                if is_admin:
+                    query = db.session.query(ExameImg, Medico.nome.label('medico_nome')).join(Medico)
+                else:
+                    query = db.session.query(ExameImg, Medico.nome.label('medico_nome')).join(Medico).filter(ExameImg.id_medico == medico_id)
                 
                 if busca_paciente:
                     # Split search terms and create flexible search
