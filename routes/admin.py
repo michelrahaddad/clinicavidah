@@ -42,7 +42,11 @@ def dashboard():
         
         # Log dashboard access
         admin_data = session.get('admin_data', {})
-        logging.info(f'Dashboard accessed by: {admin_data.get("nome", "Unknown")}')
+        if isinstance(admin_data, dict):
+            admin_name = admin_data.get("nome", "Unknown")
+        else:
+            admin_name = "Unknown"
+        logging.info(f'Dashboard accessed by: {admin_name}')
         
         return render_template('admin/dashboard.html', **stats)
     except Exception as e:
@@ -463,3 +467,192 @@ def create_user():
         logging.error(f'Create user error: {e}')
         flash('Erro ao criar usuário.', 'error')
         return redirect(url_for('admin.user_management'))
+
+# New User Management APIs
+@admin_bp.route('/api/users/add-admin', methods=['POST'])
+@require_admin
+def api_add_admin():
+    """API to add new administrator"""
+    try:
+        from werkzeug.security import generate_password_hash
+        from utils.timezone_helper import now_brasilia
+        
+        data = request.get_json()
+        usuario = data.get('usuario')
+        nome = data.get('nome')
+        email = data.get('email')
+        senha = data.get('senha')
+        
+        if not all([usuario, nome, email, senha]):
+            return jsonify({'success': False, 'message': 'Todos os campos são obrigatórios'})
+        
+        # Check if admin already exists
+        existing_admin = Administrador.query.filter(
+            (Administrador.usuario == usuario) | (Administrador.email == email)
+        ).first()
+        
+        if existing_admin:
+            return jsonify({'success': False, 'message': 'Usuário ou email já existe'})
+        
+        # Create new admin
+        new_admin = Administrador(
+            usuario=usuario,
+            nome=nome,
+            email=email,
+            senha=generate_password_hash(senha),
+            ativo=True,
+            created_at=now_brasilia().replace(tzinfo=None)
+        )
+        
+        db.session.add(new_admin)
+        db.session.commit()
+        
+        # Log action
+        from utils.security import log_admin_action
+        admin_data = session.get('admin_data', {})
+        log_admin_action('user_add', admin_data.get('usuario', 'Unknown'), 
+                        f'Novo administrador criado: {usuario}', request.remote_addr)
+        
+        return jsonify({'success': True, 'message': f'Administrador {usuario} criado com sucesso'})
+        
+    except Exception as e:
+        logging.error(f'Error adding admin: {e}')
+        return jsonify({'success': False, 'message': f'Erro ao criar administrador: {str(e)}'})
+
+@admin_bp.route('/api/users/add-medico', methods=['POST'])
+@require_admin
+def api_add_medico():
+    """API to add new doctor"""
+    try:
+        from werkzeug.security import generate_password_hash
+        from utils.timezone_helper import now_brasilia
+        
+        data = request.get_json()
+        nome = data.get('nome')
+        crm = data.get('crm')
+        senha = data.get('senha')
+        
+        if not all([nome, crm, senha]):
+            return jsonify({'success': False, 'message': 'Todos os campos são obrigatórios'})
+        
+        # Check if doctor already exists
+        existing_medico = Medico.query.filter_by(crm=crm).first()
+        if existing_medico:
+            return jsonify({'success': False, 'message': 'CRM já cadastrado'})
+        
+        # Create new doctor
+        new_medico = Medico(
+            nome=nome,
+            crm=crm,
+            senha=generate_password_hash(senha),
+            created_at=now_brasilia().replace(tzinfo=None)
+        )
+        
+        db.session.add(new_medico)
+        db.session.commit()
+        
+        # Log action
+        from utils.security import log_admin_action
+        admin_data = session.get('admin_data', {})
+        log_admin_action('user_add', admin_data.get('usuario', 'Unknown'), 
+                        f'Novo médico criado: {nome} (CRM: {crm})', request.remote_addr)
+        
+        return jsonify({'success': True, 'message': f'Médico {nome} criado com sucesso'})
+        
+    except Exception as e:
+        logging.error(f'Error adding medico: {e}')
+        return jsonify({'success': False, 'message': f'Erro ao criar médico: {str(e)}'})
+
+@admin_bp.route('/api/users/delete-admin/<int:admin_id>', methods=['DELETE'])
+@require_admin
+def api_delete_admin(admin_id):
+    """API to delete administrator"""
+    try:
+        admin_to_delete = Administrador.query.get_or_404(admin_id)
+        
+        # Prevent deleting yourself
+        current_admin = session.get('admin_data', {})
+        if current_admin.get('id') == admin_id:
+            return jsonify({'success': False, 'message': 'Não é possível deletar seu próprio usuário'})
+        
+        # Check if it's the last admin
+        total_admins = Administrador.query.filter_by(ativo=True).count()
+        if total_admins <= 1:
+            return jsonify({'success': False, 'message': 'Não é possível deletar o último administrador'})
+        
+        admin_name = admin_to_delete.nome
+        db.session.delete(admin_to_delete)
+        db.session.commit()
+        
+        # Log action
+        from utils.security import log_admin_action
+        log_admin_action('user_delete', current_admin.get('usuario', 'Unknown'), 
+                        f'Administrador deletado: {admin_name}', request.remote_addr)
+        
+        return jsonify({'success': True, 'message': f'Administrador {admin_name} deletado com sucesso'})
+        
+    except Exception as e:
+        logging.error(f'Error deleting admin: {e}')
+        return jsonify({'success': False, 'message': f'Erro ao deletar administrador: {str(e)}'})
+
+@admin_bp.route('/api/users/delete-medico/<int:medico_id>', methods=['DELETE'])
+@require_admin
+def api_delete_medico(medico_id):
+    """API to delete doctor"""
+    try:
+        medico_to_delete = Medico.query.get_or_404(medico_id)
+        
+        # Check if doctor has associated records
+        has_records = (
+            db.session.query(Receita).filter_by(id_medico=medico_id).first() or
+            db.session.query(ExameLab).filter_by(id_medico=medico_id).first() or
+            db.session.query(ExameImg).filter_by(id_medico=medico_id).first() or
+            db.session.query(Agendamento).filter_by(id_medico=medico_id).first()
+        )
+        
+        if has_records:
+            return jsonify({'success': False, 'message': 'Não é possível deletar médico com registros associados'})
+        
+        medico_name = medico_to_delete.nome
+        db.session.delete(medico_to_delete)
+        db.session.commit()
+        
+        # Log action
+        from utils.security import log_admin_action
+        current_admin = session.get('admin_data', {})
+        log_admin_action('user_delete', current_admin.get('usuario', 'Unknown'), 
+                        f'Médico deletado: {medico_name}', request.remote_addr)
+        
+        return jsonify({'success': True, 'message': f'Médico {medico_name} deletado com sucesso'})
+        
+    except Exception as e:
+        logging.error(f'Error deleting medico: {e}')
+        return jsonify({'success': False, 'message': f'Erro ao deletar médico: {str(e)}'})
+
+@admin_bp.route('/api/users/toggle-admin-status/<int:admin_id>', methods=['POST'])
+@require_admin
+def api_toggle_admin_status(admin_id):
+    """API to toggle administrator active status"""
+    try:
+        admin_to_toggle = Administrador.query.get_or_404(admin_id)
+        
+        # Prevent deactivating yourself
+        current_admin = session.get('admin_data', {})
+        if current_admin.get('id') == admin_id:
+            return jsonify({'success': False, 'message': 'Não é possível alterar status do seu próprio usuário'})
+        
+        admin_to_toggle.ativo = not admin_to_toggle.ativo
+        db.session.commit()
+        
+        status = "ativado" if admin_to_toggle.ativo else "desativado"
+        
+        # Log action
+        from utils.security import log_admin_action
+        log_admin_action('user_toggle', current_admin.get('usuario', 'Unknown'), 
+                        f'Administrador {status}: {admin_to_toggle.nome}', request.remote_addr)
+        
+        return jsonify({'success': True, 'message': f'Administrador {admin_to_toggle.nome} {status} com sucesso'})
+        
+    except Exception as e:
+        logging.error(f'Error toggling admin status: {e}')
+        return jsonify({'success': False, 'message': f'Erro ao alterar status: {str(e)}'})

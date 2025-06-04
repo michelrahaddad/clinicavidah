@@ -12,7 +12,10 @@
                 </h2>
                 <div>
                     <button class="btn neural-btn me-2" data-bs-toggle="modal" data-bs-target="#createAdminModal">
-                        <i class="fas fa-user-plus me-2"></i>Novo Administrador
+                        <i class="fas fa-user-shield me-2"></i>Novo Administrador
+                    </button>
+                    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createMedicoModal">
+                        <i class="fas fa-user-md me-2"></i>Novo Médico
                     </button>
                     <a href="/admin/dashboard" class="btn btn-outline-light">
                         <i class="fas fa-arrow-left me-2"></i>Voltar
@@ -25,300 +28,414 @@
     <!-- Tabs -->
     <div class="row mb-4">
         <div class="col-12">
-            <ul class="nav nav-tabs glass-card" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="medicos-tab" data-bs-toggle="tab" data-bs-target="#medicos" type="button" role="tab">
-                        <i class="fas fa-user-md me-2"></i>Médicos ({{ medicos|length }})
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="admins-tab" data-bs-toggle="tab" data-bs-target="#admins" type="button" role="tab">
+            <nav>
+                <div class="nav nav-tabs neural-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-admins-tab" data-bs-toggle="tab" data-bs-target="#nav-admins" type="button" role="tab">
                         <i class="fas fa-user-shield me-2"></i>Administradores ({{ admins|length }})
                     </button>
-                </li>
-            </ul>
+                    <button class="nav-link" id="nav-medicos-tab" data-bs-toggle="tab" data-bs-target="#nav-medicos" type="button" role="tab">
+                        <i class="fas fa-user-md me-2"></i>Médicos ({{ medicos|length }})
+                    </button>
+                </div>
+            </nav>
         </div>
     </div>
 
-    <!-- Tab Content -->
-    <div class="tab-content">
-        <!-- Médicos Tab -->
-        <div class="tab-pane fade show active" id="medicos" role="tabpanel">
-            <div class="glass-card p-4">
-                <h4 class="text-light mb-3">
-                    <i class="fas fa-user-md me-2"></i>Médicos Cadastrados
-                </h4>
-                
-                {% if medicos %}
-                <div class="table-responsive">
-                    <table class="table table-dark table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nome</th>
-                                <th>CRM</th>
-                                <th>Data Cadastro</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for medico in medicos %}
-                            <tr>
-                                <td>{{ medico.id }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" 
-                                             style="width: 32px; height: 32px;">
-                                            <i class="fas fa-user-md text-white"></i>
-                                        </div>
-                                        {{ medico.nome }}
-                                    </div>
-                                </td>
-                                <td>{{ medico.crm }}</td>
-                                <td>{{ medico.created_at.strftime('%d/%m/%Y') if medico.created_at else 'N/A' }}</td>
-                                <td>
-                                    <span class="badge bg-success">Ativo</span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewMedico({{ medico.id }})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editMedico({{ medico.id }})">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deactivateMedico({{ medico.id }})">
-                                        <i class="fas fa-ban"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <div class="tab-content" id="nav-tabContent">
+        <!-- Administrators Tab -->
+        <div class="tab-pane fade show active" id="nav-admins" role="tabpanel">
+            <div class="row">
+                <div class="col-12">
+                    <div class="neural-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-light">
+                                <i class="fas fa-user-shield me-2"></i>Administradores do Sistema
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table neural-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Usuário</th>
+                                            <th>Nome</th>
+                                            <th>Email</th>
+                                            <th>Status</th>
+                                            <th>Criado em</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for admin in admins %}
+                                        <tr>
+                                            <td>{{ admin.id }}</td>
+                                            <td>{{ admin.usuario }}</td>
+                                            <td>{{ admin.nome }}</td>
+                                            <td>{{ admin.email }}</td>
+                                            <td>
+                                                {% if admin.ativo %}
+                                                    <span class="badge bg-success">Ativo</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Inativo</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ admin.created_at.strftime('%d/%m/%Y %H:%M') if admin.created_at else 'N/A' }}</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-warning btn-sm" onclick="toggleAdminStatus({{ admin.id }})">
+                                                        <i class="fas fa-power-off"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" onclick="deleteAdmin({{ admin.id }}, '{{ admin.nome }}')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">Nenhum médico cadastrado</p>
-                </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- Administradores Tab -->
-        <div class="tab-pane fade" id="admins" role="tabpanel">
-            <div class="glass-card p-4">
-                <h4 class="text-light mb-3">
-                    <i class="fas fa-user-shield me-2"></i>Administradores
-                </h4>
-                
-                {% if admins %}
-                <div class="table-responsive">
-                    <table class="table table-dark table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Usuário</th>
-                                <th>Nome</th>
-                                <th>Email</th>
-                                <th>Último Acesso</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for admin in admins %}
-                            <tr>
-                                <td>{{ admin.id }}</td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center me-2" 
-                                             style="width: 32px; height: 32px;">
-                                            <i class="fas fa-user-shield text-dark"></i>
-                                        </div>
-                                        {{ admin.usuario }}
-                                    </div>
-                                </td>
-                                <td>{{ admin.nome }}</td>
-                                <td>{{ admin.email }}</td>
-                                <td>
-                                    {% if admin.ultimo_acesso %}
-                                        {{ admin.ultimo_acesso.strftime('%d/%m/%Y %H:%M') }}
-                                    {% else %}
-                                        Nunca
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="badge {% if admin.ativo %}bg-success{% else %}bg-danger{% endif %}">
-                                        {% if admin.ativo %}Ativo{% else %}Inativo{% endif %}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info me-1" onclick="viewAdmin({{ admin.id }})">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    {% if admin.usuario != 'admin' %}
-                                    <button class="btn btn-sm btn-outline-warning me-1" onclick="editAdmin({{ admin.id }})">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="toggleAdmin({{ admin.id }})">
-                                        <i class="fas fa-{% if admin.ativo %}ban{% else %}check{% endif %}"></i>
-                                    </button>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+        <!-- Doctors Tab -->
+        <div class="tab-pane fade" id="nav-medicos" role="tabpanel">
+            <div class="row">
+                <div class="col-12">
+                    <div class="neural-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 text-light">
+                                <i class="fas fa-user-md me-2"></i>Médicos Cadastrados
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table neural-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nome</th>
+                                            <th>CRM</th>
+                                            <th>Cadastrado em</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for medico in medicos %}
+                                        <tr>
+                                            <td>{{ medico.id }}</td>
+                                            <td>{{ medico.nome }}</td>
+                                            <td>{{ medico.crm }}</td>
+                                            <td>{{ medico.created_at.strftime('%d/%m/%Y %H:%M') if medico.created_at else 'N/A' }}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" onclick="deleteMedico({{ medico.id }}, '{{ medico.nome }}')">
+                                                    <i class="fas fa-trash me-1"></i>Excluir
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-user-shield fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">Nenhum administrador adicional cadastrado</p>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
 <!-- Create Admin Modal -->
-<div class="modal fade" id="createAdminModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="createAdminModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content glass-card">
+        <div class="modal-content neural-modal">
             <div class="modal-header">
                 <h5 class="modal-title text-light">
-                    <i class="fas fa-user-plus me-2"></i>Novo Administrador
+                    <i class="fas fa-user-shield me-2"></i>Criar Novo Administrador
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form method="POST" action="/admin/user/create">
-                <div class="modal-body">
+            <div class="modal-body">
+                <form id="createAdminForm">
                     <div class="mb-3">
                         <label class="form-label text-light">Usuário</label>
-                        <input type="text" name="usuario" class="form-control glass-input" required>
+                        <input type="text" class="form-control neural-input" name="usuario" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-light">Nome Completo</label>
-                        <input type="text" name="nome" class="form-control glass-input" required>
+                        <input type="text" class="form-control neural-input" name="nome" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-light">Email</label>
-                        <input type="email" name="email" class="form-control glass-input" required>
+                        <input type="email" class="form-control neural-input" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label text-light">Senha</label>
-                        <input type="password" name="senha" class="form-control glass-input" required>
+                        <input type="password" class="form-control neural-input" name="senha" required>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn neural-btn">
-                        <i class="fas fa-save me-2"></i>Criar Administrador
-                    </button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn neural-btn" onclick="createAdmin()">
+                    <i class="fas fa-plus me-2"></i>Criar Administrador
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- User Details Modal -->
-<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content glass-card">
+<!-- Create Medico Modal -->
+<div class="modal fade" id="createMedicoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content neural-modal">
             <div class="modal-header">
-                <h5 class="modal-title text-light">Detalhes do Usuário</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title text-light">
+                    <i class="fas fa-user-md me-2"></i>Criar Novo Médico
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div id="userDetailsContent"></div>
+                <form id="createMedicoForm">
+                    <div class="mb-3">
+                        <label class="form-label text-light">Nome Completo</label>
+                        <input type="text" class="form-control neural-input" name="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">CRM</label>
+                        <input type="text" class="form-control neural-input" name="crm" required placeholder="Ex: 12345/SP">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-light">Senha</label>
+                        <input type="password" class="form-control neural-input" name="senha" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="createMedico()">
+                    <i class="fas fa-plus me-2"></i>Criar Médico
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-function viewMedico(id) {
-    // Simulate medical user details
-    const content = `
-        <div class="row">
-            <div class="col-md-6">
-                <h6 class="text-primary">Informações Básicas</h6>
-                <p><strong>ID:</strong> ${id}</p>
-                <p><strong>Tipo:</strong> Médico</p>
-                <p><strong>Status:</strong> <span class="badge bg-success">Ativo</span></p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-primary">Estatísticas</h6>
-                <p><strong>Receitas Emitidas:</strong> ${Math.floor(Math.random() * 100)}</p>
-                <p><strong>Exames Solicitados:</strong> ${Math.floor(Math.random() * 50)}</p>
-                <p><strong>Último Acesso:</strong> Hoje</p>
-            </div>
-        </div>
-    `;
+// Create Admin
+function createAdmin() {
+    const form = document.getElementById('createAdminForm');
+    const formData = new FormData(form);
     
-    document.getElementById('userDetailsContent').innerHTML = content;
-    const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
-    modal.show();
-}
-
-function viewAdmin(id) {
-    // Simulate admin user details
-    const content = `
-        <div class="row">
-            <div class="col-md-6">
-                <h6 class="text-warning">Informações Básicas</h6>
-                <p><strong>ID:</strong> ${id}</p>
-                <p><strong>Tipo:</strong> Administrador</p>
-                <p><strong>Permissões:</strong> Total</p>
-            </div>
-            <div class="col-md-6">
-                <h6 class="text-warning">Atividade</h6>
-                <p><strong>Backups Criados:</strong> ${Math.floor(Math.random() * 10)}</p>
-                <p><strong>Logs Limpos:</strong> ${Math.floor(Math.random() * 5)}</p>
-                <p><strong>Atualizações:</strong> ${Math.floor(Math.random() * 3)}</p>
-            </div>
-        </div>
-    `;
+    const data = {
+        usuario: formData.get('usuario'),
+        nome: formData.get('nome'),
+        email: formData.get('email'),
+        senha: formData.get('senha')
+    };
     
-    document.getElementById('userDetailsContent').innerHTML = content;
-    const modal = new bootstrap.Modal(document.getElementById('userDetailsModal'));
-    modal.show();
+    fetch('/admin/api/users/add-admin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('error', 'Erro ao criar administrador');
+        console.error('Error:', error);
+    });
 }
 
-function editMedico(id) {
-    showAlert('Funcionalidade de edição em desenvolvimento', 'info');
+// Create Medico
+function createMedico() {
+    const form = document.getElementById('createMedicoForm');
+    const formData = new FormData(form);
+    
+    const data = {
+        nome: formData.get('nome'),
+        crm: formData.get('crm'),
+        senha: formData.get('senha')
+    };
+    
+    fetch('/admin/api/users/add-medico', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('error', 'Erro ao criar médico');
+        console.error('Error:', error);
+    });
 }
 
-function editAdmin(id) {
-    showAlert('Funcionalidade de edição em desenvolvimento', 'info');
-}
-
-function deactivateMedico(id) {
-    if (confirm('Tem certeza que deseja desativar este médico?')) {
-        showAlert('Médico desativado com sucesso', 'success');
+// Delete Admin
+function deleteAdmin(adminId, adminName) {
+    if (confirm(`Tem certeza que deseja deletar o administrador "${adminName}"?`)) {
+        fetch(`/admin/api/users/delete-admin/${adminId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showAlert('error', data.message);
+            }
+        })
+        .catch(error => {
+            showAlert('error', 'Erro ao deletar administrador');
+            console.error('Error:', error);
+        });
     }
 }
 
-function toggleAdmin(id) {
-    if (confirm('Tem certeza que deseja alterar o status deste administrador?')) {
-        showAlert('Status do administrador alterado', 'success');
+// Delete Medico
+function deleteMedico(medicoId, medicoName) {
+    if (confirm(`Tem certeza que deseja deletar o médico "${medicoName}"?`)) {
+        fetch(`/admin/api/users/delete-medico/${medicoId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', data.message);
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showAlert('error', data.message);
+            }
+        })
+        .catch(error => {
+            showAlert('error', 'Erro ao deletar médico');
+            console.error('Error:', error);
+        });
     }
 }
 
-function showAlert(message, type) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+// Toggle Admin Status
+function toggleAdminStatus(adminId) {
+    fetch(`/admin/api/users/toggle-admin-status/${adminId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showAlert('error', data.message);
+        }
+    })
+    .catch(error => {
+        showAlert('error', 'Erro ao alterar status');
+        console.error('Error:', error);
+    });
+}
+
+// Show Alert
+function showAlert(type, message) {
+    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+    const alertHtml = `
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
     `;
-    document.body.appendChild(alertDiv);
     
+    const container = document.querySelector('.container-fluid');
+    container.insertAdjacentHTML('afterbegin', alertHtml);
+    
+    // Auto dismiss after 5 seconds
     setTimeout(() => {
-        alertDiv.remove();
+        const alert = document.querySelector('.alert');
+        if (alert) {
+            alert.remove();
+        }
     }, 5000);
 }
 </script>
+
+<style>
+.neural-tabs .nav-link {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    margin-right: 5px;
+    border-radius: 10px 10px 0 0;
+}
+
+.neural-tabs .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: #ffffff;
+}
+
+.neural-tabs .nav-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.neural-modal {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+}
+
+.neural-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+    border-radius: 8px;
+}
+
+.neural-input:focus {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: #667eea;
+    color: #ffffff;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.neural-input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.btn-group-sm > .btn {
+    margin-right: 3px;
+}
+</style>
 {% endblock %}
