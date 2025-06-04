@@ -118,7 +118,9 @@ def salvar_receita():
             
             response = make_response(pdf_file)
             response.headers['Content-Type'] = 'application/pdf'
-            response.headers['Content-Disposition'] = f'attachment; filename=receita_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            response.headers['Content-Disposition'] = f'inline; filename=receita_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            response.headers['X-PDF-Success'] = 'true'
+            response.headers['X-Redirect-URL'] = url_for('receita.receita')
             
             flash('Receita salva e PDF gerado com sucesso!', 'success')
             logging.info(f'Prescription created for patient: {nome_paciente}')
@@ -195,7 +197,9 @@ def gerar_pdf_reimprimir_receita(receita_obj):
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=receita_{receita_obj.nome_paciente}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=receita_{receita_obj.nome_paciente}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        response.headers['X-PDF-Success'] = 'true'
+        response.headers['X-Redirect-URL'] = url_for('prontuario.prontuario')
         
         return response
         

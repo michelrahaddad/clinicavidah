@@ -134,7 +134,9 @@ def salvar_formulario_alto_custo():
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=formulario_alto_custo_{nome_paciente}_{data}.pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=formulario_alto_custo_{nome_paciente}_{data}.pdf'
+        response.headers['X-PDF-Success'] = 'true'
+        response.headers['X-Redirect-URL'] = url_for('formulario_alto_custo.formulario_alto_custo')
         
         flash('Formulário de alto custo salvo e PDF gerado com sucesso!', 'success')
         logging.info(f'High-cost form created for patient: {nome_paciente}')

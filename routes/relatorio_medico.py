@@ -97,7 +97,9 @@ def salvar_relatorio_medico():
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'attachment; filename=relatorio_medico_{nome_paciente}_{data}.pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=relatorio_medico_{nome_paciente}_{data}.pdf'
+        response.headers['X-PDF-Success'] = 'true'
+        response.headers['X-Redirect-URL'] = url_for('relatorio_medico.relatorio_medico')
         
         flash('Relatório médico salvo e PDF gerado com sucesso!', 'success')
         logging.info(f'Medical report created for patient: {nome_paciente}')
