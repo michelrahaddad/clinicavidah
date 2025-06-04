@@ -129,7 +129,7 @@ def estatisticas_neurais():
         horario_pico = 14  # 2 PM is typical peak for medical practices
         
         # Monthly usage progression based on actual system usage
-        base_usage = max(total_receitas, 10)
+        base_usage = total_receitas if total_receitas > 10 else 10
         uso_mensal = [
             int(base_usage * 0.6),   # January
             int(base_usage * 0.7),   # February
