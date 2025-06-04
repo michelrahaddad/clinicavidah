@@ -360,30 +360,50 @@ window.adicionarExamePersonalizado = function() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Configurar data atual
+    // Configurar data atual automaticamente
     const dataExame = document.getElementById('data_exame');
-    if (dataExame && !dataExame.value) {
+    console.log('Campo de data encontrado:', dataExame);
+    if (dataExame) {
         const hoje = new Date().toISOString().split('T')[0];
         dataExame.value = hoje;
+        console.log('Data configurada para:', hoje);
+    } else {
+        console.error('Campo data_exame não encontrado!');
     }
     
-    // Configurar busca de exames - versão simplificada e funcional
+    // Configurar busca de exames com debug detalhado
     const buscarExame = document.getElementById('buscarExame');
+    console.log('Campo de busca encontrado:', buscarExame);
+    
     if (buscarExame) {
+        console.log('Adicionando event listener para busca');
+        
         buscarExame.addEventListener('input', function() {
             const termo = this.value.toLowerCase().trim();
-            console.log('Buscando por:', termo);
+            console.log('=== BUSCA INICIADA ===');
+            console.log('Termo de busca:', termo);
+            console.log('Valor original:', this.value);
             
             // Selecionar todos os checkboxes de exames
             const allFormChecks = document.querySelectorAll('.form-check');
-            let totalVisible = 0;
+            console.log('Total de form-checks encontrados:', allFormChecks.length);
             
-            allFormChecks.forEach(formCheck => {
+            let totalVisible = 0;
+            let totalProcessed = 0;
+            
+            allFormChecks.forEach((formCheck, index) => {
                 const label = formCheck.querySelector('.form-check-label');
                 if (label) {
                     const texto = label.textContent.toLowerCase();
+                    totalProcessed++;
                     
-                    if (termo === '' || texto.includes(termo)) {
+                    const matches = termo === '' || texto.includes(termo);
+                    
+                    if (index < 3) { // Log dos primeiros 3 para debug
+                        console.log(`Exame ${index}: "${label.textContent}" -> ${matches ? 'VISÍVEL' : 'OCULTO'}`);
+                    }
+                    
+                    if (matches) {
                         formCheck.style.display = 'block';
                         totalVisible++;
                     } else {
@@ -392,30 +412,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
             
-            // Mostrar resultado da busca no console
-            console.log(`Encontrados ${totalVisible} exames com "${termo}"`);
-            
-            // Resetar display de todas as seções quando não há busca
-            if (termo === '') {
-                const allSections = document.querySelectorAll('.col-md-6, .card');
-                allSections.forEach(section => {
-                    section.style.display = 'block';
-                });
-            }
+            console.log(`Processados: ${totalProcessed}, Visíveis: ${totalVisible}`);
+            console.log('=== BUSCA FINALIZADA ===');
         });
         
-        // Adicionar evento para limpar busca quando campo estiver vazio
-        buscarExame.addEventListener('keyup', function(e) {
-            if (e.key === 'Escape' || this.value === '') {
-                this.value = '';
-                // Mostrar todos os exames
-                const allFormChecks = document.querySelectorAll('.form-check');
-                allFormChecks.forEach(formCheck => {
-                    formCheck.style.display = 'block';
-                });
-                console.log('Busca limpa - mostrando todos os exames');
-            }
-        });
+        // Teste manual da busca
+        console.log('Testando busca manualmente...');
+        setTimeout(() => {
+            const testTerms = ['eco', 'cardio', 'ultra'];
+            testTerms.forEach(term => {
+                console.log(`Teste com termo: "${term}"`);
+                buscarExame.value = term;
+                buscarExame.dispatchEvent(new Event('input'));
+            });
+            // Limpar após teste
+            setTimeout(() => {
+                buscarExame.value = '';
+                buscarExame.dispatchEvent(new Event('input'));
+            }, 1000);
+        }, 2000);
+        
+    } else {
+        console.error('Campo de busca não encontrado!');
     }
     
     console.log('Sistema de Exames de Imagem carregado');
