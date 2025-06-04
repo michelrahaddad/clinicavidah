@@ -257,3 +257,52 @@ def gerar_pdf_receita(receita_id):
         logging.error(f'Error generating prescription PDF: {e}')
         flash('Erro ao gerar PDF da receita.', 'error')
         return redirect(url_for('receita.receita'))
+
+@receita_bp.route('/receita/reimprimir/<int:receita_id>')
+def reimprimir_receita(receita_id):
+    """Generate PDF for existing prescription with current date"""
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        # Get current doctor ID from session
+        medico_id = session.get('medico_id')
+        if not medico_id:
+            flash('Sessão expirada. Faça login novamente.', 'error')
+            return redirect(url_for('auth.login'))
+        
+        # Get prescription and verify ownership
+        receita_obj = db.session.query(Receita).filter_by(id=receita_id, id_medico=medico_id).first()
+        if not receita_obj:
+            flash('Receita não encontrada.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        medico = db.session.query(Medico).get(medico_id)
+        data_atual = datetime.now().strftime('%d/%m/%Y')
+        
+        # Get complete patient data
+        paciente = db.session.query(Paciente).get(receita_obj.id_paciente)
+        
+        pdf_html = render_template('receita_pdf.html',
+                                 paciente=receita_obj.nome_paciente,
+                                 medicamentos=receita_obj.medicamentos.split(','),
+                                 posologias=receita_obj.posologias.split(','),
+                                 duracoes=receita_obj.duracoes.split(','),
+                                 vias=receita_obj.vias.split(','),
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
+                                 data=data_atual,
+                                 assinatura=medico.assinatura if medico else None,
+                                 zip=zip)
+        
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+        
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=receita_reimpressao_{receita_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        return response
+    except Exception as e:
+        logging.error(f'Reprint prescription error: {e}')
+        flash('Erro ao reimprimir receita.', 'error')
+        return redirect(url_for('prontuario.prontuario'))

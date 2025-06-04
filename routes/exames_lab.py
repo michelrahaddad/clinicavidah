@@ -193,3 +193,48 @@ def gerar_pdf_exame_lab(exame_id):
         logging.error(f"Error generating lab exam PDF: {str(e)}")
         flash('Erro ao gerar PDF do exame laboratorial', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+@exames_lab_bp.route('/exames_lab/reimprimir/<int:exame_id>')
+def reimprimir_exame_lab(exame_id):
+    """Generate PDF for existing lab exam with current date"""
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        # Get current doctor ID from session
+        medico_id = session.get('medico_id')
+        if not medico_id:
+            flash('Sessão expirada. Faça login novamente.', 'error')
+            return redirect(url_for('auth.login'))
+        
+        # Get exam and verify ownership
+        exame = db.session.query(ExameLab).filter_by(id=exame_id, id_medico=medico_id).first()
+        if not exame:
+            flash('Exame não encontrado.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        medico = db.session.query(Medico).get(medico_id)
+        data_atual = datetime.now().strftime('%d/%m/%Y')
+        
+        # Ensure exames is a list
+        exames_list = exame.exames.split(',') if isinstance(exame.exames, str) else exame.exames
+        
+        pdf_html = render_template('exames_lab_pdf.html',
+                                 nome_paciente=exame.nome_paciente,
+                                 exames=exames_list,
+                                 medico=medico.nome if medico else "Médico não encontrado",
+                                 crm=medico.crm if medico else "CRM não disponível",
+                                 data=data_atual,
+                                 assinatura=medico.assinatura if medico else None)
+        
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+        
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=exame_lab_reimpressao_{exame_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        return response
+    except Exception as e:
+        logging.error(f'Reprint lab exam error: {e}')
+        flash('Erro ao reimprimir exame laboratorial.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
