@@ -33,7 +33,13 @@ function setupMedicamentAutoCompleteInteligente() {
                 })
                 .then(data => {
                     console.log('Dados recebidos:', data);
-                    showMedicamentSuggestionsInteligente(newInput, data);
+                    if (data && data.length > 0) {
+                        console.log('Chamando showMedicamentSuggestionsInteligente com', data.length, 'itens');
+                        showMedicamentSuggestionsInteligente(newInput, data);
+                    } else {
+                        console.log('Nenhum dado para mostrar sugestões');
+                        hideMedicamentSuggestions(newInput);
+                    }
                 })
                 .catch(error => {
                     console.error('Erro na API:', error);
@@ -117,12 +123,20 @@ function showMedicamentSuggestionsInteligente(input, medicamentos) {
             div.style.transform = 'translateX(0)';
         });
         
-        div.addEventListener('click', () => {
-            console.log('Medicamento selecionado:', med);
+        div.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Medicamento clicado:', med);
             input.value = principio;
             suggestions.remove();
             // Auto-preencher campos baseado no histórico
-            preencherCamposMedicamentoInteligente(input, med);
+            setTimeout(() => {
+                preencherCamposMedicamentoInteligente(input, med);
+            }, 100);
+        });
+        
+        div.addEventListener('mousedown', (e) => {
+            e.preventDefault();
         });
         
         suggestions.appendChild(div);
