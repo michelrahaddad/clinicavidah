@@ -21,7 +21,7 @@
                             <i class="fas fa-clipboard-list me-2 text-success"></i>
                             Solicitação de Exames Laboratoriais
                         </h5>
-                        <button type="button" class="btn btn-warning" >
+                        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalExamesPersonalizados">
                             <i class="fas fa-cog"></i> Exames Personalizados
                         </button>
                     </div>
@@ -434,4 +434,22 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Definir data atual automaticamente se não houver valor
+    const dataInput = document.getElementById('data');
+    if (dataInput && !dataInput.value) {
+        const hoje = new Date();
+        const ano = hoje.getFullYear();
+        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+        const dia = String(hoje.getDate()).padStart(2, '0');
+        dataInput.value = `${ano}-${mes}-${dia}`;
+    }
+    
+    console.log('Sistema de Exames Laboratoriais carregado');
+});
+</script>
 {% endblock %}
