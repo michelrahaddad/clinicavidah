@@ -93,6 +93,8 @@ def salvar_receita():
         # Generate PDF
         try:
             logging.info(f'Starting PDF generation for prescription: {nome_paciente}')
+            
+            # Generate PDF directly using WeasyPrint
             pdf_html = render_template('receita_pdf.html',
                                      nome_paciente=nome_paciente,
                                      cpf_paciente=paciente.cpf if paciente else None,
@@ -111,20 +113,22 @@ def salvar_receita():
             
             logging.info('HTML template rendered successfully')
             
-            # Create WeasyPrint HTML object with better error handling
-            # Store the PDF generation data in session for later retrieval
-            session['pdf_data'] = {
-                'type': 'receita',
-                'id': receita_obj.id,
-                'patient_name': nome_paciente,
-                'date': data
-            }
+            # Create PDF using WeasyPrint with proper error handling
+            html_doc = weasyprint.HTML(string=pdf_html, base_url=request.url_root)
+            pdf_file = html_doc.write_pdf()
+            logging.info('PDF file generated successfully')
             
-            flash('Receita salva com sucesso!', 'success')
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'inline; filename=receita_{nome_paciente.replace(" ", "_")}_{data}.pdf'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            flash('Receita salva e PDF gerado com sucesso!', 'success')
             logging.info(f'Prescription created for patient: {nome_paciente}')
             
-            # Redirect to PDF generation endpoint
-            return redirect(url_for('receita.gerar_pdf_receita', receita_id=receita_obj.id))
+            return response
             
         except Exception as pdf_error:
             logging.error(f'PDF generation error: {pdf_error}')
@@ -226,7 +230,7 @@ def gerar_pdf_receita(receita_id):
         vias = receita_obj.vias.split(',')
         
         # Generate PDF
-        pdf_html = render_template('pdf_receita.html',
+        pdf_html = render_template('receita_pdf.html',
                                  paciente=receita_obj.nome_paciente,
                                  medicamentos=medicamentos,
                                  posologias=posologias,

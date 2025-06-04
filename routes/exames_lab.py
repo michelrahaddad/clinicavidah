@@ -81,26 +81,33 @@ def salvar_exames_lab():
         db.session.commit()
         
         # Generate PDF
-        pdf_html = render_template('exames_lab_pdf.html',
-                                 nome_paciente=nome_paciente,
-                                 exames=exames,
-                                 medico=medico.nome if medico else "Médico não encontrado",
-                                 crm=medico.crm if medico else "CRM não disponível",
-                                 assinatura=medico.assinatura if medico else None,
-                                 data=data)
-        
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
-        
-        response = make_response(pdf_file)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'inline; filename=exames_lab_{nome_paciente}_{data}.pdf'
-        response.headers['X-PDF-Success'] = 'true'
-        response.headers['X-Redirect-URL'] = url_for('exames_lab.exames_lab')
-        
-        flash('Exames laboratoriais salvos e PDF gerado com sucesso!', 'success')
-        logging.info(f'Lab exams created for patient: {nome_paciente}')
-        
-        return response
+        try:
+            pdf_html = render_template('exames_lab_pdf.html',
+                                     nome_paciente=nome_paciente,
+                                     exames=exames,
+                                     medico=medico.nome if medico else "Médico não encontrado",
+                                     crm=medico.crm if medico else "CRM não disponível",
+                                     assinatura=medico.assinatura if medico else None,
+                                     data=data)
+            
+            pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+            
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'inline; filename=exames_lab_{nome_paciente}_{data}.pdf'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            flash('Exames laboratoriais salvos e PDF gerado com sucesso!', 'success')
+            logging.info(f'Lab exams created for patient: {nome_paciente}')
+            
+            return response
+            
+        except Exception as pdf_error:
+            logging.error(f'Lab exams PDF generation error: {pdf_error}')
+            flash('Exames laboratoriais salvos com sucesso! Erro na geração do PDF.', 'warning')
+            return redirect(url_for('exames_lab.exames_lab'))
         
     except Exception as e:
         logging.error(f'Lab exams error: {e}')
