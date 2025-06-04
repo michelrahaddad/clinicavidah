@@ -130,3 +130,33 @@ def novo_paciente():
             flash('Erro ao cadastrar paciente. Tente novamente.', 'error')
     
     return render_template('novo_paciente.html')
+
+@pacientes_bp.route('/api/pacientes')
+def get_pacientes():
+    """API para autocomplete de pacientes"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify([])
+    
+    try:
+        term = request.args.get('q', '').strip()
+        if len(term) < 2:
+            return jsonify([])
+        
+        pacientes = Paciente.query.filter(
+            Paciente.nome.ilike(f'%{term}%')
+        ).limit(10).all()
+        
+        result = []
+        for p in pacientes:
+            result.append({
+                'id': p.id,
+                'nome': p.nome,
+                'cpf': p.cpf or '',
+                'idade': str(p.idade) if p.idade else '',
+                'endereco': p.endereco or '',
+                'cidade': p.cidade or ''
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify([])

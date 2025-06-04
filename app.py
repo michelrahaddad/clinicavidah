@@ -19,6 +19,34 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
+
+# Rate limiting storage
+rate_limit_storage = {}
+
+def rate_limit():
+    """Rate limiting middleware"""
+    from flask import request, g
+    import time
+    
+    client_ip = request.environ.get('REMOTE_ADDR', 'unknown')
+    current_time = time.time()
+    
+    # Limpar entradas antigas
+    for ip in list(rate_limit_storage.keys()):
+        rate_limit_storage[ip] = [req_time for req_time in rate_limit_storage[ip] 
+                                  if current_time - req_time < 60]
+    
+    # Verificar limite
+    if client_ip not in rate_limit_storage:
+        rate_limit_storage[client_ip] = []
+    
+    if len(rate_limit_storage[client_ip]) >= 60:  # 60 requests per minute
+        return jsonify({'error': 'Rate limit exceeded'}), 429
+    
+    rate_limit_storage[client_ip].append(current_time)
+    return None
+
+
 def create_app():
     # Create Flask app
     app = Flask(__name__)
@@ -113,6 +141,8 @@ def create_app():
     from routes.relatorios import relatorios_bp
     from routes.estatisticas_neurais import estatisticas_neurais_bp
     from routes.admin import admin_bp
+    from routes.atestado import atestado_bp
+    from routes.estatisticas import estatisticas_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
@@ -132,6 +162,8 @@ def create_app():
     app.register_blueprint(relatorios_bp)
     app.register_blueprint(estatisticas_neurais_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(atestado_bp)
+    app.register_blueprint(estatisticas_bp)
     
     # Error handlers
     @app.errorhandler(404)
