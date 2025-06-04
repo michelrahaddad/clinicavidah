@@ -53,7 +53,6 @@
                                id="cpf_paciente"
                                class="form-control glass-input" 
                                placeholder="000.000.000-00"
-                               readonly
                                style="background: rgba(255, 255, 255, 0.05);">
                     </div>
                     <div class="col-md-6 mb-3">
@@ -64,7 +63,6 @@
                                id="idade_paciente"
                                class="form-control glass-input" 
                                placeholder="--"
-                               readonly
                                style="background: rgba(255, 255, 255, 0.05);">
                     </div>
                 </div>
@@ -77,7 +75,6 @@
                                id="endereco_completo"
                                class="form-control glass-input" 
                                placeholder="Endereço não informado"
-                               readonly
                                style="background: rgba(255, 255, 255, 0.05);">
                     </div>
                     <div class="col-md-4 mb-3">
@@ -88,7 +85,6 @@
                                id="cidade_uf_completo"
                                class="form-control glass-input" 
                                placeholder="Cidade/UF"
-                               readonly
                                style="background: rgba(255, 255, 255, 0.05);">
                     </div>
                 </div>
@@ -328,10 +324,10 @@ function showPatientSuggestions(patients, input) {
 
 function selectPatient(patient) {
     const nomeInput = document.getElementById('nome_paciente');
-    const cpfInput = document.getElementById('cpf');
-    const idadeInput = document.getElementById('idade');
-    const enderecoInput = document.getElementById('endereco');
-    const cidadeInput = document.getElementById('cidade');
+    const cpfInput = document.getElementById('cpf_paciente');
+    const idadeInput = document.getElementById('idade_paciente');
+    const enderecoInput = document.getElementById('endereco_completo');
+    const cidadeInput = document.getElementById('cidade_uf_completo');
     
     if (nomeInput) nomeInput.value = patient.nome;
     if (cpfInput) cpfInput.value = patient.cpf || '';
@@ -342,7 +338,7 @@ function selectPatient(patient) {
 
 function setupMedicamentAutocomplete() {
     document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('medicamento-input')) {
+        if (e.target.classList.contains('medicamento-autocomplete')) {
             const query = e.target.value;
             if (query.length < 2) {
                 clearSuggestions('medicament');
