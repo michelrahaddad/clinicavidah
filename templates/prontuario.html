@@ -59,150 +59,75 @@
     <!-- Results -->
     {% if resultados %}
     <div class="card glass-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-light">
-                <i class="fas fa-user me-2"></i>
-                Histórico do Paciente: <span id="selected-patient-name" class="text-primary"></span>
-            </h5>
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="filter-buttons">
-                    <button type="button" id="show-all-records" class="btn btn-sm btn-outline-info neural-btn me-2 filter-btn" data-type="all">
-                        <i class="fas fa-list me-1"></i>Todos
-                    </button>
-                    <button type="button" id="show-receitas" class="btn btn-sm btn-outline-primary neural-btn me-2 filter-btn" data-type="receita">
-                        <i class="fas fa-prescription-bottle-alt me-1"></i>Receitas
-                    </button>
-                    <button type="button" id="show-exames-lab" class="btn btn-sm btn-outline-success neural-btn me-2 filter-btn" data-type="exame_lab">
-                        <i class="fas fa-flask me-1"></i>Lab
-                    </button>
-                    <button type="button" id="show-exames-img" class="btn btn-sm btn-outline-warning neural-btn filter-btn" data-type="exame_img">
-                        <i class="fas fa-x-ray me-1"></i>Imagem
-                    </button>
-                </div>
-                
-                <div class="batch-actions" id="batch-actions">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-sm btn-outline-info neural-btn" onclick="prontuarioSearch.printAllByCategory()" title="Imprimir todos visíveis">
-                            <i class="fas fa-print me-1"></i>Imprimir Todos
-                        </button>
-                        <button class="btn btn-sm btn-outline-secondary neural-btn" onclick="prontuarioSearch.toggleEditMode()" title="Editar registros" id="edit-mode-btn">
-                            <i class="fas fa-edit me-1"></i>Editar
-                        </button>
-                        <button class="btn btn-sm btn-outline-success neural-btn" onclick="prontuarioSearch.addNewRecord()" title="Adicionar novo registro">
-                            <i class="fas fa-plus me-1"></i>Adicionar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            <div id="patient-records"></div>
-        </div>
-    </div>
-    
-    <!-- Legacy Filters (hidden by default) -->
-    <div class="card glass-card mb-4" id="legacy-filters" style="display: none;">
         <div class="card-header">
             <h5 class="mb-0 text-light">
-                <i class="fas fa-filter me-2"></i>
-                Filtros de Busca
+                <i class="fas fa-file-medical me-2"></i>
+                Resultados da Busca ({{ resultados|length }} registros encontrados)
             </h5>
         </div>
         <div class="card-body">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    <label for="busca_paciente_legacy" class="form-label text-light">Nome do Paciente</label>
-                    <input type="text" 
-                           name="busca_paciente" 
-                           id="busca_paciente_legacy"
-                           class="form-control glass-input" 
-                           placeholder="Digite o nome do paciente"
-                           value="{{ busca_paciente }}">
-                </div>
-                <div class="col-md-3">
-                    <label for="tipo" class="form-label text-light">Tipo de Registro</label>
-                    <select name="tipo" id="tipo" class="form-select glass-input">
-                        <option value="">Todos os tipos</option>
-                        <option value="receita" {{ 'selected' if filtro_tipo == 'receita' else '' }}>Receitas</option>
-                        <option value="exame_lab" {{ 'selected' if filtro_tipo == 'exame_lab' else '' }}>Exames Lab</option>
-                        <option value="exame_img" {{ 'selected' if filtro_tipo == 'exame_img' else '' }}>Exames Imagem</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="data_inicio" class="form-label text-light">Data Início</label>
-                    <input type="date" 
-                           name="data_inicio" 
-                           id="data_inicio"
-                           class="form-control glass-input"
-                           value="{{ filtro_data_inicio }}">
-                </div>
-                <div class="col-md-2">
-                    <label for="data_fim" class="form-label text-light">Data Fim</label>
-                    <input type="date" 
-                           name="data_fim" 
-                           id="data_fim"
-                           class="form-control glass-input"
-                           value="{{ filtro_data_fim }}">
-                </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary neural-btn w-100">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Results -->
-    <div class="card glass-card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-light">
-                <i class="fas fa-list me-2"></i>
-                Registros Encontrados ({{ resultados|length }})
-            </h5>
-        </div>
-        <div class="card-body">
-            {% if resultados %}
             <div class="table-responsive">
-                <table class="table table-dark table-hover">
+                <table class="table table-dark table-striped">
                     <thead>
                         <tr>
-                            <th><i class="fas fa-calendar me-2"></i>Data</th>
-                            <th><i class="fas fa-user me-2"></i>Paciente</th>
-                            <th><i class="fas fa-tag me-2"></i>Tipo</th>
-                            <th><i class="fas fa-info-circle me-2"></i>Detalhes</th>
-                            <th><i class="fas fa-user-md me-2"></i>Médico</th>
-                            <th><i class="fas fa-cogs me-2"></i>Ações</th>
+                            <th>Data</th>
+                            <th>Paciente</th>
+                            <th>Tipo</th>
+                            <th>Detalhes</th>
+                            <th>Médico</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for resultado in resultados %}
-                        <tr class="record-row">
+                        <tr>
                             <td>{{ resultado.data }}</td>
-                            <td>
-                                <i class="fas fa-user me-2 text-primary"></i>
-                                {{ resultado.nome_paciente }}
-                            </td>
+                            <td><strong>{{ resultado.nome_paciente }}</strong></td>
                             <td>
                                 {% if resultado.tipo == 'receita' %}
-                                    <span class="badge bg-primary">
-                                        <i class="fas fa-prescription-bottle-alt me-1"></i>Receita
-                                    </span>
+                                    <span class="badge bg-success">Receita</span>
                                 {% elif resultado.tipo == 'exame_lab' %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-flask me-1"></i>Exame Lab
-                                    </span>
+                                    <span class="badge bg-info">Exame Lab</span>
                                 {% elif resultado.tipo == 'exame_img' %}
-                                    <span class="badge bg-info">
-                                        <i class="fas fa-x-ray me-1"></i>Exame Imagem
-                                    </span>
+                                    <span class="badge bg-warning">Exame Imagem</span>
                                 {% endif %}
                             </td>
-                            <td class="text-muted">{{ resultado.detalhes_registro }}</td>
+                            <td>{{ resultado.detalhes_registro }}</td>
                             <td>{{ resultado.medico_nome }}</td>
                             <td>
                                 {% if resultado.tipo == 'receita' %}
-                                    <a href="{{ url_for('receita.refazer_receita', id=resultado.id_registro) }}" 
+                                    <a href="{{ url_for('receita.gerar_receita_pdf', receita_id=resultado.id_registro) }}" 
+                                       class="btn btn-sm btn-outline-info neural-btn" target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>PDF
+                                    </a>
+                                {% elif resultado.tipo == 'exame_lab' %}
+                                    <a href="{{ url_for('exames_lab.gerar_exame_pdf', exame_id=resultado.id_registro) }}" 
+                                       class="btn btn-sm btn-outline-info neural-btn" target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>PDF
+                                    </a>
+                                {% elif resultado.tipo == 'exame_img' %}
+                                    <a href="{{ url_for('exames_img.gerar_exame_pdf', exame_id=resultado.id_registro) }}" 
+                                       class="btn btn-sm btn-outline-info neural-btn" target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>PDF
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% elif busca_paciente %}
+    <div class="card glass-card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum registro encontrado</h5>
+            <p class="text-muted">Não foram encontrados registros para "{{ busca_paciente }}".</p>
+        </div>
+    </div>
+    {% endif %} 
                                        class="btn btn-sm btn-outline-primary neural-btn">
                                         <i class="fas fa-redo me-1"></i>Refazer
                                     </a>

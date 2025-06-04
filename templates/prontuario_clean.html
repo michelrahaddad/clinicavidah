@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 page-title">
+                <i class="fas fa-file-medical me-3 text-primary"></i>
+                <span class="gradient-text">Prontuário Eletrônico</span>
+            </h2>
+        </div>
+    </div>
+    
+    <!-- Search Form -->
+    <div class="card glass-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-search me-2"></i>
+                Busca de Pacientes
+            </h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('prontuario.prontuario') }}">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="busca_paciente" class="form-label text-light">Nome do Paciente</label>
+                        <input type="text" 
+                               name="busca_paciente"
+                               id="busca_paciente"
+                               class="form-control glass-input" 
+                               placeholder="Digite o nome do paciente para buscar..."
+                               value="{{ busca_paciente or '' }}"
+                               autocomplete="off">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="tipo" class="form-label text-light">Tipo de Registro</label>
+                        <select name="tipo" id="tipo" class="form-select glass-input">
+                            <option value="">Todos os tipos</option>
+                            <option value="receita" {% if filtro_tipo == 'receita' %}selected{% endif %}>Receitas</option>
+                            <option value="exame_lab" {% if filtro_tipo == 'exame_lab' %}selected{% endif %}>Exames Laboratoriais</option>
+                            <option value="exame_img" {% if filtro_tipo == 'exame_img' %}selected{% endif %}>Exames de Imagem</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <div class="btn-group w-100">
+                            <button type="submit" class="btn btn-primary neural-btn">
+                                <i class="fas fa-search me-2"></i>Buscar
+                            </button>
+                            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary neural-btn">
+                                <i class="fas fa-times me-2"></i>Limpar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    {% if resultados %}
+    <div class="card glass-card">
+        <div class="card-header">
+            <h5 class="mb-0 text-light">
+                <i class="fas fa-file-medical me-2"></i>
+                Resultados da Busca ({{ resultados|length }} registros encontrados)
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Paciente</th>
+                            <th>Tipo</th>
+                            <th>Detalhes</th>
+                            <th>Médico</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resultado in resultados %}
+                        <tr>
+                            <td>{{ resultado.data }}</td>
+                            <td><strong>{{ resultado.nome_paciente }}</strong></td>
+                            <td>
+                                {% if resultado.tipo == 'receita' %}
+                                    <span class="badge bg-success">Receita</span>
+                                {% elif resultado.tipo == 'exame_lab' %}
+                                    <span class="badge bg-info">Exame Lab</span>
+                                {% elif resultado.tipo == 'exame_img' %}
+                                    <span class="badge bg-warning">Exame Imagem</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ resultado.detalhes_registro }}</td>
+                            <td>{{ resultado.medico_nome }}</td>
+                            <td>
+                                {% if resultado.tipo == 'receita' %}
+                                    <a href="{{ url_for('receita.gerar_receita_pdf', receita_id=resultado.id_registro) }}" 
+                                       class="btn btn-sm btn-outline-info neural-btn" target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>PDF
+                                    </a>
+                                {% elif resultado.tipo == 'exame_lab' %}
+                                    <a href="{{ url_for('exames_lab.gerar_exame_pdf', exame_id=resultado.id_registro) }}" 
+                                       class="btn btn-sm btn-outline-info neural-btn" target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>PDF
+                                    </a>
+                                {% elif resultado.tipo == 'exame_img' %}
+                                    <a href="{{ url_for('exames_img.gerar_exame_pdf', exame_id=resultado.id_registro) }}" 
+                                       class="btn btn-sm btn-outline-info neural-btn" target="_blank">
+                                        <i class="fas fa-file-pdf me-1"></i>PDF
+                                    </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% elif busca_paciente %}
+    <div class="card glass-card">
+        <div class="card-body text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum registro encontrado</h5>
+            <p class="text-muted">Não foram encontrados registros para "{{ busca_paciente }}".</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -117,7 +117,7 @@ def prontuario():
         # Sort all results by date (newest first)
         resultados.sort(key=lambda x: x['data'], reverse=True)
         
-        return render_template('prontuario.html', 
+        return render_template('prontuario_clean.html', 
                              resultados=resultados,
                              busca_paciente=busca_paciente,
                              filtro_tipo=filtro_tipo,
@@ -127,4 +127,4 @@ def prontuario():
     except Exception as e:
         logging.error(f'Prontuario error: {e}')
         flash('Erro ao carregar prontuário.', 'error')
-        return render_template('prontuario.html', resultados=[])
+        return render_template('prontuario_clean.html', resultados=[])
