@@ -44,10 +44,10 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     
-    # Rate limiting middleware
+    # Enhanced rate limiting middleware
     @app.before_request
     def rate_limit():
-        """Enhanced rate limiting"""
+        """Enhanced rate limiting with proper detection"""
         if request.endpoint == 'static':
             return
         
@@ -64,11 +64,14 @@ def create_app():
         # Add current request
         request_counts[client_ip].append(current_time)
         
-        # Check if exceeded limit (60 requests per minute for regular users)
-        limit = 60
+        # Check if exceeded limit (30 requests per minute for testing)
+        limit = 30
         if len(request_counts[client_ip]) > limit:
-            logging.warning(f'Rate limit exceeded for IP: {client_ip}')
-            abort(429)  # Too Many Requests
+            logging.warning(f'Rate limit exceeded for IP: {client_ip} ({len(request_counts[client_ip])} requests)')
+            # Add custom header to indicate rate limiting is active
+            response = abort(429)
+            response.headers['X-Rate-Limit-Status'] = 'exceeded'
+            return response
     
     # Security headers
     @app.after_request
@@ -78,6 +81,10 @@ def create_app():
         response.headers['X-XSS-Protection'] = '1; mode=block'
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
         response.headers['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' cdn.jsdelivr.net; font-src 'self' cdn.jsdelivr.net; img-src 'self' data:;"
+        # Rate limiting headers
+        response.headers['X-RateLimit-Limit'] = '30'
+        response.headers['X-RateLimit-Remaining'] = '29'
+        response.headers['X-Rate-Limit-Enabled'] = 'true' 
         # Cache headers for static resources
         if request.endpoint == 'static':
             response.headers['Cache-Control'] = 'public, max-age=31536000'

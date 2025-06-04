@@ -307,5 +307,30 @@ def reimprimir_receita(receita_id):
         logging.error(f'Reprint prescription error: {e}')
         flash('Erro ao reimprimir receita.', 'error')
         return redirect(url_for('prontuario.prontuario'))
-
+@receita_bp.route('/refazer_receita/<int:id>')
+def refazer_receita_novo(id):
+    """Refaz uma receita existente usando novo nome de função"""
+    if 'usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        receita = Receita.query.get_or_404(id)
+        
+        # Verificar se o médico logado é o autor da receita
+        if receita.medico_nome != session['usuario']:
+            flash('Você não tem permissão para refazer esta receita.', 'error')
+            return redirect(url_for('receita.receita'))
+        
+        # Redirecionar para a página de receita com dados preenchidos
+        return redirect(url_for('receita.receita', 
+                               paciente_id=receita.id_paciente,
+                               medicamentos=receita.medicamentos,
+                               posologias=receita.posologias,
+                               duracoes=receita.duracoes,
+                               vias=receita.vias))
+                               
+    except Exception as e:
+        logging.error(f'Erro ao refazer receita {id}: {e}')
+        flash('Erro ao carregar receita para refazer.', 'error')
+        return redirect(url_for('receita.receita'))
 
