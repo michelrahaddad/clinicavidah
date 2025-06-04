@@ -70,15 +70,16 @@ def get_medicamentos_historico():
             medico_id = 1
         
         # Buscar medicamentos no histórico do médico, ordenados por frequência de uso
-        query = """
+        from sqlalchemy import text
+        query = text("""
             SELECT principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito
             FROM medicamentos_historico 
-            WHERE principio_ativo ILIKE %s AND id_medico = %s
+            WHERE principio_ativo ILIKE :term AND id_medico = :medico_id
             ORDER BY vezes_prescrito DESC, ultima_prescricao DESC
             LIMIT 10
-        """
+        """)
         
-        result = db.session.execute(query, (f'%{term}%', medico_id)).fetchall()
+        result = db.session.execute(query, {'term': f'%{term}%', 'medico_id': medico_id}).fetchall()
         
         medicamentos = []
         for row in result:
@@ -112,15 +113,16 @@ def get_medicamento_dados(principio_ativo):
             medico_id = 1
         
         # Buscar o medicamento mais prescrito pelo médico
-        query = """
+        from sqlalchemy import text
+        query = text("""
             SELECT concentracao, via, frequencia, quantidade
             FROM medicamentos_historico 
-            WHERE principio_ativo ILIKE %s AND id_medico = %s
+            WHERE principio_ativo ILIKE :principio AND id_medico = :medico_id
             ORDER BY vezes_prescrito DESC, ultima_prescricao DESC
             LIMIT 1
-        """
+        """)
         
-        result = db.session.execute(query, (principio_ativo.lower(), medico_id)).fetchone()
+        result = db.session.execute(query, {'principio': principio_ativo.lower(), 'medico_id': medico_id}).fetchone()
         
         if result:
             return jsonify({

@@ -36,23 +36,34 @@ def salvar_medicamentos_historico(principios_ativos, concentracoes, vias, freque
             
         # Verificar se já existe este medicamento para este médico
         try:
+            from sqlalchemy import text
             # Usar SQL direto para melhor performance
             existing = db.session.execute(
-                "SELECT id, vezes_prescrito FROM medicamentos_historico WHERE principio_ativo = %s AND id_medico = %s AND concentracao = %s AND via = %s",
-                (principio, medico_id, concentracao, via)
+                text("SELECT id, vezes_prescrito FROM medicamentos_historico WHERE principio_ativo = :principio AND id_medico = :medico_id AND concentracao = :concentracao AND via = :via"),
+                {'principio': principio, 'medico_id': medico_id, 'concentracao': concentracao, 'via': via}
             ).fetchone()
             
             if existing:
                 # Atualizar contagem e data
                 db.session.execute(
-                    "UPDATE medicamentos_historico SET vezes_prescrito = %s, ultima_prescricao = %s WHERE id = %s",
-                    (existing[1] + 1, datetime.now(), existing[0])
+                    text("UPDATE medicamentos_historico SET vezes_prescrito = :vezes, ultima_prescricao = :data WHERE id = :id"),
+                    {'vezes': existing[1] + 1, 'data': datetime.now(), 'id': existing[0]}
                 )
             else:
                 # Inserir novo registro
                 db.session.execute(
-                    "INSERT INTO medicamentos_historico (principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito, ultima_prescricao, created_at, id_medico) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                    (principio, concentracao, via, frequencia, quantidade, 1, datetime.now(), datetime.now(), medico_id)
+                    text("INSERT INTO medicamentos_historico (principio_ativo, concentracao, via, frequencia, quantidade, vezes_prescrito, ultima_prescricao, created_at, id_medico) VALUES (:principio, :concentracao, :via, :frequencia, :quantidade, :vezes, :ultima, :created, :medico_id)"),
+                    {
+                        'principio': principio, 
+                        'concentracao': concentracao, 
+                        'via': via, 
+                        'frequencia': frequencia, 
+                        'quantidade': quantidade, 
+                        'vezes': 1, 
+                        'ultima': datetime.now(), 
+                        'created': datetime.now(), 
+                        'medico_id': medico_id
+                    }
                 )
         except Exception as e:
             logging.error(f"Erro ao salvar medicamento no histórico: {e}")
