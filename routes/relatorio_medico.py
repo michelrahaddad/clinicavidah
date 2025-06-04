@@ -83,28 +83,35 @@ def salvar_relatorio_medico():
         db.session.commit()
         
         # Generate PDF
-        pdf_html = render_template('relatorio_medico_pdf.html',
-                                 nome_paciente=nome_paciente,
-                                 cid_codigo=cid_codigo,
-                                 cid_descricao=cid_descricao,
-                                 relatorio_texto=relatorio_texto,
-                                 medico=medico.nome if medico else "Médico não encontrado",
-                                 crm=medico.crm if medico else "CRM não disponível",
-                                 assinatura=medico.assinatura if medico else None,
-                                 data=data)
-        
-        pdf_file = weasyprint.HTML(string=pdf_html).write_pdf()
-        
-        response = make_response(pdf_file)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'inline; filename=relatorio_medico_{nome_paciente}_{data}.pdf'
-        response.headers['X-PDF-Success'] = 'true'
-        response.headers['X-Redirect-URL'] = url_for('relatorio_medico.relatorio_medico')
-        
-        flash('Relatório médico salvo e PDF gerado com sucesso!', 'success')
-        logging.info(f'Medical report created for patient: {nome_paciente}')
-        
-        return response
+        try:
+            pdf_html = render_template('relatorio_medico_pdf.html',
+                                     nome_paciente=nome_paciente,
+                                     cid_codigo=cid_codigo,
+                                     cid_descricao=cid_descricao,
+                                     relatorio_texto=relatorio_texto,
+                                     medico=medico.nome if medico else "Médico não encontrado",
+                                     crm=medico.crm if medico else "CRM não disponível",
+                                     assinatura=medico.assinatura if medico else None,
+                                     data=data)
+            
+            pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+            
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'inline; filename=relatorio_medico_{nome_paciente}_{data}.pdf'
+            response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            
+            flash('Relatório médico salvo e PDF gerado com sucesso!', 'success')
+            logging.info(f'Medical report created for patient: {nome_paciente}')
+            
+            return response
+            
+        except Exception as pdf_error:
+            logging.error(f'Medical report PDF generation error: {pdf_error}')
+            flash('Relatório médico salvo com sucesso! Erro na geração do PDF.', 'warning')
+            return redirect(url_for('relatorio_medico.relatorio_medico'))
         
     except Exception as e:
         logging.error(f'Medical report error: {e}')
