@@ -127,6 +127,10 @@ def salvar_receita():
         )
         
         db.session.add(prontuario)
+        
+        # Save medications to intelligent history for future autocomplete
+        salvar_medicamentos_historico(principios_ativos, concentracoes, vias, frequencias, quantidades, medico_id)
+        
         db.session.commit()
         
         # Generate PDF

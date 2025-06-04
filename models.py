@@ -139,6 +139,8 @@ class Prontuario(db.Model):
     medico = relationship('Medico', back_populates='prontuarios')
 
 
+
+
 class Cid10(db.Model):
     __tablename__ = 'cid10'
     
