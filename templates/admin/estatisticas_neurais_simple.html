@@ -1,7 +1,7 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
 {% block title %}Estatísticas Neurais - Admin{% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -9,8 +9,8 @@
                 <h2 class="text-light">
                     <i class="fas fa-brain me-2"></i>Estatísticas Neurais
                 </h2>
-                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-light">
-                    <i class="fas fa-arrow-left me-2"></i>Voltar ao Dashboard
+                <a href="/admin/dashboard" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
                 </a>
             </div>
         </div>
