@@ -9,13 +9,25 @@ prontuario_bp = Blueprint('prontuario', __name__)
 @prontuario_bp.route('/prontuario', methods=['GET'])
 def prontuario():
     """Display patient records"""
-    if 'usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
-        # Get current doctor ID from session
+        # Get current doctor ID from session, handle admin users
         medico_id = session.get('medico_id')
-        if not medico_id:
+        admin_data = session.get('admin_data')
+        
+        # If admin user, get first available doctor ID or use a default value
+        if not medico_id and (admin_data or 'admin_usuario' in session):
+            primeiro_medico = db.session.query(Medico).first()
+            if primeiro_medico:
+                medico_id = primeiro_medico.id
+                logging.info(f"Admin user accessing prontuario, using medico_id: {medico_id}")
+            else:
+                medico_id = 1  # Default fallback
+        
+        # Only redirect if neither medico_id nor admin session exists
+        if not medico_id and not admin_data and 'admin_usuario' not in session:
             flash('Sessão expirada. Faça login novamente.', 'error')
             return redirect(url_for('auth.login'))
             
@@ -330,13 +342,24 @@ def autocomplete_pacientes():
 @prontuario_bp.route('/prontuario/detalhes', methods=['GET'])
 def prontuario_detalhes():
     """Display detailed view of patient records for a specific date"""
-    if 'usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
-        # Get current doctor ID from session
+        # Get current doctor ID from session, handle admin users
         medico_id = session.get('medico_id')
-        if not medico_id:
+        admin_data = session.get('admin_data')
+        
+        # If admin user, get first available doctor ID
+        if not medico_id and (admin_data or 'admin_usuario' in session):
+            primeiro_medico = db.session.query(Medico).first()
+            if primeiro_medico:
+                medico_id = primeiro_medico.id
+            else:
+                medico_id = 1
+        
+        # Only redirect if neither medico_id nor admin session exists
+        if not medico_id and not admin_data and 'admin_usuario' not in session:
             flash('Sessão expirada. Faça login novamente.', 'error')
             return redirect(url_for('auth.login'))
             
@@ -493,13 +516,23 @@ def prontuario_detalhes():
 @prontuario_bp.route('/prontuario/api/update_date', methods=['POST'])
 def update_date():
     """API endpoint to update document date"""
-    if 'usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return jsonify({'success': False, 'error': 'Sessão expirada'})
     
     try:
-        # Get current doctor ID from session
+        # Get current doctor ID from session, handle admin users
         medico_id = session.get('medico_id')
-        if not medico_id:
+        admin_data = session.get('admin_data')
+        
+        # If admin user, get first available doctor ID
+        if not medico_id and (admin_data or 'admin_usuario' in session):
+            primeiro_medico = db.session.query(Medico).first()
+            if primeiro_medico:
+                medico_id = primeiro_medico.id
+            else:
+                medico_id = 1
+        
+        if not medico_id and not admin_data and 'admin_usuario' not in session:
             return jsonify({'success': False, 'error': 'Sessão expirada'})
         
         data = request.get_json()
