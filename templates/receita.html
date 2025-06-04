@@ -52,6 +52,7 @@
                         </label>
                         <input type="text" 
                                id="cpf_paciente"
+                               name="cpf"
                                class="form-control glass-input" 
                                placeholder="000.000.000-00"
                                style="background: rgba(255, 255, 255, 0.05);">
@@ -62,6 +63,7 @@
                         </label>
                         <input type="text" 
                                id="idade_paciente"
+                               name="idade"
                                class="form-control glass-input" 
                                placeholder="--"
                                style="background: rgba(255, 255, 255, 0.05);">
@@ -74,6 +76,7 @@
                         </label>
                         <input type="text" 
                                id="endereco_completo"
+                               name="endereco"
                                class="form-control glass-input" 
                                placeholder="Endereço não informado"
                                style="background: rgba(255, 255, 255, 0.05);">
@@ -403,30 +406,33 @@ function showMedicamentSuggestions(medicaments, input) {
             });
             
             // Preenche concentração
-            if (concentracaoInput && med.concentracao) {
-                concentracaoInput.value = med.concentracao;
-                console.log('✓ Concentração preenchida:', med.concentracao);
+            if (concentracaoInput) {
+                const concentracao = med.concentracao || '500mg';
+                concentracaoInput.value = concentracao;
+                console.log('✓ Concentração preenchida:', concentracao);
             }
             
             // Preenche via de administração
-            if (viaSelect && med.via_padrao) {
-                viaSelect.value = med.via_padrao;
-                console.log('✓ Via preenchida:', med.via_padrao);
+            if (viaSelect) {
+                const via = med.via_padrao || 'Oral';
+                viaSelect.value = via;
+                console.log('✓ Via preenchida:', via);
                 
-                // Verifica se o valor foi realmente definido
-                if (viaSelect.value !== med.via_padrao) {
-                    console.warn('Valor de via não encontrado nas opções:', med.via_padrao);
+                // Verifica se o valor foi definido
+                if (viaSelect.value !== via) {
+                    console.warn('Valor de via não encontrado nas opções:', via);
                 }
             }
             
             // Preenche frequência
-            if (frequenciaSelect && med.frequencia_padrao) {
-                frequenciaSelect.value = med.frequencia_padrao;
-                console.log('✓ Frequência preenchida:', med.frequencia_padrao);
+            if (frequenciaSelect) {
+                const frequencia = med.frequencia_padrao || '3x';
+                frequenciaSelect.value = frequencia;
+                console.log('✓ Frequência preenchida:', frequencia);
                 
-                // Verifica se o valor foi realmente definido
-                if (frequenciaSelect.value !== med.frequencia_padrao) {
-                    console.warn('Valor de frequência não encontrado nas opções:', med.frequencia_padrao);
+                // Verifica se o valor foi definido
+                if (frequenciaSelect.value !== frequencia) {
+                    console.warn('Valor de frequência não encontrado nas opções:', frequencia);
                 }
             }
             
