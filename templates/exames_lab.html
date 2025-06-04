@@ -412,7 +412,7 @@
                                        placeholder="Ex: Hematologia">
                             </div>
                         </div>
-                        <button type="button" class="btn btn-success neural-btn" >
+                        <button type="button" class="btn btn-success neural-btn" onclick="adicionarExamePersonalizado()">
                             <i class="fas fa-plus me-2"></i>Adicionar Exame
                         </button>
                     </div>
@@ -492,5 +492,69 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Sistema de Exames Laboratoriais carregado');
     console.log('Busca de exames configurada');
 });
+
+// Função para adicionar exame personalizado
+function adicionarExamePersonalizado() {
+    const nomeExame = document.getElementById('nomeNovoExame').value.trim();
+    const categoria = document.getElementById('categoriaNovoExame').value.trim() || 'Exames Personalizados';
+    
+    console.log('Tentando adicionar exame:', nomeExame, 'categoria:', categoria);
+    
+    if (!nomeExame) {
+        alert('Por favor, digite o nome do exame.');
+        return;
+    }
+    
+    // Criar novo checkbox para o exame personalizado
+    const novoExameHTML = `
+        <div class="col-12 mb-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="exames[]" 
+                       value="${nomeExame}" 
+                       id="exame_custom_${Date.now()}" checked>
+                <label class="form-check-label text-light" for="exame_custom_${Date.now()}">
+                    ${nomeExame} <small class="text-muted">(Personalizado)</small>
+                </label>
+            </div>
+        </div>
+    `;
+    
+    // Encontrar seção de exames personalizados ou criar uma nova
+    let secaoPersonalizados = document.getElementById('secao-exames-personalizados');
+    if (!secaoPersonalizados) {
+        // Criar nova seção para exames personalizados
+        const novaSecao = `
+            <div class="col-md-6 mb-4" id="secao-exames-personalizados">
+                <h6 class="text-warning mb-3">
+                    <i class="fas fa-user-cog me-2"></i>Exames Personalizados
+                </h6>
+                <div class="row" id="lista-exames-personalizados">
+                    ${novoExameHTML}
+                </div>
+            </div>
+        `;
+        
+        // Adicionar após a última seção existente
+        const ultimaSecao = document.querySelector('.row .col-md-6:last-child');
+        if (ultimaSecao && ultimaSecao.parentNode) {
+            ultimaSecao.insertAdjacentHTML('afterend', novaSecao);
+        }
+    } else {
+        // Adicionar à seção existente
+        const listaPersonalizados = document.getElementById('lista-exames-personalizados');
+        if (listaPersonalizados) {
+            listaPersonalizados.insertAdjacentHTML('beforeend', novoExameHTML);
+        }
+    }
+    
+    // Limpar campos do modal
+    document.getElementById('nomeNovoExame').value = '';
+    document.getElementById('categoriaNovoExame').value = '';
+    
+    // Mostrar mensagem de sucesso
+    alert(`Exame "${nomeExame}" adicionado com sucesso e já está selecionado!`);
+    
+    console.log('Exame personalizado adicionado:', nomeExame);
+}
 </script>
 {% endblock %}
