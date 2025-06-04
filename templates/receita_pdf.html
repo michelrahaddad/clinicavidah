@@ -148,21 +148,27 @@
     </div>
     
     <div class="via-section">
-        Via {{ vias[0] if vias else 'Oral' }}
+        Uso Interno - Via {{ vias[0] if vias else 'Oral' }}
     </div>
     
     <div class="prescription-content">
-        {% for medicamento, posologia, duracao, via in zip(medicamentos, posologias, duracoes, vias) %}
-        <div class="prescription-item">
-            <div style="margin-bottom: 8px;">
-                <span style="font-weight: bold; font-size: 13pt;">{{ medicamento }}</span>
+        {% for medicamento in medicamentos %}
+        {% set parts = medicamento.split(' - ') %}
+        {% set nome_concentracao = parts[0] if parts|length > 0 else medicamento %}
+        {% set via = parts[1] if parts|length > 1 else 'Oral' %}
+        {% set frequencia = parts[2] if parts|length > 2 else '1x' %}
+        {% set quantidade = parts[3] if parts|length > 3 else '30 comprimidos' %}
+        
+        <div class="prescription-item" style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                <span style="font-weight: bold; font-size: 12pt;">{{ nome_concentracao }}</span>
+                <span style="border-bottom: 1px dotted #000; flex-grow: 1; margin: 0 15px; min-width: 50px;"></span>
+                <span style="font-size: 11pt;">{{ quantidade }}</span>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                <span class="medication-number">{{ loop.index }}) Genérico</span>
-                <span style="border-bottom: 1px dotted #000; flex-grow: 1; margin: 0 20px; height: 1px;"></span>
-                <span class="medication-quantity">{{ duracao }}</span>
+            
+            <div style="margin-left: 0px; font-size: 11pt; line-height: 1.6;">
+                Tomar 1(um) comprimido por via {{ via.lower() }}, {{ frequencia }} ao dia{% if frequencia == '3x' %} (a cada 8 horas){% elif frequencia == '2x' %} (a cada 12 horas){% elif frequencia == '4x' %} (a cada 6 horas){% endif %}{% if loop.index < medicamentos|length %} por 7 dias{% endif %}
             </div>
-            <div class="posology">- {{ posologia }}</div>
         </div>
         {% endfor %}
     </div>
