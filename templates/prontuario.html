@@ -3,11 +3,14 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <div class="col-12">
+        <div class="col-12 d-flex justify-content-between align-items-center">
             <h2 class="mb-4 page-title">
                 <i class="fas fa-file-medical me-3 text-primary"></i>
                 <span class="gradient-text">Prontuário Eletrônico</span>
             </h2>
+            <a href="{{ url_for('dashboard.dashboard') }}" class="btn btn-outline-primary neural-btn">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Dashboard
+            </a>
         </div>
     </div>
     
@@ -375,5 +378,174 @@
 }
 </style>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sistema de autocomplete para busca de pacientes
+    const buscaPacienteInput = document.getElementById('busca_paciente');
+    let autocompleteTimeout;
+    let currentResults = [];
+    
+    // Criar container para sugestões
+    const suggestionContainer = document.createElement('div');
+    suggestionContainer.className = 'autocomplete-suggestions';
+    suggestionContainer.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(30, 30, 30, 0.95);
+        border: 1px solid rgba(64, 224, 208, 0.3);
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        backdrop-filter: blur(10px);
+    `;
+    
+    // Posicionar container relativamente ao input
+    buscaPacienteInput.parentNode.style.position = 'relative';
+    buscaPacienteInput.parentNode.appendChild(suggestionContainer);
+    
+    // Função para buscar sugestões
+    async function buscarSugestoes(termo) {
+        if (termo.length < 2) {
+            suggestionContainer.style.display = 'none';
+            return;
+        }
+        
+        try {
+            const response = await fetch('/prontuario/api/autocomplete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ termo: termo })
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                mostrarSugestoes(data.sugestoes || []);
+            } else {
+                console.log('Erro na busca de autocomplete');
+                suggestionContainer.style.display = 'none';
+            }
+        } catch (error) {
+            console.log('Erro de conexão no autocomplete');
+            suggestionContainer.style.display = 'none';
+        }
+    }
+    
+    // Função para mostrar sugestões
+    function mostrarSugestoes(sugestoes) {
+        currentResults = sugestoes;
+        
+        if (sugestoes.length === 0) {
+            suggestionContainer.style.display = 'none';
+            return;
+        }
+        
+        suggestionContainer.innerHTML = '';
+        
+        sugestoes.forEach((sugestao, index) => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            item.style.cssText = `
+                padding: 10px 15px;
+                cursor: pointer;
+                border-bottom: 1px solid rgba(64, 224, 208, 0.1);
+                color: #e0e0e0;
+                transition: all 0.3s ease;
+            `;
+            
+            item.innerHTML = `
+                <div style="font-weight: 500;">${sugestao.nome}</div>
+                <small style="color: #888;">Último registro: ${sugestao.ultima_data}</small>
+            `;
+            
+            // Hover effect
+            item.addEventListener('mouseenter', function() {
+                this.style.background = 'rgba(64, 224, 208, 0.2)';
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.background = 'transparent';
+                this.style.transform = 'translateX(0)';
+            });
+            
+            // Click handler
+            item.addEventListener('click', function() {
+                buscaPacienteInput.value = sugestao.nome;
+                suggestionContainer.style.display = 'none';
+                // Trigger search
+                buscaPacienteInput.closest('form').submit();
+            });
+            
+            suggestionContainer.appendChild(item);
+        });
+        
+        suggestionContainer.style.display = 'block';
+    }
+    
+    // Event listeners
+    buscaPacienteInput.addEventListener('input', function() {
+        const termo = this.value.trim();
+        
+        clearTimeout(autocompleteTimeout);
+        autocompleteTimeout = setTimeout(() => {
+            buscarSugestoes(termo);
+        }, 300);
+    });
+    
+    // Esconder sugestões quando clicar fora
+    document.addEventListener('click', function(e) {
+        if (!buscaPacienteInput.contains(e.target) && !suggestionContainer.contains(e.target)) {
+            suggestionContainer.style.display = 'none';
+        }
+    });
+    
+    // Navegação por teclado
+    buscaPacienteInput.addEventListener('keydown', function(e) {
+        const items = suggestionContainer.querySelectorAll('.autocomplete-item');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const selected = suggestionContainer.querySelector('.selected');
+            if (selected) {
+                selected.classList.remove('selected');
+                const next = selected.nextElementSibling;
+                if (next) {
+                    next.classList.add('selected');
+                    next.scrollIntoView({ block: 'nearest' });
+                }
+            } else if (items.length > 0) {
+                items[0].classList.add('selected');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const selected = suggestionContainer.querySelector('.selected');
+            if (selected) {
+                selected.classList.remove('selected');
+                const prev = selected.previousElementSibling;
+                if (prev) {
+                    prev.classList.add('selected');
+                    prev.scrollIntoView({ block: 'nearest' });
+                }
+            }
+        } else if (e.key === 'Enter') {
+            const selected = suggestionContainer.querySelector('.selected');
+            if (selected) {
+                e.preventDefault();
+                selected.click();
+            }
+        } else if (e.key === 'Escape') {
+            suggestionContainer.style.display = 'none';
+        }
+    });
+    
+    console.log('Sistema de autocomplete do prontuário inicializado');
+});
+</script>
 
 {% endblock %}

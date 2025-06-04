@@ -599,3 +599,96 @@ def update_date():
         logging.error(f'Update date error: {e}')
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)})
+
+@prontuario_bp.route('/prontuario/api/autocomplete', methods=['POST'])
+def autocomplete():
+    """API endpoint for patient name autocomplete"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify({'success': False, 'error': 'Sessão expirada'})
+    
+    try:
+        # Get current doctor ID from session, handle admin users
+        medico_id = session.get('medico_id')
+        admin_data = session.get('admin_data')
+        
+        # If admin user, get first available doctor ID
+        if not medico_id and (admin_data or 'admin_usuario' in session):
+            primeiro_medico = db.session.query(Medico).first()
+            if primeiro_medico:
+                medico_id = primeiro_medico.id
+            else:
+                medico_id = 1
+        
+        if not medico_id and not admin_data and 'admin_usuario' not in session:
+            return jsonify({'success': False, 'error': 'Sessão expirada'})
+        
+        data = request.get_json()
+        termo = data.get('termo', '').strip()
+        
+        if len(termo) < 2:
+            return jsonify({'sugestoes': []})
+        
+        sugestoes = []
+        pacientes_encontrados = set()
+        
+        # Buscar em receitas
+        receitas = db.session.query(Receita.nome_paciente, Receita.data).filter(
+            Receita.id_medico == medico_id,
+            Receita.nome_paciente.ilike(f'%{termo}%')
+        ).order_by(Receita.data.desc()).limit(10).all()
+        
+        for receita in receitas:
+            nome = receita.nome_paciente
+            if nome not in pacientes_encontrados:
+                pacientes_encontrados.add(nome)
+                sugestoes.append({
+                    'nome': nome,
+                    'ultima_data': receita.data,
+                    'tipo': 'receita'
+                })
+        
+        # Buscar em exames laboratoriais
+        exames_lab = db.session.query(ExameLab.nome_paciente, ExameLab.data).filter(
+            ExameLab.id_medico == medico_id,
+            ExameLab.nome_paciente.ilike(f'%{termo}%')
+        ).order_by(ExameLab.data.desc()).limit(10).all()
+        
+        for exame in exames_lab:
+            nome = exame.nome_paciente
+            if nome not in pacientes_encontrados:
+                pacientes_encontrados.add(nome)
+                sugestoes.append({
+                    'nome': nome,
+                    'ultima_data': exame.data,
+                    'tipo': 'exame_lab'
+                })
+        
+        # Buscar em exames de imagem
+        exames_img = db.session.query(ExameImg.nome_paciente, ExameImg.data).filter(
+            ExameImg.id_medico == medico_id,
+            ExameImg.nome_paciente.ilike(f'%{termo}%')
+        ).order_by(ExameImg.data.desc()).limit(10).all()
+        
+        for exame in exames_img:
+            nome = exame.nome_paciente
+            if nome not in pacientes_encontrados:
+                pacientes_encontrados.add(nome)
+                sugestoes.append({
+                    'nome': nome,
+                    'ultima_data': exame.data,
+                    'tipo': 'exame_img'
+                })
+        
+        # Ordenar sugestões por data mais recente
+        sugestoes.sort(key=lambda x: x['ultima_data'], reverse=True)
+        
+        # Limitar a 8 sugestões
+        sugestoes = sugestoes[:8]
+        
+        logging.info(f"Autocomplete search for '{termo}' returned {len(sugestoes)} suggestions")
+        
+        return jsonify({'success': True, 'sugestoes': sugestoes})
+        
+    except Exception as e:
+        logging.error(f'Autocomplete error: {e}')
+        return jsonify({'success': False, 'error': str(e)})
