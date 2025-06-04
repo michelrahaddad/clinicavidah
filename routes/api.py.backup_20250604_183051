@@ -14,10 +14,6 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 @rate_limit(max_requests=50, per_minutes=5)
 @require_auth
 def buscar_pacientes():
-    # Setup admin access
-    admin_data = session.get('admin_data')
-    is_admin = admin_data or 'admin_usuario' in session
-
     """Search patients by name"""
     query = request.args.get('q', '').strip()
     
@@ -66,7 +62,7 @@ def buscar_pacientes():
 @api_bp.route('/prontuario_paciente/<int:paciente_id>')
 def prontuario_paciente(paciente_id):
     """Get patient medical records"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
@@ -158,7 +154,7 @@ def buscar_medicamentos():
 @api_bp.route('/record_details/<string:tipo>/<int:record_id>')
 def record_details(tipo, record_id):
     """Get detailed record information"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
@@ -376,7 +372,7 @@ def buscar_exames_img():
 @api_bp.route('/update_record_date', methods=['POST'])
 def update_record_date():
     """Update record date"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
     
     try:
@@ -447,7 +443,7 @@ def buscar_cid10():
 def adicionar_exame_personalizado():
     """Add custom exam"""
     try:
-        if 'usuario' not in session and 'admin_usuario' not in session:
+        if 'usuario' not in session:
             return jsonify({'success': False, 'message': 'Usuário não autenticado'}), 401
         
         nome_exame = sanitizar_entrada(request.form.get('nome_exame', ''))
@@ -498,7 +494,7 @@ def adicionar_exame_personalizado():
 def listar_exames_personalizados(tipo):
     """List custom exams by type"""
     try:
-        if 'usuario' not in session and 'admin_usuario' not in session:
+        if 'usuario' not in session:
             return jsonify({'success': False, 'message': 'Usuário não autenticado'}), 401
         
         if tipo not in ['laboratorial', 'imagem']:
@@ -534,7 +530,7 @@ def listar_exames_personalizados(tipo):
 def remover_exame_personalizado(exame_id):
     """Remove custom exam (soft delete)"""
     try:
-        if 'usuario' not in session and 'admin_usuario' not in session:
+        if 'usuario' not in session:
             return jsonify({'success': False, 'message': 'Usuário não autenticado'}), 401
         
         medico_id = session['usuario']['id']

@@ -12,7 +12,7 @@ agenda_bp = Blueprint('agenda', __name__)
 @agenda_bp.route('/agenda', methods=['GET', 'POST'])
 def agenda():
     """Display and manage appointments"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         return redirect(url_for('auth.login'))
     
     if request.method == 'POST':
@@ -90,7 +90,7 @@ def agenda():
 @agenda_bp.route('/agenda/excluir/<int:id>', methods=['POST'])
 def excluir_agendamento(id):
     """Delete appointment"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -112,7 +112,7 @@ def excluir_agendamento(id):
 @agenda_bp.route('/agenda/editar/<int:id>', methods=['POST'])
 def editar_agendamento(id):
     """Edit appointment"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:

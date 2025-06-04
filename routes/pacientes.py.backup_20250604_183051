@@ -9,7 +9,7 @@ pacientes_bp = Blueprint('pacientes', __name__)
 @pacientes_bp.route('/novo_paciente', methods=['GET', 'POST'])
 def novo_paciente():
     """Register new patient"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session:
         flash('Faça login para acessar esta página.', 'error')
         return redirect(url_for('auth.login'))
     
