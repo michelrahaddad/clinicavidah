@@ -45,31 +45,36 @@ def get_pacientes():
 @api_bp.route('/medicamentos')
 def get_medicamentos():
     """API para autocomplete de medicamentos"""
-    # Verificação mais flexível de autenticação
-    if not (session.get('usuario') or session.get('admin_usuario') or session.get('nome')):
-        return jsonify([])
-    
     try:
         term = request.args.get('q', '').strip()
+        logging.info(f"Buscando medicamentos com termo: '{term}'")
+        
         if len(term) < 2:
             return jsonify([])
         
+        # Busca direta no banco
         medicamentos = Medicamento.query.filter(
             Medicamento.nome.ilike(f'%{term}%')
         ).limit(10).all()
         
+        logging.info(f"Encontrados {len(medicamentos)} medicamentos")
+        
         result = []
         for m in medicamentos:
-            result.append({
+            med_data = {
                 'id': m.id,
                 'nome': m.nome,
-                'tipo': m.tipo or '',
-                'concentracao': m.concentracao or ''
-            })
+                'tipo': getattr(m, 'tipo', '') or '',
+                'concentracao': getattr(m, 'concentracao', '') or ''
+            }
+            result.append(med_data)
+            logging.info(f"Medicamento: {med_data}")
         
         return jsonify(result)
     except Exception as e:
         logging.error(f"Erro na API de medicamentos: {e}")
+        import traceback
+        logging.error(traceback.format_exc())
         return jsonify([])
 
 @api_bp.route('/buscar_pacientes')
