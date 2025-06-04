@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from utils.db import insert_patient_if_not_exists
 from utils.forms import validar_data, sanitizar_entrada
 from models import Agendamento
+from utils.forms import sanitizar_entrada
 from app import db
 from datetime import datetime
 import logging

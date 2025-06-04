@@ -47,22 +47,27 @@ def create_app():
     # Rate limiting middleware
     @app.before_request
     def rate_limit():
-        """Simple rate limiting"""
+        """Enhanced rate limiting"""
         if request.endpoint == 'static':
             return
         
-        client_ip = request.remote_addr
+        client_ip = request.remote_addr or 'unknown'
         current_time = time()
         
         # Clean old requests (older than 1 minute)
-        request_counts[client_ip] = [req_time for req_time in request_counts[client_ip] 
-                                    if current_time - req_time < 60]
+        if client_ip in request_counts:
+            request_counts[client_ip] = [req_time for req_time in request_counts[client_ip] 
+                                        if current_time - req_time < 60]
+        else:
+            request_counts[client_ip] = []
         
         # Add current request
         request_counts[client_ip].append(current_time)
         
-        # Check if exceeded limit (100 requests per minute)
-        if len(request_counts[client_ip]) > 100:
+        # Check if exceeded limit (60 requests per minute for regular users)
+        limit = 60
+        if len(request_counts[client_ip]) > limit:
+            logging.warning(f'Rate limit exceeded for IP: {client_ip}')
             abort(429)  # Too Many Requests
     
     # Security headers

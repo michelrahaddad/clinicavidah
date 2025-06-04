@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from utils.db import get_db_connection, insert_patient_if_not_exists
 from utils.forms import validar_medicamentos, sanitizar_entrada
 from models import Medico, Receita, Prontuario, Paciente
+from utils.forms import sanitizar_entrada
 from app import db
 from datetime import datetime
 import logging
@@ -306,3 +307,5 @@ def reimprimir_receita(receita_id):
         logging.error(f'Reprint prescription error: {e}')
         flash('Erro ao reimprimir receita.', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+
