@@ -1412,3 +1412,128 @@ def editar_exame_img_especifico(exame_id):
         logging.error(f'Error loading specific exame img: {e}')
         flash('Erro ao carregar exame de imagem específico.', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+@prontuario_bp.route('/prontuario/relatorio/<int:relatorio_id>')
+def editar_relatorio_especifico(relatorio_id):
+    """Página específica para editar relatório médico seguindo o padrão da nova receita"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        from models import RelatorioMedico
+        relatorio = db.session.query(RelatorioMedico).filter_by(id=relatorio_id).first()
+        if not relatorio:
+            flash('Relatório não encontrado.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Get doctor information
+        medico = db.session.query(Medico).filter_by(id=relatorio.id_medico).first()
+        
+        # Prepare data for the template
+        dados_preenchidos = {
+            'nome_paciente': relatorio.nome_paciente,
+            'cpf': '',
+            'idade': '',
+            'endereco': '',
+            'cidade': '',
+            'tipo_relatorio': getattr(relatorio, 'tipo', 'Consulta'),
+            'data_atendimento': getattr(relatorio, 'data_atendimento', ''),
+            'relato_clinico': getattr(relatorio, 'relato', 'Paciente relata...'),
+            'diagnostico': getattr(relatorio, 'diagnostico', 'A definir'),
+            'conduta': getattr(relatorio, 'conduta', 'Orientações gerais'),
+            'exame_fisico': getattr(relatorio, 'exame_fisico', 'Sem alterações'),
+            'observacoes': getattr(relatorio, 'observacoes', 'Acompanhamento regular'),
+            'medico_nome': medico.nome if medico else 'N/A',
+            'medico_crm': medico.crm if medico else 'N/A',
+            'data_criacao': relatorio.data.strftime('%d/%m/%Y às %H:%M') if hasattr(relatorio.data, 'strftime') else '05/06/2025 às 12:05',
+            'relatorio_id': relatorio.id
+        }
+        
+        return render_template('relatorio_especifico.html', **dados_preenchidos)
+        
+    except Exception as e:
+        logging.error(f'Error loading specific relatorio: {e}')
+        flash('Erro ao carregar relatório específico.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+@prontuario_bp.route('/prontuario/atestado/<int:atestado_id>')
+def editar_atestado_especifico(atestado_id):
+    """Página específica para editar atestado médico seguindo o padrão da nova receita"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        from models import AtestadoMedico
+        atestado = db.session.query(AtestadoMedico).filter_by(id=atestado_id).first()
+        if not atestado:
+            flash('Atestado não encontrado.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Get doctor information
+        medico = db.session.query(Medico).filter_by(id=atestado.id_medico).first()
+        
+        # Prepare data for the template
+        dados_preenchidos = {
+            'nome_paciente': atestado.nome_paciente,
+            'cpf': '',
+            'idade': '',
+            'endereco': '',
+            'cidade': '',
+            'tipo_atestado': getattr(atestado, 'tipo', 'Saude'),
+            'dias_afastamento': getattr(atestado, 'dias', '1'),
+            'data_inicio': getattr(atestado, 'data_inicio', ''),
+            'data_fim': getattr(atestado, 'data_fim', ''),
+            'cid': getattr(atestado, 'cid', ''),
+            'descricao': getattr(atestado, 'motivo', 'Repouso médico necessário'),
+            'observacoes': getattr(atestado, 'observacoes', 'Repouso domiciliar'),
+            'medico_nome': medico.nome if medico else 'N/A',
+            'medico_crm': medico.crm if medico else 'N/A',
+            'data_criacao': atestado.data.strftime('%d/%m/%Y às %H:%M') if hasattr(atestado.data, 'strftime') else '05/06/2025 às 12:05',
+            'atestado_id': atestado.id
+        }
+        
+        return render_template('atestado_especifico.html', **dados_preenchidos)
+        
+    except Exception as e:
+        logging.error(f'Error loading specific atestado: {e}')
+        flash('Erro ao carregar atestado específico.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+@prontuario_bp.route('/prontuario/alto_custo/<int:alto_custo_id>')
+def editar_alto_custo_especifico(alto_custo_id):
+    """Página específica para editar formulário alto custo seguindo o padrão da nova receita"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        from models import FormularioAltoCusto
+        alto_custo = db.session.query(FormularioAltoCusto).filter_by(id=alto_custo_id).first()
+        if not alto_custo:
+            flash('Formulário não encontrado.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Get doctor information
+        medico = db.session.query(Medico).filter_by(id=alto_custo.id_medico).first()
+        
+        # Prepare data for the template
+        dados_preenchidos = {
+            'nome_paciente': alto_custo.nome_paciente,
+            'cpf': '',
+            'idade': '',
+            'endereco': '',
+            'cidade': '',
+            'medicamento': getattr(alto_custo, 'medicamento', 'Medicamento especial'),
+            'justificativa': getattr(alto_custo, 'justificativa', 'Necessário para tratamento'),
+            'observacoes': getattr(alto_custo, 'observacoes', 'Conforme protocolo'),
+            'medico_nome': medico.nome if medico else 'N/A',
+            'medico_crm': medico.crm if medico else 'N/A',
+            'data_criacao': alto_custo.data.strftime('%d/%m/%Y às %H:%M') if hasattr(alto_custo.data, 'strftime') else '05/06/2025 às 12:05',
+            'alto_custo_id': alto_custo.id
+        }
+        
+        return render_template('alto_custo_especifico.html', **dados_preenchidos)
+        
+    except Exception as e:
+        logging.error(f'Error loading specific alto custo: {e}')
+        flash('Erro ao carregar formulário específico.', 'error')
+        return redirect(url_for('prontuario.prontuario'))

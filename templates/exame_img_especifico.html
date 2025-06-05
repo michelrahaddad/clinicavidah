@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 page-title">
+                <i class="fas fa-x-ray me-3 text-primary"></i>
+                <span class="gradient-text">Exame de Imagem</span>
+            </h2>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('exames_img.salvar_exame_img') }}" method="post" id="exame-form">
+        <input type="hidden" name="refazer" value="true">
+        <input type="hidden" name="exame_id" value="{{ exame_id }}">
+        
+        <!-- Dados do Paciente -->
+        <div class="card glass-card">
+            <div class="card-header">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-user me-2"></i>
+                    Dados do Paciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="nome_paciente" class="form-label text-light">
+                                <i class="fas fa-user me-2"></i>Nome do Paciente *
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" 
+                                       id="nome_paciente"
+                                       name="nome_paciente"
+                                       class="form-control glass-input" 
+                                       placeholder="Digite o nome do paciente..."
+                                       value="{{ nome_paciente }}"
+                                       required
+                                       autocomplete="off"
+                                       style="height: 50px; font-size: 1.1rem; font-weight: 500;">
+                                <div id="paciente-suggestions" class="suggestions-dropdown"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dados adicionais do paciente -->
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="cpf_paciente" class="form-label text-light">
+                            <i class="fas fa-id-card me-2 text-warning"></i>CPF
+                        </label>
+                        <input type="text" 
+                               id="cpf_paciente"
+                               name="cpf"
+                               class="form-control glass-input" 
+                               placeholder="000.000.000-00"
+                               value="{{ cpf }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="idade_paciente" class="form-label text-light">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>Idade
+                        </label>
+                        <input type="text" 
+                               id="idade_paciente"
+                               name="idade"
+                               class="form-control glass-input" 
+                               placeholder="--"
+                               value="{{ idade }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="endereco_completo" class="form-label text-light">
+                            <i class="fas fa-map-marker-alt me-2 text-danger"></i>Endereço
+                        </label>
+                        <input type="text" 
+                               id="endereco_completo"
+                               name="endereco"
+                               class="form-control glass-input" 
+                               placeholder="Endereço não informado"
+                               value="{{ endereco }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="cidade_uf_completo" class="form-label text-light">
+                            <i class="fas fa-city me-2 text-info"></i>Cidade/UF
+                        </label>
+                        <input type="text" 
+                               id="cidade_uf_completo"
+                               name="cidade"
+                               class="form-control glass-input" 
+                               placeholder="Cidade/UF"
+                               value="{{ cidade }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Exames de Imagem Solicitados -->
+        <div class="card glass-card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-x-ray me-2"></i>
+                    Exames de Imagem Solicitados
+                </h5>
+                <div class="header-buttons">
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="limparExames()">
+                        <i class="fas fa-eraser me-1"></i>LIMPAR
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="adicionarExame()">
+                        <i class="fas fa-plus me-1"></i>+ EXAME
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted mb-3">
+                        <small>Formato: [Tipo de Exame] / [Região] / [Contraste]</small>
+                    </p>
+                </div>
+                
+                <div id="exames-container">
+                    {% for i in range(exames_solicitados|length if exames_solicitados else 1) %}
+                    <div class="exame-group mb-4 p-3" style="background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="row align-items-center mb-2">
+                            <div class="col">
+                                <h6 class="text-info mb-0">
+                                    <i class="fas fa-camera me-2"></i>Exame {{ i + 1 }}
+                                </h6>
+                            </div>
+                            {% if i > 0 %}
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerExame(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Tipo de Exame</strong>
+                                </label>
+                                <select name="exame_tipo[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                                    <option value="Raio-X" selected>Raio-X</option>
+                                    <option value="Tomografia">Tomografia</option>
+                                    <option value="Ressonância">Ressonância</option>
+                                    <option value="Ultrassom">Ultrassom</option>
+                                    <option value="Mamografia">Mamografia</option>
+                                    <option value="Densitometria">Densitometria</option>
+                                    <option value="Ecocardiograma">Ecocardiograma</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Região</strong>
+                                </label>
+                                <input type="text" 
+                                       name="exame_regiao[]"
+                                       class="form-control glass-input" 
+                                       placeholder="Ex: Tórax PA e Perfil"
+                                       value="{{ exames_solicitados[i] if exames_solicitados and i < exames_solicitados|length else 'Tórax PA e Perfil' }}"
+                                       style="font-size: 0.9rem;">
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Contraste</strong>
+                                </label>
+                                <select name="exame_contraste[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                                    <option value="Sem contraste" selected>Sem contraste</option>
+                                    <option value="Com contraste">Com contraste</option>
+                                    <option value="Com e sem contraste">Com e sem contraste</option>
+                                    <option value="Se necessário">Se necessário</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Preparação e Observações -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-clock me-2"></i>Preparação
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="preparacao" 
+                                  class="form-control glass-input" 
+                                  rows="4" 
+                                  placeholder="Descreva a preparação necessária...">{{ preparacao }}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-notes-medical me-2"></i>Observações
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="observacoes" 
+                                  class="form-control glass-input" 
+                                  rows="4" 
+                                  placeholder="Observações adicionais...">{{ observacoes }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informações do Médico e Data -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-user-md me-2"></i>Médico
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" 
+                               name="medico"
+                               class="form-control glass-input" 
+                               value="{{ medico_nome }}"
+                               readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-id-badge me-2"></i>CRM
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               value="{{ medico_crm }}"
+                               readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-calendar me-2"></i>Data de Criação
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               value="{{ data_criacao }}"
+                               readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="row mt-4 mb-5">
+            <div class="col-12 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </button>
+                <div>
+                    <button type="submit" class="btn btn-success me-3">
+                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                    </button>
+                    <a href="{{ url_for('exames_img.gerar_pdf', exame_id=exame_id) }}" 
+                       class="btn btn-primary" target="_blank">
+                        <i class="fas fa-file-pdf me-2"></i>Gerar PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Função para adicionar exame
+function adicionarExame() {
+    const container = document.getElementById('exames-container');
+    const currentCount = container.children.length;
+    const newIndex = currentCount + 1;
+    
+    const exameHTML = `
+        <div class="exame-group mb-4 p-3" style="background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="row align-items-center mb-2">
+                <div class="col">
+                    <h6 class="text-info mb-0">
+                        <i class="fas fa-camera me-2"></i>Exame ${newIndex}
+                    </h6>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerExame(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Tipo de Exame</strong>
+                    </label>
+                    <select name="exame_tipo[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                        <option value="Raio-X">Raio-X</option>
+                        <option value="Tomografia">Tomografia</option>
+                        <option value="Ressonância">Ressonância</option>
+                        <option value="Ultrassom">Ultrassom</option>
+                        <option value="Mamografia">Mamografia</option>
+                        <option value="Densitometria">Densitometria</option>
+                        <option value="Ecocardiograma">Ecocardiograma</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Região</strong>
+                    </label>
+                    <input type="text" 
+                           name="exame_regiao[]"
+                           class="form-control glass-input" 
+                           placeholder="Ex: Tórax PA e Perfil"
+                           style="font-size: 0.9rem;">
+                </div>
+                <div class="col-lg-4 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Contraste</strong>
+                    </label>
+                    <select name="exame_contraste[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                        <option value="Sem contraste">Sem contraste</option>
+                        <option value="Com contraste">Com contraste</option>
+                        <option value="Com e sem contraste">Com e sem contraste</option>
+                        <option value="Se necessário">Se necessário</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', exameHTML);
+}
+
+// Função para remover exame
+function removerExame(button) {
+    const exameGroup = button.closest('.exame-group');
+    exameGroup.remove();
+    
+    // Renumerar exames
+    const groups = document.querySelectorAll('.exame-group');
+    groups.forEach((group, index) => {
+        const title = group.querySelector('h6');
+        title.innerHTML = `<i class="fas fa-camera me-2"></i>Exame ${index + 1}`;
+    });
+}
+
+// Função para limpar exames
+function limparExames() {
+    const container = document.getElementById('exames-container');
+    const firstGroup = container.querySelector('.exame-group');
+    
+    // Limpar inputs do primeiro grupo
+    firstGroup.querySelectorAll('input, select, textarea').forEach(input => {
+        if (input.type !== 'hidden') {
+            input.value = '';
+        }
+    });
+    
+    // Remover grupos adicionais
+    const additionalGroups = container.querySelectorAll('.exame-group:not(:first-child)');
+    additionalGroups.forEach(group => group.remove());
+}
+</script>
+{% endblock %}
