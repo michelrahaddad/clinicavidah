@@ -22,7 +22,7 @@ def login():
         
         if not nome or not senha:
             flash('Nome e senha são obrigatórios.', 'error')
-            return render_template('login.html')
+            return render_template('login_fixed.html')
         
         try:
             logging.info(f'Login attempt - Nome: {nome}, CRM: {crm}')
