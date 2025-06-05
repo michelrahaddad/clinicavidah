@@ -8,13 +8,13 @@ import logging
 
 def create_black_signature(signature_data):
     """
-    Converte assinatura digital para preto sólido
+    Processa assinatura para aparecer em preto visível no PDF
     
     Args:
         signature_data (str): Data URL da assinatura
     
     Returns:
-        str: Data URL da assinatura processada em preto
+        str: Data URL da assinatura processada
     """
     try:
         if not signature_data or not signature_data.startswith('data:image'):
@@ -31,39 +31,32 @@ def create_black_signature(signature_data):
         if image.mode != 'RGBA':
             image = image.convert('RGBA')
         
-        # Converte para RGB com fundo branco
-        background = Image.new('RGB', image.size, (255, 255, 255))
-        if image.mode == 'RGBA':
-            background.paste(image, mask=image.split()[-1])
-        else:
-            background.paste(image)
+        # Cria uma nova imagem RGB com fundo branco
+        width, height = image.size
+        processed_image = Image.new('RGB', (width, height), 'white')
         
-        # Converte para escala de cinza
-        grayscale = background.convert('L')
-        
-        # Aumenta contraste drasticamente
-        enhancer = ImageEnhance.Contrast(grayscale)
-        high_contrast = enhancer.enhance(5.0)
-        
-        # Aplica threshold para binarizar (preto/branco) 
-        def threshold_func(pixel):
-            return 0 if pixel < 200 else 255
-        binary = high_contrast.point(threshold_func, mode='1')
-        
-        # Converte de volta para RGB
-        final_image = binary.convert('RGB')
-        
-        # Inverte se necessário (garante que texto seja preto)
-        pixels = list(final_image.getdata())
-        black_count = sum(1 for r, g, b in pixels if r < 50 and g < 50 and b < 50)
-        white_count = sum(1 for r, g, b in pixels if r > 200 and g > 200 and b > 200)
-        
-        if black_count < white_count * 0.1:  # Se quase não há preto, inverte
-            final_image = ImageOps.invert(final_image)
+        # Processa pixel por pixel para converter transparências em preto
+        for y in range(height):
+            for x in range(width):
+                r, g, b, a = image.getpixel((x, y))
+                
+                # Se o pixel tem alguma opacidade (não é totalmente transparente)
+                if a > 50:  # Threshold para considerar como parte da assinatura
+                    # Calcula intensidade do pixel
+                    intensity = (r + g + b) / 3
+                    
+                    # Se o pixel é escuro ou tem boa opacidade, torna preto
+                    if intensity < 200 or a > 150:
+                        processed_image.putpixel((x, y), (0, 0, 0))  # Preto
+                    else:
+                        processed_image.putpixel((x, y), (255, 255, 255))  # Branco
+                else:
+                    # Pixel transparente vira branco
+                    processed_image.putpixel((x, y), (255, 255, 255))
         
         # Salva como PNG
         output_buffer = io.BytesIO()
-        final_image.save(output_buffer, format='PNG')
+        processed_image.save(output_buffer, format='PNG')
         output_buffer.seek(0)
         
         processed_data = base64.b64encode(output_buffer.getvalue()).decode()
