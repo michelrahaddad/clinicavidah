@@ -7,6 +7,26 @@ from datetime import datetime
 import logging
 import weasyprint
 
+def formatar_data_brasileira(data):
+    """Converte data para o formato brasileiro DD/MM/AAAA"""
+    if isinstance(data, str):
+        try:
+            if '-' in data:
+                data_obj = datetime.strptime(data, '%Y-%m-%d')
+            else:
+                return data
+        except:
+            return data
+    elif isinstance(data, datetime):
+        data_obj = data
+    else:
+        try:
+            data_obj = datetime.strptime(str(data), '%Y-%m-%d')
+        except:
+            return str(data)
+    
+    return data_obj.strftime('%d/%m/%Y')
+
 exames_img_bp = Blueprint('exames_img', __name__)
 
 @exames_img_bp.route('/exames_img', methods=['GET'])
@@ -88,7 +108,7 @@ def salvar_exames_img():
                                      medico=medico.nome if medico else "Médico não encontrado",
                                      crm=medico.crm if medico else "CRM não disponível",
                                      assinatura=medico.assinatura if medico else None,
-                                     data=data)
+                                     data=formatar_data_brasileira(data))
             
             # Generate PDF directly and return as response
             pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()

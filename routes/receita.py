@@ -352,7 +352,7 @@ def gerar_pdf_receita(receita_id):
                                  vias=vias,
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
-                                 data=receita_obj.data,
+                                 data=formatar_data_brasileira(receita_obj.data),
                                  assinatura=medico.assinatura if medico else None,
                                  zip=zip)
         
