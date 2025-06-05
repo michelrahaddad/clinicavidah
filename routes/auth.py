@@ -16,13 +16,14 @@ def index():
 def login():
     """Handle user authentication - restored to 11:00 AM working state"""
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '').strip()
+        nome = request.form.get('nome', '').strip()
+        crm = request.form.get('crm', '').strip()
+        senha = request.form.get('senha', '').strip()
         
-        logging.info(f"Login attempt - Username: {username}")
+        logging.info(f"Login attempt - Nome: {nome}, CRM: {crm}")
         
         # Check for admin login (admin/admin123)
-        if username.lower() == 'admin' and password == 'admin123':
+        if nome.lower() == 'admin' and senha == 'admin123':
             session.clear()
             session['user_id'] = 'admin'
             session['user_name'] = 'Administrador'
@@ -32,18 +33,21 @@ def login():
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('dashboard.dashboard'))
         
-        # Check for doctor login by name or CRM
-        if username and password:
+        # Check for doctor login
+        if nome and senha:
             try:
-                # Search for doctor by name (contains) or exact CRM match
-                medico = db.session.query(Medico).filter(
-                    db.or_(
-                        Medico.nome.ilike(f'%{username}%'),
-                        Medico.crm == username
-                    )
-                ).first()
+                # Search for doctor by name and optionally CRM
+                query = db.session.query(Medico).filter(
+                    Medico.nome.ilike(f'%{nome}%')
+                )
                 
-                if medico and check_password_hash(medico.senha, password):
+                # If CRM is provided, also filter by CRM
+                if crm:
+                    query = query.filter(Medico.crm == crm)
+                
+                medico = query.first()
+                
+                if medico and check_password_hash(medico.senha, senha):
                     session.clear()
                     session['user_id'] = medico.id
                     session['user_name'] = medico.nome
@@ -54,14 +58,14 @@ def login():
                     flash('Login realizado com sucesso!', 'success')
                     return redirect(url_for('dashboard.dashboard'))
                 else:
-                    logging.warning(f"Failed login attempt for: {username}")
-                    flash('Usuário ou senha incorretos!', 'error')
+                    logging.warning(f"Failed login attempt for: {nome}")
+                    flash('Nome, CRM ou senha incorretos!', 'error')
                     
             except Exception as e:
                 logging.error(f"Database error during login: {e}")
                 flash('Erro interno do sistema. Tente novamente.', 'error')
         else:
-            flash('Preencha todos os campos!', 'error')
+            flash('Nome e senha são obrigatórios!', 'error')
     
     return render_template('login.html')
 
