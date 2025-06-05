@@ -16,7 +16,7 @@ def index():
 def login():
     """Handle user login"""
     if request.method == 'GET':
-        return render_template('login_simple.html')
+        return render_template('login.html')
     
     if request.method == 'POST':
         nome = request.form.get('nome', '').strip()

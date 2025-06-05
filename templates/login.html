@@ -138,22 +138,22 @@
     -webkit-backdrop-filter: blur(20px);
 }
 
-/* Forçar estilos dos inputs */
+/* Forçar estilos dos inputs - mantendo design original */
 .form-control {
     background-color: white !important;
-    color: black !important;
+    color: #333 !important;
     border: 1px solid #ddd !important;
 }
 
 .form-control:focus {
     background-color: white !important;
-    color: black !important;
+    color: #333 !important;
     border-color: #007bff !important;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
 }
 
 .form-floating > label {
-    color: #666 !important;
+    color: #adb5bd !important;
 }
 
 .form-floating > .form-control:focus ~ label,
@@ -163,8 +163,19 @@
 
 /* Placeholder styling */
 .form-control::placeholder {
-    color: #999 !important;
+    color: #6c757d !important;
     opacity: 1 !important;
+}
+
+/* Garantir que o texto seja sempre visível */
+input[type="text"], input[type="password"] {
+    background-color: white !important;
+    color: #333 !important;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+    background-color: white !important;
+    color: #333 !important;
 }
 </style>
 

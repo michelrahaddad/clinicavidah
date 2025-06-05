@@ -43,7 +43,7 @@ def dashboard():
         
         logging.info(f'Dashboard accessed by: {user_name}')
         
-        return render_template('dashboard_simple.html', 
+        return render_template('dashboard.html', 
                              usuario=usuario_data or admin_data,
                              **stats)
     except Exception as e:
