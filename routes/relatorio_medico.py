@@ -3,6 +3,7 @@ from models import RelatorioMedico, Medico, Paciente, Cid10
 from app import db
 from sqlalchemy import text
 from utils.forms import sanitizar_entrada
+from utils.image_processing import create_black_signature
 from datetime import datetime
 import logging
 import weasyprint
@@ -91,7 +92,7 @@ def salvar_relatorio_medico():
                                      relatorio_texto=relatorio_texto,
                                      medico=medico.nome if medico else "Médico não encontrado",
                                      crm=medico.crm if medico else "CRM não disponível",
-                                     assinatura=medico.assinatura if medico else None,
+                                     assinatura=create_black_signature(medico.assinatura) if medico and medico.assinatura else None,
                                      data=data)
             
             # Generate PDF directly and return as response

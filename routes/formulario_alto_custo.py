@@ -3,6 +3,7 @@ from models import FormularioAltoCusto, Medico, Paciente, Cid10
 from app import db
 from sqlalchemy import text
 from utils.forms import sanitizar_entrada
+from utils.image_processing import create_black_signature
 from datetime import datetime
 import logging
 import weasyprint
@@ -147,7 +148,7 @@ def salvar_formulario_alto_custo():
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
                                  medico_cns=medico_cns,
-                                 assinatura=medico.assinatura if medico else None,
+                                 assinatura=create_black_signature(medico.assinatura) if medico and medico.assinatura else None,
                                  data=formatar_data_brasileira(data))
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
