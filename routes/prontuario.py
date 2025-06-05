@@ -302,6 +302,14 @@ def prontuario():
                         'atestado': 0,
                         'alto_custo': 0
                     },
+                    'primeiros_ids': {
+                        'receita': None,
+                        'exame_lab': None,
+                        'exame_img': None,
+                        'relatorio': None,
+                        'atestado': None,
+                        'alto_custo': None
+                    },
                     'documentos': {
                         'receita': [],
                         'exame_lab': [],
@@ -317,6 +325,10 @@ def prontuario():
             grupos[key]['contadores'][tipo] += 1
             grupos[key]['documentos'][tipo].append(resultado)
             grupos[key]['total_documentos'] += 1
+            
+            # Store first document ID for badge links
+            if grupos[key]['primeiros_ids'][tipo] is None:
+                grupos[key]['primeiros_ids'][tipo] = resultado.get('id_registro')
         
         # Convert to list and sort by date (newest first)
         resultados_agrupados = list(grupos.values())

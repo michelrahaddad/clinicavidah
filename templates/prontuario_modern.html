@@ -612,13 +612,24 @@
                                         </span>
                                     {% endif %}
                                     
-                                    <a href="{{ url_for('prontuario.prontuario_exames_lab', paciente=grupo.nome_paciente) }}" class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_lab == 0 else '' }}; text-decoration: none;">
-                                        🧪 {{ grupo.contadores.exame_lab }}
-                                    </a>
+                                    {% if grupo.contadores.exame_lab > 0 and grupo.primeiros_ids.exame_lab %}
+                                        <a href="{{ url_for('prontuario.editar_exame_lab_especifico', exame_id=grupo.primeiros_ids.exame_lab) }}" class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)" style="text-decoration: none;">
+                                            🧪 {{ grupo.contadores.exame_lab }}
+                                        </a>
+                                    {% else %}
+                                        <span class="medical-badge lab-badge" title="Nenhum exame laboratorial" style="opacity: 0.3;">
+                                            🧪 0
+                                        </span>
+                                    {% endif %}
                                     
-                                    <a href="{{ url_for('prontuario.prontuario_exames_img', paciente=grupo.nome_paciente) }}" class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_img == 0 else '' }}; text-decoration: none;">
-                                        🩻 {{ grupo.contadores.exame_img }}
-                                    </a>
+                                    {% if grupo.contadores.exame_img > 0 and grupo.primeiros_ids.exame_img %}
+                                        <a href="{{ url_for('prontuario.editar_exame_img_especifico', exame_id=grupo.primeiros_ids.exame_img) }}" class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem" style="text-decoration: none;">
+                                            🩻 {{ grupo.contadores.exame_img }}</a>
+                                    {% else %}
+                                        <span class="medical-badge img-badge" title="Nenhum exame de imagem" style="opacity: 0.3;">
+                                            🩻 0
+                                        </span>
+                                    {% endif %}
                                     
                                     <a href="{{ url_for('prontuario.prontuario_relatorios', paciente=grupo.nome_paciente) }}" class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.relatorio == 0 else '' }}; text-decoration: none;">
                                         🧾 {{ grupo.contadores.relatorio }}
