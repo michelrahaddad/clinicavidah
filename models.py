@@ -23,6 +23,7 @@ class Medico(db.Model):
     atestados = relationship('AtestadoMedico', back_populates='medico', lazy=True)
     formularios_alto_custo = relationship('FormularioAltoCusto', back_populates='medico', lazy=True)
     exames_personalizados = relationship('ExamePersonalizado', back_populates='medico', lazy=True)
+    consultas = relationship('Consulta', back_populates='medico', lazy=True)
 
 class Paciente(db.Model):
     __tablename__ = 'pacientes'
@@ -46,6 +47,7 @@ class Paciente(db.Model):
     relatorios = relationship('RelatorioMedico', back_populates='paciente', lazy=True)
     atestados = relationship('AtestadoMedico', back_populates='paciente', lazy=True)
     formularios_alto_custo = relationship('FormularioAltoCusto', back_populates='paciente', lazy=True)
+    consultas = relationship('Consulta', back_populates='paciente', lazy=True)
 
 class Receita(db.Model):
     __tablename__ = 'receitas'
@@ -290,6 +292,23 @@ class Atestado(db.Model):
     usuario_id = Column(Integer, nullable=True)
 
 
+
+class Consulta(db.Model):
+    __tablename__ = 'consultas'
+    
+    id = Column(Integer, primary_key=True)
+    paciente_id = Column(Integer, ForeignKey('pacientes.id'), nullable=False)
+    medico_id = Column(Integer, ForeignKey('medicos.id'), nullable=False)
+    data_consulta = Column(DateTime, nullable=False)
+    horario = Column(DateTime, nullable=False)
+    tipo_consulta = Column(String(100), nullable=False)
+    status = Column(String(50), default='agendada')  # agendada, realizada, cancelada
+    observacoes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    paciente = relationship('Paciente', back_populates='consultas')
+    medico = relationship('Medico', back_populates='consultas')
 
 class Medicamento(db.Model):
     __tablename__ = 'medicamentos'
