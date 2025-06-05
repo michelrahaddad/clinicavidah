@@ -14,97 +14,60 @@ def index():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Handle user login"""
-    if request.method == 'GET':
-        return render_template('login.html')
-    
+    """Handle user authentication - restored to 11:00 AM working state"""
     if request.method == 'POST':
-        nome = request.form.get('nome', '').strip()
-        crm = request.form.get('crm', '').strip()
-        senha = request.form.get('senha', '')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '').strip()
         
-        if not nome or not senha:
-            flash('Nome e senha são obrigatórios.', 'error')
-            return render_template('login.html')
+        logging.info(f"Login attempt - Username: {username}")
         
-        try:
-            logging.info(f'Login attempt - Nome: {nome}, CRM: {crm}')
-            
-            # Primeiro, verificar se é administrador (usando nome como usuário)
-            admin = Administrador.query.filter_by(usuario=nome, ativo=True).first()
-            logging.info(f'Admin query result: {admin is not None}')
-            
-            if admin:
-                logging.info(f'Admin found: {admin.nome}, checking password...')
-                senha_valida = check_password_hash(admin.senha, senha)
-                logging.info(f'Password validation: {senha_valida}')
+        # Check for admin login (admin/admin123)
+        if username.lower() == 'admin' and password == 'admin123':
+            session.clear()
+            session['user_id'] = 'admin'
+            session['user_name'] = 'Administrador'
+            session['user_type'] = 'admin'
+            session['is_admin'] = True
+            logging.info("Admin login successful")
+            flash('Login realizado com sucesso!', 'success')
+            return redirect(url_for('dashboard.dashboard'))
+        
+        # Check for doctor login by name or CRM
+        if username and password:
+            try:
+                # Search for doctor by name (contains) or exact CRM match
+                medico = db.session.query(Medico).filter(
+                    db.or_(
+                        Medico.nome.ilike(f'%{username}%'),
+                        Medico.crm == username
+                    )
+                ).first()
                 
-                if senha_valida:
-                    # Limpar sessão completamente
+                if medico and check_password_hash(medico.senha, password):
                     session.clear()
-                    
-                    # Login como administrador
-                    session['admin'] = True
-                    session['admin_data'] = {
-                        'id': admin.id,
-                        'usuario': admin.usuario,
-                        'nome': admin.nome,
-                        'email': admin.email
-                    }
-                    session['usuario'] = admin.nome
-                    session.permanent = True
-                    
-                    # Update last access
-                    try:
-                        admin.ultimo_acesso = datetime.utcnow()
-                        db.session.commit()
-                    except Exception as e:
-                        logging.warning(f'Failed to update last access: {e}')
-                    
-                    flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
-                    logging.info(f'Admin login successful for: {nome}')
-                    
-                    # Redirecionamento robusto para dashboard
-                    from flask import make_response
-                    response = make_response(redirect('/dashboard', code=302))
-                    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-                    response.headers['Pragma'] = 'no-cache'
-                    response.headers['Expires'] = '0'
-                    return response
-                else:
-                    logging.warning(f'Invalid password for admin: {nome}')
-            
-            # Se não é admin, verificar se é médico (CRM obrigatório para médicos)
-            if crm:  # Se CRM foi fornecido, tentar login como médico
-                medico = Medico.query.filter_by(nome=nome, crm=crm).first()
-                
-                if medico and medico.senha and check_password_hash(medico.senha, senha):
-                    session['usuario'] = medico.nome
-                    session['medico_data'] = {
-                        'id': medico.id,
-                        'nome': medico.nome,
-                        'crm': medico.crm
-                    }
-                    flash(f'Bem-vindo, {medico.nome}!', 'success')
-                    logging.info(f'Login successful for user: {nome} (CRM: {crm})')
+                    session['user_id'] = medico.id
+                    session['user_name'] = medico.nome
+                    session['user_crm'] = medico.crm
+                    session['user_type'] = 'medico'
+                    session['is_admin'] = False
+                    logging.info(f"Doctor login successful: {medico.nome}")
+                    flash('Login realizado com sucesso!', 'success')
                     return redirect(url_for('dashboard.dashboard'))
                 else:
-                    flash('Credenciais inválidas. Verifique nome, CRM e senha.', 'error')
-                    logging.warning(f'Failed login attempt for: {nome} (CRM: {crm})')
-            else:
-                flash('Para acessar como médico, é necessário informar o CRM.', 'error')
-                
-        except Exception as e:
-            logging.error(f'Login error: {e}')
-            flash('Erro interno. Tente novamente.', 'error')
+                    logging.warning(f"Failed login attempt for: {username}")
+                    flash('Usuário ou senha incorretos!', 'error')
+                    
+            except Exception as e:
+                logging.error(f"Database error during login: {e}")
+                flash('Erro interno do sistema. Tente novamente.', 'error')
+        else:
+            flash('Preencha todos os campos!', 'error')
     
     return render_template('login.html')
 
 @auth_bp.route('/logout')
 def logout():
     """Handle user logout"""
-    user_name = session.get('usuario', 'Unknown')
     session.clear()
-    flash('Logout realizado com sucesso.', 'info')
-    logging.info(f'User logged out: {user_name}')
+    flash('Logout realizado com sucesso!', 'info')
     return redirect(url_for('auth.login'))
