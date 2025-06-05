@@ -1099,11 +1099,28 @@ def prontuario_medicamentos(receita_id):
                 'quantidade': '30 comprimidos'
             })
         
+        # Handle date formatting for different data types
+        try:
+            if hasattr(receita.data, 'strftime'):
+                data_formatada = receita.data.strftime('%d/%m/%Y')
+            elif isinstance(receita.data, str):
+                # Try to parse string date
+                try:
+                    from datetime import datetime
+                    data_obj = datetime.strptime(receita.data, '%Y-%m-%d')
+                    data_formatada = data_obj.strftime('%d/%m/%Y')
+                except:
+                    data_formatada = receita.data
+            else:
+                data_formatada = datetime.now().strftime('%d/%m/%Y')
+        except:
+            data_formatada = datetime.now().strftime('%d/%m/%Y')
+        
         return render_template('prontuario_medicamentos.html',
                              receita=receita,
                              medico=medico,
                              medicamentos=medicamentos_list,
-                             data_formatada=receita.data.strftime('%d/%m/%Y') if receita.data else datetime.now().strftime('%d/%m/%Y'))
+                             data_formatada=data_formatada)
         
     except Exception as e:
         logging.error(f'Error displaying medication page: {e}')
@@ -1126,11 +1143,26 @@ def salvar_medicamentos(receita_id):
         nome_paciente = sanitizar_entrada(request.form.get('nome_paciente', ''))
         
         # Get medication data
-        principios_ativos = [sanitizar_entrada(p) for p in request.form.getlist('principio_ativo[]') if p.strip()]
-        concentracoes = [sanitizar_entrada(c) for c in request.form.getlist('concentracao[]') if c.strip()]
-        vias = [sanitizar_entrada(v) for v in request.form.getlist('via[]') if v.strip()]
-        frequencias = [sanitizar_entrada(f) for f in request.form.getlist('frequencia[]') if f.strip()]
-        quantidades = [sanitizar_entrada(q) for q in request.form.getlist('quantidade[]') if q.strip()]
+        principios_ativos = [sanitizar_entrada(p) for p in request.form.getlist('principio_ativo[]') if p and p.strip()]
+        concentracoes = [sanitizar_entrada(c) for c in request.form.getlist('concentracao[]') if c and c.strip()]
+        vias = [sanitizar_entrada(v) for v in request.form.getlist('via[]') if v and v.strip()]
+        frequencias = [sanitizar_entrada(f) for f in request.form.getlist('frequencia[]') if f and f.strip()]
+        quantidades = [sanitizar_entrada(q) for q in request.form.getlist('quantidade[]') if q and q.strip()]
+        
+        # Ensure all arrays have the same length
+        max_length = max(len(principios_ativos), len(concentracoes), len(vias), len(frequencias), len(quantidades)) if any([principios_ativos, concentracoes, vias, frequencias, quantidades]) else 0
+        
+        # Pad arrays to same length
+        while len(principios_ativos) < max_length:
+            principios_ativos.append('Medicamento')
+        while len(concentracoes) < max_length:
+            concentracoes.append('500mg')
+        while len(vias) < max_length:
+            vias.append('Oral')
+        while len(frequencias) < max_length:
+            frequencias.append('2x')
+        while len(quantidades) < max_length:
+            quantidades.append('30 comprimidos')
         
         # Validation
         if not nome_paciente:
