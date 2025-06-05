@@ -9,6 +9,27 @@ from datetime import datetime
 import logging
 import weasyprint
 
+def formatar_data_brasileira(data):
+    """Converte data para o formato brasileiro DD/MM/AAAA"""
+    if isinstance(data, str):
+        try:
+            # Tenta converter string para datetime
+            if '-' in data:
+                data_obj = datetime.strptime(data, '%Y-%m-%d')
+            else:
+                return data  # Já está no formato brasileiro
+        except:
+            return data
+    elif isinstance(data, datetime):
+        data_obj = data
+    else:
+        try:
+            data_obj = datetime.strptime(str(data), '%Y-%m-%d')
+        except:
+            return str(data)
+    
+    return data_obj.strftime('%d/%m/%Y')
+
 def sanitizar_entrada(valor):
     """Sanitiza entrada de usuário"""
     if not valor:
@@ -201,7 +222,7 @@ def salvar_receita():
                                      medico=medico.nome if medico else "Médico não encontrado",
                                      crm=medico.crm if medico else "CRM não disponível",
                                      assinatura=medico.assinatura if medico else None,
-                                     data=data,
+                                     data=formatar_data_brasileira(data),
                                      zip=zip)
             
             logging.info('HTML template rendered successfully')
