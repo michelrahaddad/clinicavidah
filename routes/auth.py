@@ -15,6 +15,9 @@ def index():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """Handle user login"""
+    if request.method == 'GET':
+        return render_template('login_simples.html')
+    
     if request.method == 'POST':
         nome = request.form.get('nome', '').strip()
         crm = request.form.get('crm', '').strip()
@@ -22,7 +25,7 @@ def login():
         
         if not nome or not senha:
             flash('Nome e senha são obrigatórios.', 'error')
-            return render_template('login_fixed.html')
+            return render_template('login_simples.html')
         
         try:
             logging.info(f'Login attempt - Nome: {nome}, CRM: {crm}')
@@ -146,7 +149,7 @@ def login():
             logging.error(f'Login error: {e}')
             flash('Erro interno. Tente novamente.', 'error')
     
-    return render_template('login.html')
+    return render_template('login_simples.html')
 
 @auth_bp.route('/logout')
 def logout():
