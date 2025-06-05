@@ -1106,7 +1106,6 @@ def prontuario_medicamentos(receita_id):
             elif isinstance(receita.data, str):
                 # Try to parse string date
                 try:
-                    from datetime import datetime
                     data_obj = datetime.strptime(receita.data, '%Y-%m-%d')
                     data_formatada = data_obj.strftime('%d/%m/%Y')
                 except:
@@ -1271,4 +1270,145 @@ def medicamentos_pdf(receita_id):
     except Exception as e:
         logging.error(f'Error generating medication PDF: {e}')
         flash('Erro ao gerar PDF de medicamentos.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+# Rotas para páginas específicas de cada tipo de documento médico clonando o design da receita
+
+@prontuario_bp.route('/prontuario/receita/<int:receita_id>')
+def editar_receita_especifica(receita_id):
+    """Página específica para editar receita médica seguindo o padrão da nova receita"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        receita = db.session.query(Receita).filter_by(id=receita_id).first()
+        if not receita:
+            flash('Receita não encontrada.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Get doctor information
+        medico = db.session.query(Medico).filter_by(id=receita.id_medico).first()
+        
+        # Parse medications from the prescription
+        medicamentos_list = []
+        if receita.medicamentos:
+            medicamentos_raw = receita.medicamentos.split('\n')
+            for i, med in enumerate(medicamentos_raw):
+                if med.strip():
+                    medicamentos_list.append(med.strip())
+        
+        # Prepare data for the template (mirroring receita.html structure)
+        dados_preenchidos = {
+            'nome_paciente': receita.nome_paciente,
+            'cpf': '',
+            'idade': '',
+            'endereco': '',
+            'cidade': '',
+            'medicamentos': medicamentos_list,
+            'posologia': getattr(receita, 'posologia', '2x'),
+            'duracao': getattr(receita, 'observacoes', 'Conforme prescrição'),
+            'via': 'Oral',
+            'medico_nome': medico.nome if medico else 'N/A',
+            'medico_crm': medico.crm if medico else 'N/A',
+            'data_criacao': receita.data.strftime('%d/%m/%Y às %H:%M') if hasattr(receita.data, 'strftime') else '05/06/2025 às 12:05',
+            'receita_id': receita.id
+        }
+        
+        return render_template('receita_especifica.html', **dados_preenchidos)
+        
+    except Exception as e:
+        logging.error(f'Error loading specific receita: {e}')
+        flash('Erro ao carregar receita específica.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+@prontuario_bp.route('/prontuario/exame_lab/<int:exame_id>')
+def editar_exame_lab_especifico(exame_id):
+    """Página específica para editar exame laboratorial seguindo o padrão da nova receita"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        exame = db.session.query(ExameLab).filter_by(id=exame_id).first()
+        if not exame:
+            flash('Exame não encontrado.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Get doctor information
+        medico = db.session.query(Medico).filter_by(id=exame.id_medico).first()
+        
+        # Parse exams from the request
+        exames_list = []
+        if exame.exames_solicitados:
+            exames_raw = exame.exames_solicitados.split('\n')
+            for i, ex in enumerate(exames_raw):
+                if ex.strip():
+                    exames_list.append(ex.strip())
+        
+        # Prepare data for the template
+        dados_preenchidos = {
+            'nome_paciente': exame.nome_paciente,
+            'cpf': '',
+            'idade': '',
+            'endereco': '',
+            'cidade': '',
+            'exames_solicitados': exames_list,
+            'preparacao': getattr(exame, 'preparacao', 'Jejum de 12 horas'),
+            'observacoes': getattr(exame, 'observacoes', 'Realizar pela manhã'),
+            'medico_nome': medico.nome if medico else 'N/A',
+            'medico_crm': medico.crm if medico else 'N/A',
+            'data_criacao': exame.data.strftime('%d/%m/%Y às %H:%M') if hasattr(exame.data, 'strftime') else '05/06/2025 às 12:05',
+            'exame_id': exame.id
+        }
+        
+        return render_template('exame_lab_especifico.html', **dados_preenchidos)
+        
+    except Exception as e:
+        logging.error(f'Error loading specific exame lab: {e}')
+        flash('Erro ao carregar exame laboratorial específico.', 'error')
+        return redirect(url_for('prontuario.prontuario'))
+
+@prontuario_bp.route('/prontuario/exame_img/<int:exame_id>')
+def editar_exame_img_especifico(exame_id):
+    """Página específica para editar exame de imagem seguindo o padrão da nova receita"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        exame = db.session.query(ExameImg).filter_by(id=exame_id).first()
+        if not exame:
+            flash('Exame não encontrado.', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Get doctor information
+        medico = db.session.query(Medico).filter_by(id=exame.id_medico).first()
+        
+        # Parse exams from the request
+        exames_list = []
+        if exame.exames_solicitados:
+            exames_raw = exame.exames_solicitados.split('\n')
+            for i, ex in enumerate(exames_raw):
+                if ex.strip():
+                    exames_list.append(ex.strip())
+        
+        # Prepare data for the template
+        dados_preenchidos = {
+            'nome_paciente': exame.nome_paciente,
+            'cpf': '',
+            'idade': '',
+            'endereco': '',
+            'cidade': '',
+            'exames_solicitados': exames_list,
+            'preparacao': getattr(exame, 'preparacao', 'Trazer exames anteriores'),
+            'observacoes': getattr(exame, 'observacoes', 'Com contraste se necessário'),
+            'medico_nome': medico.nome if medico else 'N/A',
+            'medico_crm': medico.crm if medico else 'N/A',
+            'data_criacao': exame.data.strftime('%d/%m/%Y às %H:%M') if hasattr(exame.data, 'strftime') else '05/06/2025 às 12:05',
+            'exame_id': exame.id
+        }
+        
+        return render_template('exame_img_especifico.html', **dados_preenchidos)
+        
+    except Exception as e:
+        logging.error(f'Error loading specific exame img: {e}')
+        flash('Erro ao carregar exame de imagem específico.', 'error')
         return redirect(url_for('prontuario.prontuario'))

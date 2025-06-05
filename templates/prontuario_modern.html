@@ -602,9 +602,15 @@
                                     {% set total_docs = grupo.contadores.receita + grupo.contadores.exame_lab + grupo.contadores.exame_img + grupo.contadores.relatorio + grupo.contadores.atestado + grupo.contadores.alto_custo %}
                                     
                                     <!-- Sempre mostrar todos os tipos de documentos médicos organizados cronologicamente -->
-                                    <a href="{{ url_for('prontuario.prontuario_receitas', paciente=grupo.nome_paciente) }}" class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.receita == 0 else '' }}; text-decoration: none;">
-                                        💊 {{ grupo.contadores.receita }}
-                                    </a>
+                                    {% if grupo.contadores.receita > 0 and grupo.primeiros_ids.receita %}
+                                        <a href="{{ url_for('prontuario.editar_receita_especifica', receita_id=grupo.primeiros_ids.receita) }}" class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)" style="text-decoration: none;">
+                                            💊 {{ grupo.contadores.receita }}
+                                        </a>
+                                    {% else %}
+                                        <span class="medical-badge receita-badge" title="Nenhuma receita" style="opacity: 0.3;">
+                                            💊 0
+                                        </span>
+                                    {% endif %}
                                     
                                     <a href="{{ url_for('prontuario.prontuario_exames_lab', paciente=grupo.nome_paciente) }}" class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_lab == 0 else '' }}; text-decoration: none;">
                                         🧪 {{ grupo.contadores.exame_lab }}

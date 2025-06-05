@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4 page-title">
+                <i class="fas fa-prescription-bottle-alt me-3 text-primary"></i>
+                <span class="gradient-text">Receita Médica</span>
+            </h2>
+        </div>
+    </div>
+    
+    <form action="{{ url_for('receita.salvar_receita') }}" method="post" id="receita-form">
+        <input type="hidden" name="refazer" value="true">
+        <input type="hidden" name="receita_id" value="{{ receita_id }}">
+        
+        <!-- Dados do Paciente -->
+        <div class="card glass-card">
+            <div class="card-header">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-user me-2"></i>
+                    Dados do Paciente
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <label for="nome_paciente" class="form-label text-light">
+                                <i class="fas fa-user me-2"></i>Nome do Paciente *
+                            </label>
+                            <div class="position-relative">
+                                <input type="text" 
+                                       id="nome_paciente"
+                                       name="nome_paciente"
+                                       class="form-control glass-input" 
+                                       placeholder="Digite o nome do paciente..."
+                                       value="{{ nome_paciente }}"
+                                       required
+                                       autocomplete="off"
+                                       style="height: 50px; font-size: 1.1rem; font-weight: 500;">
+                                <div id="paciente-suggestions" class="suggestions-dropdown"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dados adicionais do paciente -->
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="cpf_paciente" class="form-label text-light">
+                            <i class="fas fa-id-card me-2 text-warning"></i>CPF
+                        </label>
+                        <input type="text" 
+                               id="cpf_paciente"
+                               name="cpf"
+                               class="form-control glass-input" 
+                               placeholder="000.000.000-00"
+                               value="{{ cpf }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="idade_paciente" class="form-label text-light">
+                            <i class="fas fa-calendar-alt me-2 text-primary"></i>Idade
+                        </label>
+                        <input type="text" 
+                               id="idade_paciente"
+                               name="idade"
+                               class="form-control glass-input" 
+                               placeholder="--"
+                               value="{{ idade }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label for="endereco_completo" class="form-label text-light">
+                            <i class="fas fa-map-marker-alt me-2 text-danger"></i>Endereço
+                        </label>
+                        <input type="text" 
+                               id="endereco_completo"
+                               name="endereco"
+                               class="form-control glass-input" 
+                               placeholder="Endereço não informado"
+                               value="{{ endereco }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="cidade_uf_completo" class="form-label text-light">
+                            <i class="fas fa-city me-2 text-info"></i>Cidade/UF
+                        </label>
+                        <input type="text" 
+                               id="cidade_uf_completo"
+                               name="cidade"
+                               class="form-control glass-input" 
+                               placeholder="Cidade/UF"
+                               value="{{ cidade }}"
+                               style="background: rgba(255, 255, 255, 0.05);">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Medicamentos Prescritos -->
+        <div class="card glass-card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-light">
+                    <i class="fas fa-pills me-2"></i>
+                    Medicamentos Prescritos
+                </h5>
+                <div class="header-buttons">
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="limparMedicamentos()">
+                        <i class="fas fa-eraser me-1"></i>LIMPAR
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="adicionarMedicamento()">
+                        <i class="fas fa-plus me-1"></i>+ MEDICAMENTO
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <p class="text-muted mb-3">
+                        <small>Formato: [Princípio ativo] / [Conc.] / [Via] / [Freq] / [Qtd]</small>
+                    </p>
+                </div>
+                
+                <div id="medicamentos-container">
+                    {% for i in range(medicamentos|length if medicamentos else 1) %}
+                    <div class="medicamento-group mb-4 p-3" style="background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <div class="row align-items-center mb-2">
+                            <div class="col">
+                                <h6 class="text-info mb-0">
+                                    <i class="fas fa-capsules me-2"></i>Medicamento {{ i + 1 }}
+                                </h6>
+                            </div>
+                            {% if i > 0 %}
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerMedicamento(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Princípio ativo</strong>
+                                </label>
+                                <input type="text" 
+                                       name="principio_ativo[]"
+                                       class="form-control glass-input medicamento-input" 
+                                       placeholder="Ex: Dipirona"
+                                       value="{{ medicamentos[i] if medicamentos and i < medicamentos|length else 'Dipirona' }}"
+                                       style="font-size: 0.9rem;">
+                            </div>
+                            <div class="col-lg-2 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Conc.</strong>
+                                </label>
+                                <input type="text" 
+                                       name="concentracao[]"
+                                       class="form-control glass-input" 
+                                       placeholder="500mg"
+                                       value="500mg"
+                                       style="font-size: 0.9rem;">
+                            </div>
+                            <div class="col-lg-2 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Via</strong>
+                                </label>
+                                <select name="via[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                                    <option value="Oral" selected>Oral</option>
+                                    <option value="Tópica">Tópica</option>
+                                    <option value="Sublingual">Sublingual</option>
+                                    <option value="Injetável">Injetável</option>
+                                    <option value="Inalatória">Inalatória</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Freq</strong>
+                                </label>
+                                <select name="frequencia[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                                    <option value="1x ao dia">1x ao dia</option>
+                                    <option value="2x ao dia" selected>2x ao dia</option>
+                                    <option value="3x ao dia">3x ao dia</option>
+                                    <option value="4x ao dia">4x ao dia</option>
+                                    <option value="De 6/6h">De 6/6h</option>
+                                    <option value="De 8/8h">De 8/8h</option>
+                                    <option value="De 12/12h">De 12/12h</option>
+                                    <option value="SOS">SOS</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-6 mb-2">
+                                <label class="form-label text-light small">
+                                    <strong>Qtd</strong>
+                                </label>
+                                <input type="text" 
+                                       name="quantidade[]"
+                                       class="form-control glass-input" 
+                                       placeholder="30 comp"
+                                       value="30 comprimidos"
+                                       style="font-size: 0.9rem;">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Posologias e Durações -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-clock me-2"></i>Posologias
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="posologia" 
+                                  class="form-control glass-input" 
+                                  rows="4" 
+                                  placeholder="Descreva as posologias...">{{ posologia }}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-calendar-week me-2"></i>Durações
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="duracao" 
+                                  class="form-control glass-input" 
+                                  rows="4" 
+                                  placeholder="Descreva as durações do tratamento...">{{ duracao }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informações do Médico e Data -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-route me-2"></i>Vias
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea name="vias" 
+                                  class="form-control glass-input" 
+                                  rows="3" 
+                                  placeholder="Descreva as vias de administração...">{{ via }}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-user-md me-2"></i>Médico
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" 
+                               name="medico"
+                               class="form-control glass-input" 
+                               value="{{ medico_nome }}"
+                               readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-light">
+                            <i class="fas fa-calendar me-2"></i>Data de Criação
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               value="{{ data_criacao }}"
+                               readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="row mt-4 mb-5">
+            <div class="col-12 d-flex justify-content-between">
+                <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </button>
+                <div>
+                    <button type="submit" class="btn btn-success me-3">
+                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                    </button>
+                    <a href="{{ url_for('receita.gerar_pdf', receita_id=receita_id) }}" 
+                       class="btn btn-primary" target="_blank">
+                        <i class="fas fa-file-pdf me-2"></i>Gerar PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Função para adicionar medicamento
+function adicionarMedicamento() {
+    const container = document.getElementById('medicamentos-container');
+    const currentCount = container.children.length;
+    const newIndex = currentCount + 1;
+    
+    const medicamentoHTML = `
+        <div class="medicamento-group mb-4 p-3" style="background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="row align-items-center mb-2">
+                <div class="col">
+                    <h6 class="text-info mb-0">
+                        <i class="fas fa-capsules me-2"></i>Medicamento ${newIndex}
+                    </h6>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="removerMedicamento(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Princípio ativo</strong>
+                    </label>
+                    <input type="text" 
+                           name="principio_ativo[]"
+                           class="form-control glass-input medicamento-input" 
+                           placeholder="Ex: Dipirona"
+                           style="font-size: 0.9rem;">
+                </div>
+                <div class="col-lg-2 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Conc.</strong>
+                    </label>
+                    <input type="text" 
+                           name="concentracao[]"
+                           class="form-control glass-input" 
+                           placeholder="500mg"
+                           style="font-size: 0.9rem;">
+                </div>
+                <div class="col-lg-2 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Via</strong>
+                    </label>
+                    <select name="via[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                        <option value="Oral">Oral</option>
+                        <option value="Tópica">Tópica</option>
+                        <option value="Sublingual">Sublingual</option>
+                        <option value="Injetável">Injetável</option>
+                        <option value="Inalatória">Inalatória</option>
+                    </select>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Freq</strong>
+                    </label>
+                    <select name="frequencia[]" class="form-control glass-input" style="font-size: 0.9rem;">
+                        <option value="1x ao dia">1x ao dia</option>
+                        <option value="2x ao dia">2x ao dia</option>
+                        <option value="3x ao dia">3x ao dia</option>
+                        <option value="4x ao dia">4x ao dia</option>
+                        <option value="De 6/6h">De 6/6h</option>
+                        <option value="De 8/8h">De 8/8h</option>
+                        <option value="De 12/12h">De 12/12h</option>
+                        <option value="SOS">SOS</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-2">
+                    <label class="form-label text-light small">
+                        <strong>Qtd</strong>
+                    </label>
+                    <input type="text" 
+                           name="quantidade[]"
+                           class="form-control glass-input" 
+                           placeholder="30 comp"
+                           style="font-size: 0.9rem;">
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.insertAdjacentHTML('beforeend', medicamentoHTML);
+}
+
+// Função para remover medicamento
+function removerMedicamento(button) {
+    const medicamentoGroup = button.closest('.medicamento-group');
+    medicamentoGroup.remove();
+    
+    // Renumerar medicamentos
+    const groups = document.querySelectorAll('.medicamento-group');
+    groups.forEach((group, index) => {
+        const title = group.querySelector('h6');
+        title.innerHTML = `<i class="fas fa-capsules me-2"></i>Medicamento ${index + 1}`;
+    });
+}
+
+// Função para limpar medicamentos
+function limparMedicamentos() {
+    const container = document.getElementById('medicamentos-container');
+    const firstGroup = container.querySelector('.medicamento-group');
+    
+    // Limpar inputs do primeiro grupo
+    firstGroup.querySelectorAll('input, select, textarea').forEach(input => {
+        if (input.type !== 'hidden') {
+            input.value = '';
+        }
+    });
+    
+    // Remover grupos adicionais
+    const additionalGroups = container.querySelectorAll('.medicamento-group:not(:first-child)');
+    additionalGroups.forEach(group => group.remove());
+}
+</script>
+{% endblock %}
