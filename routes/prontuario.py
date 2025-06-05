@@ -199,7 +199,7 @@ def prontuario():
                     
                     resultados.append({
                         'tipo': 'relatorio',
-                        'data': relatorio.data,
+                        'data': formatar_data_brasileira(relatorio.data),
                         'id_registro': relatorio.id,
                         'nome_paciente': relatorio.nome_paciente,
                         'medico_nome': medico_nome,
@@ -230,7 +230,7 @@ def prontuario():
                     
                     resultados.append({
                         'tipo': 'atestado',
-                        'data': atestado.data,
+                        'data': formatar_data_brasileira(atestado.data),
                         'id_registro': atestado.id,
                         'nome_paciente': atestado.nome_paciente,
                         'medico_nome': medico_nome,
@@ -261,7 +261,7 @@ def prontuario():
                     
                     resultados.append({
                         'tipo': 'alto_custo',
-                        'data': formulario.data,
+                        'data': formatar_data_brasileira(formulario.data),
                         'id_registro': formulario.id,
                         'nome_paciente': formulario.nome_paciente,
                         'medico_nome': medico_nome,
