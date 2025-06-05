@@ -1006,7 +1006,7 @@ def salvar_exame_lab():
         
         if exame:
             exame.data = datetime.strptime(dados['data'], '%Y-%m-%d').date()
-            exame.exames_solicitados = dados['exames_solicitados']
+            exame.exames = dados['exames_solicitados']
             exame.preparacao = dados.get('preparacao', '')
             exame.observacoes = dados.get('observacoes', '')
             exame.medico_nome = dados['medico_nome']
@@ -1350,8 +1350,8 @@ def editar_exame_lab_especifico(exame_id):
         
         # Parse exams from the request
         exames_list = []
-        if exame.exames_solicitados:
-            exames_raw = exame.exames_solicitados.split('\n')
+        if exame.exames:
+            exames_raw = exame.exames.split('\n')
             for i, ex in enumerate(exames_raw):
                 if ex.strip():
                     exames_list.append(ex.strip())
@@ -1396,8 +1396,8 @@ def editar_exame_img_especifico(exame_id):
         
         # Parse exams from the request
         exames_list = []
-        if exame.exames_solicitados:
-            exames_raw = exame.exames_solicitados.split('\n')
+        if exame.exames:
+            exames_raw = exame.exames.split('\n')
             for i, ex in enumerate(exames_raw):
                 if ex.strip():
                     exames_list.append(ex.strip())

@@ -631,17 +631,35 @@
                                         </span>
                                     {% endif %}
                                     
-                                    <a href="{{ url_for('prontuario.prontuario_relatorios', paciente=grupo.nome_paciente) }}" class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.relatorio == 0 else '' }}; text-decoration: none;">
-                                        🧾 {{ grupo.contadores.relatorio }}
-                                    </a>
+                                    {% if grupo.contadores.relatorio > 0 and grupo.primeiros_ids.relatorio %}
+                                        <a href="{{ url_for('prontuario.editar_relatorio_especifico', relatorio_id=grupo.primeiros_ids.relatorio) }}" class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)" style="text-decoration: none;">
+                                            🧾 {{ grupo.contadores.relatorio }}
+                                        </a>
+                                    {% else %}
+                                        <span class="medical-badge relatorio-badge" title="Nenhum relatório médico" style="opacity: 0.3;">
+                                            🧾 0
+                                        </span>
+                                    {% endif %}
                                     
-                                    <a href="{{ url_for('prontuario.prontuario_atestados', paciente=grupo.nome_paciente) }}" class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.atestado == 0 else '' }}; text-decoration: none;">
-                                        📄 {{ grupo.contadores.atestado }}
-                                    </a>
+                                    {% if grupo.contadores.atestado > 0 and grupo.primeiros_ids.atestado %}
+                                        <a href="{{ url_for('prontuario.editar_atestado_especifico', atestado_id=grupo.primeiros_ids.atestado) }}" class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)" style="text-decoration: none;">
+                                            📄 {{ grupo.contadores.atestado }}
+                                        </a>
+                                    {% else %}
+                                        <span class="medical-badge atestado-badge" title="Nenhum atestado médico" style="opacity: 0.3;">
+                                            📄 0
+                                        </span>
+                                    {% endif %}
                                     
-                                    <a href="{{ url_for('prontuario.prontuario_alto_custo', paciente=grupo.nome_paciente) }}" class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo" style="{{ 'opacity: 0.3;' if grupo.contadores.alto_custo == 0 else '' }}; text-decoration: none;">
-                                        💰💊 {{ grupo.contadores.alto_custo }}
-                                    </a>
+                                    {% if grupo.contadores.alto_custo > 0 and grupo.primeiros_ids.alto_custo %}
+                                        <a href="{{ url_for('prontuario.editar_alto_custo_especifico', alto_custo_id=grupo.primeiros_ids.alto_custo) }}" class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo" style="text-decoration: none;">
+                                            💰💊 {{ grupo.contadores.alto_custo }}
+                                        </a>
+                                    {% else %}
+                                        <span class="medical-badge alto-custo-badge" title="Nenhum formulário alto custo" style="opacity: 0.3;">
+                                            💰💊 0
+                                        </span>
+                                    {% endif %}
                                     
                                     {% if total_docs == 0 %}
                                         <div class="mt-2"><span class="text-muted small">Nenhum documento registrado</span></div>
