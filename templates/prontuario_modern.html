@@ -586,81 +586,97 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Autocomplete functionality
-        const buscaPacienteInput = document.getElementById('busca_paciente');
-        const suggestionsDiv = document.getElementById('suggestions');
-        let debounceTimer;
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get elements
+            const buscaPacienteInput = document.getElementById('busca_paciente');
+            const suggestionsDiv = document.getElementById('suggestions');
+            const searchForm = document.getElementById('searchForm');
+            const clearBtn = document.querySelector('.btn-clear');
+            const searchBtn = document.querySelector('.btn-search');
+            let debounceTimer;
 
-        buscaPacienteInput.addEventListener('input', function() {
-            const term = this.value.trim();
-            
-            clearTimeout(debounceTimer);
-            
-            if (term.length < 2) {
-                suggestionsDiv.style.display = 'none';
-                return;
-            }
-            
-            debounceTimer = setTimeout(() => {
-                fetch(`/prontuario/api/autocomplete_pacientes?q=${encodeURIComponent(term)}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        suggestionsDiv.innerHTML = '';
-                        
-                        if (data.suggestions && data.suggestions.length > 0) {
-                            data.suggestions.forEach(suggestion => {
-                                const div = document.createElement('div');
-                                div.className = 'autocomplete-suggestion';
-                                div.textContent = suggestion;
-                                div.addEventListener('click', function() {
-                                    buscaPacienteInput.value = suggestion;
-                                    suggestionsDiv.style.display = 'none';
-                                });
-                                suggestionsDiv.appendChild(div);
-                            });
-                            suggestionsDiv.style.display = 'block';
-                        } else {
-                            suggestionsDiv.style.display = 'none';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Erro no autocomplete:', error);
+            // Autocomplete functionality
+            if (buscaPacienteInput && suggestionsDiv) {
+                buscaPacienteInput.addEventListener('input', function() {
+                    const term = this.value.trim();
+                    
+                    clearTimeout(debounceTimer);
+                    
+                    if (term.length < 2) {
                         suggestionsDiv.style.display = 'none';
-                    });
-            }, 300);
-        });
+                        return;
+                    }
+                    
+                    debounceTimer = setTimeout(() => {
+                        fetch(`/prontuario/api/autocomplete_pacientes?q=${encodeURIComponent(term)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                suggestionsDiv.innerHTML = '';
+                                
+                                if (data.suggestions && data.suggestions.length > 0) {
+                                    data.suggestions.forEach(suggestion => {
+                                        const div = document.createElement('div');
+                                        div.className = 'autocomplete-suggestion';
+                                        div.textContent = suggestion;
+                                        div.onclick = function() {
+                                            buscaPacienteInput.value = suggestion;
+                                            suggestionsDiv.style.display = 'none';
+                                        };
+                                        suggestionsDiv.appendChild(div);
+                                    });
+                                    suggestionsDiv.style.display = 'block';
+                                } else {
+                                    suggestionsDiv.style.display = 'none';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Erro no autocomplete:', error);
+                                suggestionsDiv.style.display = 'none';
+                            });
+                    }, 300);
+                });
 
-        // Hide suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.autocomplete-container')) {
-                suggestionsDiv.style.display = 'none';
+                // Hide suggestions when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('.autocomplete-container')) {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                });
             }
-        });
 
-        // Clear button functionality
-        document.querySelector('.btn-clear').addEventListener('click', function() {
-            document.getElementById('busca_paciente').value = '';
-            document.getElementById('filtro_tipo').value = '';
-            document.getElementById('filtro_data_inicio').value = '';
-            document.getElementById('filtro_data_fim').value = '';
-            suggestionsDiv.style.display = 'none';
-            
-            // Clear URL parameters and reload
-            window.location.href = window.location.pathname;
-        });
-
-        // Search form submission with loading
-        document.getElementById('searchForm').addEventListener('submit', function(e) {
-            const loadingSpinner = document.getElementById('loadingSpinner');
-            if (loadingSpinner) {
-                loadingSpinner.style.display = 'block';
+            // Clear button functionality
+            if (clearBtn) {
+                clearBtn.onclick = function() {
+                    document.getElementById('busca_paciente').value = '';
+                    document.getElementById('filtro_tipo').value = '';
+                    document.getElementById('filtro_data_inicio').value = '';
+                    document.getElementById('filtro_data_fim').value = '';
+                    if (suggestionsDiv) {
+                        suggestionsDiv.style.display = 'none';
+                    }
+                    
+                    // Clear URL parameters and reload
+                    window.location.href = window.location.pathname;
+                };
             }
-        });
 
-        // Search button functionality (already works with form submission)
-        document.querySelector('.btn-search').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('searchForm').submit();
+            // Search button functionality
+            if (searchBtn && searchForm) {
+                searchBtn.onclick = function() {
+                    searchForm.submit();
+                };
+            }
+
+            // Form submission handler
+            if (searchForm) {
+                searchForm.onsubmit = function(e) {
+                    const loadingSpinner = document.getElementById('loadingSpinner');
+                    if (loadingSpinner) {
+                        loadingSpinner.style.display = 'block';
+                    }
+                    return true; // Allow form submission
+                };
+            }
         });
     </script>
 </body>
