@@ -64,7 +64,24 @@ def login():
                     flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
                     logging.info(f'Admin login successful for: {nome}')
                     
-                    return redirect('/prontuario')
+                    # Redirecionamento direto via HTML para garantir funcionamento
+                    return f'''
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="utf-8">
+                        <title>Redirecionando...</title>
+                        <meta http-equiv="refresh" content="0;url=/prontuario">
+                    </head>
+                    <body style="background: #2c3e50; color: white; text-align: center; padding: 50px;">
+                        <h2>Login realizado com sucesso!</h2>
+                        <p>Redirecionando para o sistema...</p>
+                        <script>
+                            window.location.href = "/prontuario";
+                        </script>
+                    </body>
+                    </html>
+                    '''
                 else:
                     logging.warning(f'Invalid password for admin: {nome}')
             

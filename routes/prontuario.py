@@ -41,7 +41,7 @@ def formatar_data_brasileira(data):
 prontuario_bp = Blueprint('prontuario', __name__)
 
 @prontuario_bp.route('/prontuario', methods=['GET'])
-def prontuario():
+def buscar_paciente():
     """Display patient records"""
     # Log session data for debugging
     logging.info(f"Prontuario access - usuario: {session.get('usuario')}, admin_usuario: {session.get('admin_usuario')}")
