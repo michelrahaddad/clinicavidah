@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from utils.db import insert_patient_if_not_exists
 from utils.forms import sanitizar_entrada
 from models import Medico, ExameLab, Prontuario
-from main import db
+from app import db
 from datetime import datetime
 import logging
 import weasyprint

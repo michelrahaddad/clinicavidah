@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, session
 from werkzeug.security import generate_password_hash
-from models import Medico
-from main import db
+from models import db, Medico
 import secrets
 import logging
 from datetime import datetime, timedelta

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from models import Administrador, LogSistema, BackupConfig, Medico, Paciente, Receita, ExameLab, ExameImg
-from main import db
+from app import db
 from datetime import datetime, timedelta
 import os
 import zipfile

@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
-from models import Atestado, Paciente
-from main import db
+from models import db, Atestado, Paciente
 from datetime import datetime
 import logging
 

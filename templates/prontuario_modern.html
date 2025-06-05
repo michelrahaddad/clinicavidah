@@ -602,64 +602,29 @@
                                     {% set total_docs = grupo.contadores.receita + grupo.contadores.exame_lab + grupo.contadores.exame_img + grupo.contadores.relatorio + grupo.contadores.atestado + grupo.contadores.alto_custo %}
                                     
                                     <!-- Sempre mostrar todos os tipos de documentos médicos organizados cronologicamente -->
-                                    {% if grupo.contadores.receita > 0 and grupo.primeiros_ids.receita %}
-                                        <a href="{{ url_for('prontuario.editar_receita_especifica', receita_id=grupo.primeiros_ids.receita) }}" class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)" style="text-decoration: none;">
-                                            💊 {{ grupo.contadores.receita }}
-                                        </a>
-                                    {% else %}
-                                        <span class="medical-badge receita-badge" title="Nenhuma receita" style="opacity: 0.3;">
-                                            💊 0
-                                        </span>
-                                    {% endif %}
+                                    <a href="{{ url_for('prontuario.prontuario_receitas', paciente=grupo.nome_paciente) }}" class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.receita == 0 else '' }}; text-decoration: none;">
+                                        💊 {{ grupo.contadores.receita }}
+                                    </a>
                                     
-                                    {% if grupo.contadores.exame_lab > 0 and grupo.primeiros_ids.exame_lab %}
-                                        <a href="{{ url_for('prontuario.editar_exame_lab_especifico', exame_id=grupo.primeiros_ids.exame_lab) }}" class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)" style="text-decoration: none;">
-                                            🧪 {{ grupo.contadores.exame_lab }}
-                                        </a>
-                                    {% else %}
-                                        <span class="medical-badge lab-badge" title="Nenhum exame laboratorial" style="opacity: 0.3;">
-                                            🧪 0
-                                        </span>
-                                    {% endif %}
+                                    <a href="{{ url_for('prontuario.prontuario_exames_lab', paciente=grupo.nome_paciente) }}" class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_lab == 0 else '' }}; text-decoration: none;">
+                                        🧪 {{ grupo.contadores.exame_lab }}
+                                    </a>
                                     
-                                    {% if grupo.contadores.exame_img > 0 and grupo.primeiros_ids.exame_img %}
-                                        <a href="{{ url_for('prontuario.editar_exame_img_especifico', exame_id=grupo.primeiros_ids.exame_img) }}" class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem" style="text-decoration: none;">
-                                            🩻 {{ grupo.contadores.exame_img }}</a>
-                                    {% else %}
-                                        <span class="medical-badge img-badge" title="Nenhum exame de imagem" style="opacity: 0.3;">
-                                            🩻 0
-                                        </span>
-                                    {% endif %}
+                                    <a href="{{ url_for('prontuario.prontuario_exames_img', paciente=grupo.nome_paciente) }}" class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_img == 0 else '' }}; text-decoration: none;">
+                                        🩻 {{ grupo.contadores.exame_img }}
+                                    </a>
                                     
-                                    {% if grupo.contadores.relatorio > 0 and grupo.primeiros_ids.relatorio %}
-                                        <a href="{{ url_for('prontuario.editar_relatorio_especifico', relatorio_id=grupo.primeiros_ids.relatorio) }}" class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)" style="text-decoration: none;">
-                                            🧾 {{ grupo.contadores.relatorio }}
-                                        </a>
-                                    {% else %}
-                                        <span class="medical-badge relatorio-badge" title="Nenhum relatório médico" style="opacity: 0.3;">
-                                            🧾 0
-                                        </span>
-                                    {% endif %}
+                                    <a href="{{ url_for('prontuario.prontuario_relatorios', paciente=grupo.nome_paciente) }}" class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.relatorio == 0 else '' }}; text-decoration: none;">
+                                        🧾 {{ grupo.contadores.relatorio }}
+                                    </a>
                                     
-                                    {% if grupo.contadores.atestado > 0 and grupo.primeiros_ids.atestado %}
-                                        <a href="{{ url_for('prontuario.editar_atestado_especifico', atestado_id=grupo.primeiros_ids.atestado) }}" class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)" style="text-decoration: none;">
-                                            📄 {{ grupo.contadores.atestado }}
-                                        </a>
-                                    {% else %}
-                                        <span class="medical-badge atestado-badge" title="Nenhum atestado médico" style="opacity: 0.3;">
-                                            📄 0
-                                        </span>
-                                    {% endif %}
+                                    <a href="{{ url_for('prontuario.prontuario_atestados', paciente=grupo.nome_paciente) }}" class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.atestado == 0 else '' }}; text-decoration: none;">
+                                        📄 {{ grupo.contadores.atestado }}
+                                    </a>
                                     
-                                    {% if grupo.contadores.alto_custo > 0 and grupo.primeiros_ids.alto_custo %}
-                                        <a href="{{ url_for('prontuario.editar_alto_custo_especifico', alto_custo_id=grupo.primeiros_ids.alto_custo) }}" class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo" style="text-decoration: none;">
-                                            💰💊 {{ grupo.contadores.alto_custo }}
-                                        </a>
-                                    {% else %}
-                                        <span class="medical-badge alto-custo-badge" title="Nenhum formulário alto custo" style="opacity: 0.3;">
-                                            💰💊 0
-                                        </span>
-                                    {% endif %}
+                                    <a href="{{ url_for('prontuario.prontuario_alto_custo', paciente=grupo.nome_paciente) }}" class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo" style="{{ 'opacity: 0.3;' if grupo.contadores.alto_custo == 0 else '' }}; text-decoration: none;">
+                                        💰💊 {{ grupo.contadores.alto_custo }}
+                                    </a>
                                     
                                     {% if total_docs == 0 %}
                                         <div class="mt-2"><span class="text-muted small">Nenhum documento registrado</span></div>

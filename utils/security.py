@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import session, redirect, url_for, request, flash
 from models import LogSistema
-from main import db
+from app import db
 from datetime import datetime
 import logging
 

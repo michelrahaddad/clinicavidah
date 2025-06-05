@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session, make_response
 from models import RelatorioMedico, Medico, Paciente, Cid10
-from main import db
+from app import db
 from sqlalchemy import text
 from utils.forms import sanitizar_entrada
 from datetime import datetime

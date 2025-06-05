@@ -1,7 +1,7 @@
 from sqlalchemy import or_
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
 from models import Prontuario, Receita, ExameLab, ExameImg, Medico, RelatorioMedico, AtestadoMedico, FormularioAltoCusto, Paciente
-from main import db
+from app import db
 from utils.forms import sanitizar_entrada
 import logging
 from datetime import datetime
@@ -41,7 +41,7 @@ def formatar_data_brasileira(data):
 prontuario_bp = Blueprint('prontuario', __name__)
 
 @prontuario_bp.route('/prontuario', methods=['GET'])
-def buscar_paciente():
+def prontuario():
     """Display patient records"""
     # Log session data for debugging
     logging.info(f"Prontuario access - usuario: {session.get('usuario')}, admin_usuario: {session.get('admin_usuario')}")
@@ -302,14 +302,6 @@ def buscar_paciente():
                         'atestado': 0,
                         'alto_custo': 0
                     },
-                    'primeiros_ids': {
-                        'receita': None,
-                        'exame_lab': None,
-                        'exame_img': None,
-                        'relatorio': None,
-                        'atestado': None,
-                        'alto_custo': None
-                    },
                     'documentos': {
                         'receita': [],
                         'exame_lab': [],
@@ -325,10 +317,6 @@ def buscar_paciente():
             grupos[key]['contadores'][tipo] += 1
             grupos[key]['documentos'][tipo].append(resultado)
             grupos[key]['total_documentos'] += 1
-            
-            # Store first document ID for badge links
-            if grupos[key]['primeiros_ids'][tipo] is None:
-                grupos[key]['primeiros_ids'][tipo] = resultado.get('id_registro')
         
         # Convert to list and sort by date (newest first)
         resultados_agrupados = list(grupos.values())
@@ -1006,7 +994,7 @@ def salvar_exame_lab():
         
         if exame:
             exame.data = datetime.strptime(dados['data'], '%Y-%m-%d').date()
-            exame.exames = dados['exames_solicitados']
+            exame.exames_solicitados = dados['exames_solicitados']
             exame.preparacao = dados.get('preparacao', '')
             exame.observacoes = dados.get('observacoes', '')
             exame.medico_nome = dados['medico_nome']
@@ -1118,6 +1106,7 @@ def prontuario_medicamentos(receita_id):
             elif isinstance(receita.data, str):
                 # Try to parse string date
                 try:
+                    from datetime import datetime
                     data_obj = datetime.strptime(receita.data, '%Y-%m-%d')
                     data_formatada = data_obj.strftime('%d/%m/%Y')
                 except:
@@ -1282,306 +1271,4 @@ def medicamentos_pdf(receita_id):
     except Exception as e:
         logging.error(f'Error generating medication PDF: {e}')
         flash('Erro ao gerar PDF de medicamentos.', 'error')
-        return redirect(url_for('prontuario.prontuario'))
-
-# Rotas para páginas específicas de cada tipo de documento médico clonando o design da receita
-
-@prontuario_bp.route('/prontuario/receita/<int:receita_id>')
-def editar_receita_especifica(receita_id):
-    """Página específica para editar receita médica seguindo o padrão da nova receita"""
-    # Allow access for badge testing
-    logging.info(f"Accessing specific receita page for ID: {receita_id}")
-    
-    try:
-        receita = db.session.query(Receita).filter_by(id=receita_id).first()
-        if not receita:
-            flash('Receita não encontrada.', 'error')
-            return redirect(url_for('prontuario.prontuario'))
-        
-        # Get doctor information
-        medico = db.session.query(Medico).filter_by(id=receita.id_medico).first()
-        
-        # Parse medications from the prescription
-        medicamentos_list = []
-        if receita.medicamentos:
-            medicamentos_raw = receita.medicamentos.split('\n')
-            for i, med in enumerate(medicamentos_raw):
-                if med.strip():
-                    medicamentos_list.append(med.strip())
-        
-        # Prepare data for the template (mirroring receita.html structure)
-        dados_preenchidos = {
-            'nome_paciente': receita.nome_paciente,
-            'cpf': '',
-            'idade': '',
-            'endereco': '',
-            'cidade': '',
-            'medicamentos': medicamentos_list,
-            'posologia': getattr(receita, 'posologia', '2x'),
-            'duracao': getattr(receita, 'observacoes', 'Conforme prescrição'),
-            'via': 'Oral',
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': receita.data if isinstance(receita.data, str) else (receita.data.strftime('%d/%m/%Y às %H:%M') if receita.data else '05/06/2025 às 12:05'),
-            'receita_id': receita.id
-        }
-        
-        # Get all prescriptions for the same doctor to build sidebar
-        receitas_medico = db.session.query(Receita).filter_by(id_medico=receita.id_medico).order_by(Receita.data.desc()).all()
-        
-        return render_template('receita_especifica.html', 
-                             receitas_medico=receitas_medico,
-                             receita_atual_id=receita.id,
-                             **dados_preenchidos)
-        
-    except Exception as e:
-        logging.error(f'Error loading specific receita: {e}')
-        flash('Erro ao carregar receita específica.', 'error')
-        return redirect(url_for('prontuario.prontuario'))
-
-@prontuario_bp.route('/prontuario/exame_lab/<int:exame_id>')
-def editar_exame_lab_especifico(exame_id):
-    """Página específica para editar exame laboratorial seguindo o padrão da nova receita"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
-        return redirect(url_for('auth.login'))
-    
-    try:
-        exame = db.session.query(ExameLab).filter_by(id=exame_id).first()
-        if not exame:
-            flash('Exame não encontrado.', 'error')
-            return redirect(url_for('prontuario.prontuario'))
-        
-        # Get doctor information
-        medico = db.session.query(Medico).filter_by(id=exame.id_medico).first()
-        
-        # Parse exams from the request
-        exames_list = []
-        if exame.exames:
-            exames_raw = exame.exames.split('\n')
-            for i, ex in enumerate(exames_raw):
-                if ex.strip():
-                    exames_list.append(ex.strip())
-        
-        # Prepare data for the template
-        dados_preenchidos = {
-            'nome_paciente': exame.nome_paciente,
-            'cpf': '',
-            'idade': '',
-            'endereco': '',
-            'cidade': '',
-            'exames_solicitados': exames_list,
-            'preparacao': getattr(exame, 'preparacao', 'Jejum de 12 horas'),
-            'observacoes': getattr(exame, 'observacoes', 'Realizar pela manhã'),
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': exame.data.strftime('%d/%m/%Y às %H:%M') if hasattr(exame.data, 'strftime') else '05/06/2025 às 12:05',
-            'exame_id': exame.id
-        }
-        
-        # Get all lab exams for the same doctor to build sidebar
-        exames_medico = db.session.query(ExameLab).filter_by(id_medico=exame.id_medico).order_by(ExameLab.data.desc()).all()
-        
-        return render_template('exame_lab_especifico.html', 
-                             exames_medico=exames_medico,
-                             exame_atual_id=exame.id,
-                             **dados_preenchidos)
-        
-    except Exception as e:
-        logging.error(f'Error loading specific exame lab: {e}')
-        flash('Erro ao carregar exame laboratorial específico.', 'error')
-        return redirect(url_for('prontuario.prontuario'))
-
-@prontuario_bp.route('/prontuario/exame_img/<int:exame_id>')
-def editar_exame_img_especifico(exame_id):
-    """Página específica para editar exame de imagem seguindo o padrão da nova receita"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
-        return redirect(url_for('auth.login'))
-    
-    try:
-        exame = db.session.query(ExameImg).filter_by(id=exame_id).first()
-        if not exame:
-            flash('Exame não encontrado.', 'error')
-            return redirect(url_for('prontuario.prontuario'))
-        
-        # Get doctor information
-        medico = db.session.query(Medico).filter_by(id=exame.id_medico).first()
-        
-        # Parse exams from the request
-        exames_list = []
-        if exame.exames:
-            exames_raw = exame.exames.split('\n')
-            for i, ex in enumerate(exames_raw):
-                if ex.strip():
-                    exames_list.append(ex.strip())
-        
-        # Prepare data for the template
-        dados_preenchidos = {
-            'nome_paciente': exame.nome_paciente,
-            'cpf': '',
-            'idade': '',
-            'endereco': '',
-            'cidade': '',
-            'exames_solicitados': exames_list,
-            'preparacao': getattr(exame, 'preparacao', 'Trazer exames anteriores'),
-            'observacoes': getattr(exame, 'observacoes', 'Com contraste se necessário'),
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': exame.data if isinstance(exame.data, str) else (exame.data.strftime('%d/%m/%Y às %H:%M') if exame.data else '05/06/2025 às 12:05'),
-            'exame_id': exame.id
-        }
-        
-        # Get all image exams for the same doctor to build sidebar
-        exames_medico = db.session.query(ExameImg).filter_by(id_medico=exame.id_medico).order_by(ExameImg.data.desc()).all()
-        
-        return render_template('exame_img_especifico.html', 
-                             exames_medico=exames_medico,
-                             exame_atual_id=exame.id,
-                             **dados_preenchidos)
-        
-    except Exception as e:
-        logging.error(f'Error loading specific exame img: {e}')
-        flash('Erro ao carregar exame de imagem específico.', 'error')
-        return redirect(url_for('prontuario.prontuario'))
-
-@prontuario_bp.route('/prontuario/relatorio/<int:relatorio_id>')
-def editar_relatorio_especifico(relatorio_id):
-    """Página específica para editar relatório médico seguindo o padrão da nova receita"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
-        return redirect(url_for('auth.login'))
-    
-    try:
-        from models import RelatorioMedico
-        relatorio = db.session.query(RelatorioMedico).filter_by(id=relatorio_id).first()
-        if not relatorio:
-            flash('Relatório não encontrado.', 'error')
-            return redirect(url_for('prontuario.prontuario'))
-        
-        # Get doctor information
-        medico = db.session.query(Medico).filter_by(id=relatorio.id_medico).first()
-        
-        # Prepare data for the template
-        dados_preenchidos = {
-            'nome_paciente': relatorio.nome_paciente,
-            'cpf': '',
-            'idade': '',
-            'endereco': '',
-            'cidade': '',
-            'tipo_relatorio': getattr(relatorio, 'tipo', 'Consulta'),
-            'data_atendimento': getattr(relatorio, 'data_atendimento', ''),
-            'relato_clinico': getattr(relatorio, 'relato', 'Paciente relata...'),
-            'diagnostico': getattr(relatorio, 'diagnostico', 'A definir'),
-            'conduta': getattr(relatorio, 'conduta', 'Orientações gerais'),
-            'exame_fisico': getattr(relatorio, 'exame_fisico', 'Sem alterações'),
-            'observacoes': getattr(relatorio, 'observacoes', 'Acompanhamento regular'),
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': relatorio.data if isinstance(relatorio.data, str) else (relatorio.data.strftime('%d/%m/%Y às %H:%M') if relatorio.data else '05/06/2025 às 12:05'),
-            'relatorio_id': relatorio.id
-        }
-        
-        # Get all reports for the same doctor to build sidebar
-        relatorios_medico = db.session.query(RelatorioMedico).filter_by(id_medico=relatorio.id_medico).order_by(RelatorioMedico.data.desc()).all()
-        
-        return render_template('relatorio_especifico.html', 
-                             relatorios_medico=relatorios_medico,
-                             relatorio_atual_id=relatorio.id,
-                             **dados_preenchidos)
-        
-    except Exception as e:
-        logging.error(f'Error loading specific relatorio: {e}')
-        flash('Erro ao carregar relatório específico.', 'error')
-        return redirect(url_for('prontuario.prontuario'))
-
-@prontuario_bp.route('/prontuario/atestado/<int:atestado_id>')
-def editar_atestado_especifico(atestado_id):
-    """Página específica para editar atestado médico seguindo o padrão da nova receita"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
-        return redirect(url_for('auth.login'))
-    
-    try:
-        from models import AtestadoMedico
-        atestado = db.session.query(AtestadoMedico).filter_by(id=atestado_id).first()
-        if not atestado:
-            flash('Atestado não encontrado.', 'error')
-            return redirect(url_for('prontuario.prontuario'))
-        
-        # Get doctor information
-        medico = db.session.query(Medico).filter_by(id=atestado.id_medico).first()
-        
-        # Prepare data for the template
-        dados_preenchidos = {
-            'nome_paciente': atestado.nome_paciente,
-            'cpf': '',
-            'idade': '',
-            'endereco': '',
-            'cidade': '',
-            'tipo_atestado': getattr(atestado, 'tipo', 'Saude'),
-            'dias_afastamento': getattr(atestado, 'dias', '1'),
-            'data_inicio': getattr(atestado, 'data_inicio', ''),
-            'data_fim': getattr(atestado, 'data_fim', ''),
-            'cid': getattr(atestado, 'cid', ''),
-            'descricao': getattr(atestado, 'motivo', 'Repouso médico necessário'),
-            'observacoes': getattr(atestado, 'observacoes', 'Repouso domiciliar'),
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': atestado.data if isinstance(atestado.data, str) else (atestado.data.strftime('%d/%m/%Y às %H:%M') if atestado.data else '05/06/2025 às 12:05'),
-            'atestado_id': atestado.id
-        }
-        
-        # Get all certificates for the same doctor to build sidebar
-        atestados_medico = db.session.query(AtestadoMedico).filter_by(id_medico=atestado.id_medico).order_by(AtestadoMedico.data.desc()).all()
-        
-        return render_template('atestado_especifico.html', 
-                             atestados_medico=atestados_medico,
-                             atestado_atual_id=atestado.id,
-                             **dados_preenchidos)
-        
-    except Exception as e:
-        logging.error(f'Error loading specific atestado: {e}')
-        flash('Erro ao carregar atestado específico.', 'error')
-        return redirect(url_for('prontuario.prontuario'))
-
-@prontuario_bp.route('/prontuario/alto_custo/<int:alto_custo_id>')
-def editar_alto_custo_especifico(alto_custo_id):
-    """Página específica para editar formulário alto custo seguindo o padrão da nova receita"""
-    if 'usuario' not in session and 'admin_usuario' not in session:
-        return redirect(url_for('auth.login'))
-    
-    try:
-        from models import FormularioAltoCusto
-        alto_custo = db.session.query(FormularioAltoCusto).filter_by(id=alto_custo_id).first()
-        if not alto_custo:
-            flash('Formulário não encontrado.', 'error')
-            return redirect(url_for('prontuario.prontuario'))
-        
-        # Get doctor information
-        medico = db.session.query(Medico).filter_by(id=alto_custo.id_medico).first()
-        
-        # Prepare data for the template
-        dados_preenchidos = {
-            'nome_paciente': alto_custo.nome_paciente,
-            'cpf': '',
-            'idade': '',
-            'endereco': '',
-            'cidade': '',
-            'medicamento': getattr(alto_custo, 'medicamento', 'Medicamento especial'),
-            'justificativa': getattr(alto_custo, 'justificativa', 'Necessário para tratamento'),
-            'observacoes': getattr(alto_custo, 'observacoes', 'Conforme protocolo'),
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': alto_custo.data if isinstance(alto_custo.data, str) else (alto_custo.data.strftime('%d/%m/%Y às %H:%M') if alto_custo.data else '05/06/2025 às 12:05'),
-            'alto_custo_id': alto_custo.id
-        }
-        
-        # Get all high-cost forms for the same doctor to build sidebar
-        formularios_medico = db.session.query(FormularioAltoCusto).filter_by(id_medico=alto_custo.id_medico).order_by(FormularioAltoCusto.data.desc()).all()
-        
-        return render_template('alto_custo_especifico.html', 
-                             formularios_medico=formularios_medico,
-                             alto_custo_atual_id=alto_custo.id,
-                             **dados_preenchidos)
-        
-    except Exception as e:
-        logging.error(f'Error loading specific alto custo: {e}')
-        flash('Erro ao carregar formulário específico.', 'error')
         return redirect(url_for('prontuario.prontuario'))

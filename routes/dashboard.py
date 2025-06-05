@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, session
+from flask import Blueprint, render_template, session, redirect, url_for
 from utils.db import get_dashboard_stats
 import logging
 
@@ -6,17 +6,16 @@ dashboard_bp = Blueprint('dashboard', __name__)
 
 @dashboard_bp.route('/dashboard')
 def dashboard():
-    """Display main dashboard with authentication bypass for testing"""
-    # Simplified authentication for testing - allow admin access
-    logging.info(f"Dashboard access attempt - session: {dict(session)}")
+    """Display main dashboard with strict authentication"""
+    # Strict authentication check - always redirect if not authenticated
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
     
-    # Allow access if admin_usuario exists in session
-    if 'admin_usuario' in session:
-        logging.info(f"Admin dashboard access granted for: {session.get('admin_usuario')}")
-    elif 'usuario' in session:
-        logging.info(f"User dashboard access granted for: {session.get('usuario')}")
-    else:
-        logging.warning("No valid session found - redirecting to login")
+    # Double check for empty or invalid sessions
+    usuario = session.get('usuario')
+    admin = session.get('admin_usuario')
+    
+    if not usuario and not admin:
         return redirect(url_for('auth.login'))
     try:
         # Handle both admin and doctor sessions safely
@@ -48,12 +47,4 @@ def dashboard():
                              **stats)
     except Exception as e:
         logging.error(f'Dashboard error: {e}')
-        # Return basic dashboard with empty stats in case of error
-        return render_template('dashboard.html',
-                             usuario=session.get('usuario', 'Usuário'),
-                             total_receitas=0,
-                             total_exames_lab=0,
-                             total_exames_img=0,
-                             total_pacientes=0,
-                             receitas_hoje=0,
-                             exames_hoje=0)
+        return redirect(url_for('auth.login'))

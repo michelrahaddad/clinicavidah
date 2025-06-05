@@ -51,7 +51,7 @@ def create_backup():
             elif config.frequencia == 'monthly':
                 config.proximo_backup = datetime.utcnow() + timedelta(days=30)
             
-            from main import db
+            from app import db
             db.session.commit()
         
         logging.info(f'Backup created successfully: {compressed_path}')

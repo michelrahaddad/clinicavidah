@@ -1,6 +1,6 @@
 from flask import redirect, url_for, session, Blueprint, render_template, jsonify, request
 from models import Medico, Receita, ExameLab, ExameImg, Agendamento, LogSistema
-from main import db
+from app import db
 from utils.security import require_admin
 import psutil
 import time

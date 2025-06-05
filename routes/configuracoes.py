@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
-from models import Medico
-from main import db
+from models import Medico, db
 from datetime import datetime
 import logging
 import os

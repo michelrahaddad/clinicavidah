@@ -88,7 +88,7 @@
                     </button>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <a href="{{ url_for('consultas.agendar') }}" class="btn btn-outline-secondary neural-btn w-100">
+                    <a href="{{ url_for('agenda.agenda') }}" class="btn btn-outline-secondary neural-btn w-100">
                         <i class="fas fa-times me-2"></i>Limpar
                     </a>
                 </div>
@@ -131,7 +131,7 @@
                                         </li>
                                         <li>
                                             <form method="post" 
-                                                  action="{{ url_for('consultas.cancelar_consulta', id=agendamento.id) }}" 
+                                                  action="{{ url_for('agenda.excluir_agendamento', id=agendamento.id) }}" 
                                                   style="display: inline;">
                                                 <button type="submit" 
                                                         class="dropdown-item text-danger"

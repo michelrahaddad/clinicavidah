@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request, session, make_response, redirect, url_for
 from models import Paciente, Receita, ExameLab, ExameImg, Prontuario, Cid10, ExamePersonalizado, Medicamento
-from main import db
+from app import db
 from sqlalchemy import func, or_, text
 import csv
 import logging
