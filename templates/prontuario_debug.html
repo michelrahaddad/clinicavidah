@@ -145,43 +145,37 @@
                             <div class="d-flex flex-wrap align-items-center">
                                 {% if grupo.contadores.receita > 0 %}
                                     <span class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)">
-                                        <i class="fas fa-prescription-bottle-alt"></i>
-                                        {{ grupo.contadores.receita }}
+                                        💊 {{ grupo.contadores.receita }}
                                     </span>
                                 {% endif %}
                                 
                                 {% if grupo.contadores.exame_lab > 0 %}
                                     <span class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)">
-                                        <i class="fas fa-vial"></i>
-                                        {{ grupo.contadores.exame_lab }}
+                                        🧪 {{ grupo.contadores.exame_lab }}
                                     </span>
                                 {% endif %}
                                 
                                 {% if grupo.contadores.exame_img > 0 %}
                                     <span class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
-                                        <i class="fas fa-x-ray"></i>
-                                        {{ grupo.contadores.exame_img }}
+                                        🩻 {{ grupo.contadores.exame_img }}
                                     </span>
                                 {% endif %}
                                 
                                 {% if grupo.contadores.relatorio > 0 %}
                                     <span class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)">
-                                        <i class="fas fa-file-medical-alt"></i>
-                                        {{ grupo.contadores.relatorio }}
+                                        🧾 {{ grupo.contadores.relatorio }}
                                     </span>
                                 {% endif %}
                                 
                                 {% if grupo.contadores.atestado > 0 %}
                                     <span class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)">
-                                        <i class="fas fa-stamp"></i>
-                                        {{ grupo.contadores.atestado }}
+                                        📄 {{ grupo.contadores.atestado }}
                                     </span>
                                 {% endif %}
                                 
                                 {% if grupo.contadores.alto_custo > 0 %}
                                     <span class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                        {{ grupo.contadores.alto_custo }}
+                                        💰💊 {{ grupo.contadores.alto_custo }}
                                     </span>
                                 {% endif %}
                                 
