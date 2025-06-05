@@ -21,7 +21,12 @@ prontuario_bp = Blueprint('prontuario', __name__)
 @prontuario_bp.route('/prontuario', methods=['GET'])
 def prontuario():
     """Display patient records"""
+    # Log session data for debugging
+    logging.info(f"Prontuario access - usuario: {session.get('usuario')}, admin_usuario: {session.get('admin_usuario')}")
+    
+    # Simple authentication check
     if 'usuario' not in session and 'admin_usuario' not in session:
+        logging.info("No valid session found, redirecting to login")
         return redirect(url_for('auth.login'))
     
     try:
@@ -37,11 +42,6 @@ def prontuario():
                 logging.info(f"Admin user accessing prontuario, using medico_id: {medico_id}")
             else:
                 medico_id = 1  # Default fallback
-        
-        # Only redirect if neither medico_id nor admin session exists
-        if not medico_id and not admin_data and 'admin_usuario' not in session:
-            flash('Sessão expirada. Faça login novamente.', 'error')
-            return redirect(url_for('auth.login'))
             
         # Get search parameters
         busca_paciente = sanitizar_entrada(request.args.get('busca_paciente', ''))
