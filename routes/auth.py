@@ -55,20 +55,16 @@ def login():
                     session.permanent = True
                     
                     # Update last access
-                    admin.ultimo_acesso = datetime.utcnow()
-                    db.session.commit()
-                    
-                    # Log admin login
                     try:
-                        from utils.security import log_admin_action
-                        log_admin_action('login', admin.usuario, f'Login administrativo realizado', request.remote_addr)
-                    except Exception as log_error:
-                        logging.warning(f'Failed to log admin action: {log_error}')
+                        admin.ultimo_acesso = datetime.utcnow()
+                        db.session.commit()
+                    except Exception as e:
+                        logging.warning(f'Failed to update last access: {e}')
                     
                     flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
                     logging.info(f'Admin login successful for: {nome}')
                     
-                    return redirect(url_for('prontuario.buscar_paciente'))
+                    return redirect('/prontuario')
                 else:
                     logging.warning(f'Invalid password for admin: {nome}')
             
