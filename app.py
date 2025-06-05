@@ -122,54 +122,46 @@ def create_app():
             response.headers['Expires'] = '31536000'
         return response
     
-    # Register blueprints
-    from routes.auth import auth_bp
-    from routes.dashboard import dashboard_bp
-    from routes.receita import receita_bp
-    from routes.exames_lab import exames_lab_bp
-    from routes.exames_img import exames_img_bp
-    from routes.prontuario import prontuario_bp
-    from routes.agenda import agenda_bp
-    from routes.medicos import medicos_bp
-    from routes.api import api_bp
-    from routes.relatorio_medico import relatorio_medico_bp
-    from routes.atestado_medico import atestado_medico_bp
-    from routes.formulario_alto_custo import formulario_alto_custo_bp
-    from routes.pacientes import pacientes_bp
-    from routes.password_recovery import password_recovery_bp
-    from routes.exames_personalizados import exames_personalizados_bp
-    from routes.relatorios import relatorios_bp
-    from routes.estatisticas_neurais import estatisticas_neurais_bp
-    from routes.admin import admin_bp
-    from routes.atestado import atestado_bp
-    from routes.estatisticas import estatisticas_bp
-    from routes.consultas import consultas_bp
-    from routes.configuracoes import configuracoes_bp
-    from routes.backup import backup_bp
-    
-    app.register_blueprint(auth_bp)
-    app.register_blueprint(dashboard_bp)
-    app.register_blueprint(receita_bp)
-    app.register_blueprint(exames_lab_bp)
-    app.register_blueprint(exames_img_bp)
-    app.register_blueprint(prontuario_bp)
-    app.register_blueprint(agenda_bp)
-    app.register_blueprint(medicos_bp)
-    app.register_blueprint(api_bp)
-    app.register_blueprint(relatorio_medico_bp)
-    app.register_blueprint(atestado_medico_bp)
-    app.register_blueprint(formulario_alto_custo_bp)
-    app.register_blueprint(pacientes_bp)
-    app.register_blueprint(password_recovery_bp)
-    app.register_blueprint(exames_personalizados_bp)
-    app.register_blueprint(relatorios_bp)
-    app.register_blueprint(estatisticas_neurais_bp)
-    app.register_blueprint(admin_bp)
-    app.register_blueprint(atestado_bp)
-    app.register_blueprint(estatisticas_bp)
-    app.register_blueprint(consultas_bp)
-    app.register_blueprint(configuracoes_bp)
-    app.register_blueprint(backup_bp)
+    # Register core blueprints only
+    try:
+        from routes.auth import auth_bp
+        app.register_blueprint(auth_bp, url_prefix='/auth')
+        
+        from routes.dashboard import dashboard_bp
+        app.register_blueprint(dashboard_bp)
+        
+        from routes.prontuario import prontuario_bp
+        app.register_blueprint(prontuario_bp)
+        
+        from routes.receita import receita_bp
+        app.register_blueprint(receita_bp)
+        
+        from routes.exames_lab import exames_lab_bp
+        app.register_blueprint(exames_lab_bp)
+        
+        from routes.exames_img import exames_img_bp
+        app.register_blueprint(exames_img_bp)
+        
+        from routes.pacientes import pacientes_bp
+        app.register_blueprint(pacientes_bp)
+        
+        from routes.consultas import consultas_bp
+        app.register_blueprint(consultas_bp)
+        
+        from routes.configuracoes import configuracoes_bp
+        app.register_blueprint(configuracoes_bp)
+        
+        from routes.estatisticas import estatisticas_bp
+        app.register_blueprint(estatisticas_bp)
+        
+        from routes.backup import backup_bp
+        app.register_blueprint(backup_bp)
+        
+        logging.info("Core blueprints registered successfully")
+    except Exception as e:
+        logging.error(f"Error registering blueprints: {e}")
+        import traceback
+        traceback.print_exc()
     
     # Add main route
     @app.route('/')
