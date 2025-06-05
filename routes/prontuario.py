@@ -303,6 +303,14 @@ def prontuario():
         
         # Convert to list and sort by date (newest first)
         resultados_agrupados = list(grupos.values())
+                # Log dos contadores para debug
+        for key, grupo in grupos.items():
+            if grupo['nome_paciente'].lower().find('michel') >= 0:
+                logging.info(f"Debug Michel - {key}: receitas={grupo['contadores']['receita']}, "
+                           f"lab={grupo['contadores']['exame_lab']}, img={grupo['contadores']['exame_img']}, "
+                           f"relatorios={grupo['contadores']['relatorio']}, atestados={grupo['contadores']['atestado']}, "
+                           f"alto_custo={grupo['contadores']['alto_custo']}")
+        
         resultados_agrupados.sort(key=lambda x: x['data'], reverse=True)
         
         return render_template('prontuario_modern.html', 
