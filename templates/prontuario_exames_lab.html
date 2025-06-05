@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exames Laboratoriais - Sistema VIDAH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4a90e2;
+            --secondary-blue: #357abd;
+            --accent-green: #50c878;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-light: #e0e0e0;
+            --border-color: #404040;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #2a2a2a 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .card-custom {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .edit-input {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 0.5rem;
+            width: 100%;
+        }
+
+        .icon-nav {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-edit {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .btn-save {
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .btn-print {
+            background: #fd7e14;
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .data-atual-btn {
+            background: #ffc107;
+            border: none;
+            color: #000;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            margin-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-gradient">
+        <div class="container">
+            <h1 class="text-center text-white">
+                <i class="fas fa-vials me-3"></i>
+                🧪 Exames Laboratoriais - {{ paciente_nome }}
+            </h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Navegação entre ícones -->
+        <div class="icon-nav">
+            <a href="{{ url_for('prontuario.prontuario_receitas', paciente=paciente_nome) }}" class="icon-btn">
+                💊 Receitas Médicas
+            </a>
+            <a href="{{ url_for('prontuario.prontuario_exames_img', paciente=paciente_nome) }}" class="icon-btn">
+                🩻 Exames de Imagem
+            </a>
+            <a href="{{ url_for('prontuario.prontuario_relatorios', paciente=paciente_nome) }}" class="icon-btn">
+                🧾 Relatórios Médicos
+            </a>
+            <a href="{{ url_for('prontuario.prontuario_atestados', paciente=paciente_nome) }}" class="icon-btn">
+                📄 Atestados Médicos
+            </a>
+            <a href="{{ url_for('prontuario.prontuario_alto_custo', paciente=paciente_nome) }}" class="icon-btn">
+                💰💊 Alto Custo
+            </a>
+        </div>
+
+        <!-- Lista de exames laboratoriais -->
+        {% for exame in exames %}
+        <div class="card-custom">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h5 class="card-title">
+                        <i class="fas fa-vials text-primary me-2"></i>
+                        Exame Laboratorial #{{ exame.id }}
+                    </h5>
+                    <div>
+                        <button class="btn-edit" onclick="toggleEdit({{ exame.id }})">
+                            <i class="fas fa-edit me-1"></i>Editar
+                        </button>
+                        <button class="btn-save d-none" id="save-{{ exame.id }}" onclick="salvarExame({{ exame.id }})">
+                            <i class="fas fa-save me-1"></i>Salvar
+                        </button>
+                        <button class="btn-print" onclick="imprimirExame({{ exame.id }})">
+                            <i class="fas fa-print me-1"></i>PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3">
+                        <label class="form-label">Data:</label>
+                        <div class="d-flex align-items-center">
+                            <input type="date" 
+                                   class="edit-input" 
+                                   id="data-{{ exame.id }}" 
+                                   value="{{ exame.data_formatada_input }}" 
+                                   readonly>
+                            <button class="data-atual-btn" onclick="definirDataAtual({{ exame.id }})">
+                                Hoje
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label">Exames Solicitados:</label>
+                        <textarea class="edit-input" 
+                                  id="exames-{{ exame.id }}" 
+                                  rows="3" 
+                                  readonly>{{ exame.exames_solicitados }}</textarea>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Preparação:</label>
+                        <textarea class="edit-input" 
+                                  id="preparacao-{{ exame.id }}" 
+                                  rows="2" 
+                                  readonly>{{ exame.preparacao or '' }}</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Observações:</label>
+                        <textarea class="edit-input" 
+                                  id="observacoes-{{ exame.id }}" 
+                                  rows="2" 
+                                  readonly>{{ exame.observacoes or '' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Médico:</label>
+                        <input type="text" 
+                               class="edit-input" 
+                               id="medico-{{ exame.id }}" 
+                               value="{{ exame.medico_nome }}" 
+                               readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">CRM:</label>
+                        <input type="text" 
+                               class="edit-input" 
+                               id="crm-{{ exame.id }}" 
+                               value="{{ exame.medico_crm }}" 
+                               readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Data de Criação:</label>
+                        <input type="text" 
+                               class="edit-input" 
+                               value="{{ exame.created_at.strftime('%d/%m/%Y às %H:%M') }}" 
+                               readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if not exames %}
+        <div class="card-custom">
+            <div class="card-body text-center">
+                <i class="fas fa-vials fa-3x text-muted mb-3"></i>
+                <h4>Nenhum exame laboratorial encontrado</h4>
+                <p class="text-muted">Não há exames laboratoriais registrados para este paciente.</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Botão voltar ao prontuário -->
+        <div class="text-center mt-4 mb-4">
+            <a href="{{ url_for('prontuario.index') }}?busca_paciente={{ paciente_nome }}" 
+               class="btn btn-lg btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleEdit(id) {
+            const inputs = [
+                document.getElementById(`data-${id}`),
+                document.getElementById(`exames-${id}`),
+                document.getElementById(`preparacao-${id}`),
+                document.getElementById(`observacoes-${id}`),
+                document.getElementById(`medico-${id}`),
+                document.getElementById(`crm-${id}`)
+            ];
+            
+            const editBtn = document.querySelector(`[onclick="toggleEdit(${id})"]`);
+            const saveBtn = document.getElementById(`save-${id}`);
+            
+            const isReadonly = inputs[0].readOnly;
+            
+            inputs.forEach(input => {
+                input.readOnly = !isReadonly;
+                input.style.backgroundColor = isReadonly ? 'var(--dark-bg)' : '#2a2a2a';
+                input.style.borderColor = isReadonly ? 'var(--primary-blue)' : 'var(--border-color)';
+            });
+            
+            if (isReadonly) {
+                editBtn.innerHTML = '<i class="fas fa-times me-1"></i>Cancelar';
+                editBtn.style.backgroundColor = '#dc3545';
+                saveBtn.classList.remove('d-none');
+            } else {
+                editBtn.innerHTML = '<i class="fas fa-edit me-1"></i>Editar';
+                editBtn.style.backgroundColor = 'var(--primary-blue)';
+                saveBtn.classList.add('d-none');
+            }
+        }
+
+        function definirDataAtual(id) {
+            const dataInput = document.getElementById(`data-${id}`);
+            const hoje = new Date().toISOString().split('T')[0];
+            dataInput.value = hoje;
+        }
+
+        function salvarExame(id) {
+            const dados = {
+                id: id,
+                data: document.getElementById(`data-${id}`).value,
+                exames_solicitados: document.getElementById(`exames-${id}`).value,
+                preparacao: document.getElementById(`preparacao-${id}`).value,
+                observacoes: document.getElementById(`observacoes-${id}`).value,
+                medico_nome: document.getElementById(`medico-${id}`).value,
+                medico_crm: document.getElementById(`crm-${id}`).value
+            };
+
+            fetch('/prontuario/salvar_exame_lab', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Exame salvo com sucesso!');
+                    toggleEdit(id);
+                    location.reload();
+                } else {
+                    alert('Erro ao salvar: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao salvar exame');
+            });
+        }
+
+        function imprimirExame(id) {
+            window.open(`/prontuario/exame_lab_pdf/${id}`, '_blank');
+        }
+    </script>
+</body>
+</html>

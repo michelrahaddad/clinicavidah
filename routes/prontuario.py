@@ -865,3 +865,199 @@ def get_pacientes():
     except Exception as e:
         print(f"Erro na API de pacientes: {e}")
         return jsonify([])
+
+# Páginas específicas de prontuário por tipo de documento
+
+@prontuario_bp.route('/prontuario/receitas/<paciente>')
+def prontuario_receitas(paciente):
+    """Página específica de receitas médicas"""
+    try:
+        receitas = db.session.query(Receita).filter(
+            Receita.paciente_nome.ilike(f'%{paciente}%')
+        ).order_by(Receita.data.desc()).all()
+        
+        # Adicionar data formatada para input
+        for receita in receitas:
+            receita.data_formatada_input = receita.data.strftime('%Y-%m-%d')
+        
+        return render_template('prontuario_receitas.html', 
+                             receitas=receitas, 
+                             paciente_nome=paciente)
+    except Exception as e:
+        logging.error(f"Erro ao carregar receitas: {e}")
+        flash('Erro ao carregar receitas médicas', 'error')
+        return redirect(url_for('prontuario.index'))
+
+@prontuario_bp.route('/prontuario/exames_lab/<paciente>')
+def prontuario_exames_lab(paciente):
+    """Página específica de exames laboratoriais"""
+    try:
+        exames = db.session.query(ExameLab).filter(
+            ExameLab.paciente_nome.ilike(f'%{paciente}%')
+        ).order_by(ExameLab.data.desc()).all()
+        
+        # Adicionar data formatada para input
+        for exame in exames:
+            exame.data_formatada_input = exame.data.strftime('%Y-%m-%d')
+        
+        return render_template('prontuario_exames_lab.html', 
+                             exames=exames, 
+                             paciente_nome=paciente)
+    except Exception as e:
+        logging.error(f"Erro ao carregar exames laboratoriais: {e}")
+        flash('Erro ao carregar exames laboratoriais', 'error')
+        return redirect(url_for('prontuario.index'))
+
+@prontuario_bp.route('/prontuario/exames_img/<paciente>')
+def prontuario_exames_img(paciente):
+    """Página específica de exames de imagem"""
+    try:
+        exames = db.session.query(ExameImg).filter(
+            ExameImg.paciente_nome.ilike(f'%{paciente}%')
+        ).order_by(ExameImg.data.desc()).all()
+        
+        # Adicionar data formatada para input
+        for exame in exames:
+            exame.data_formatada_input = exame.data.strftime('%Y-%m-%d')
+        
+        return render_template('prontuario_exames_img.html', 
+                             exames=exames, 
+                             paciente_nome=paciente)
+    except Exception as e:
+        logging.error(f"Erro ao carregar exames de imagem: {e}")
+        flash('Erro ao carregar exames de imagem', 'error')
+        return redirect(url_for('prontuario.index'))
+
+@prontuario_bp.route('/prontuario/relatorios/<paciente>')
+def prontuario_relatorios(paciente):
+    """Página específica de relatórios médicos"""
+    try:
+        relatorios = db.session.query(RelatorioMedico).filter(
+            RelatorioMedico.paciente_nome.ilike(f'%{paciente}%')
+        ).order_by(RelatorioMedico.data.desc()).all()
+        
+        # Adicionar data formatada para input
+        for relatorio in relatorios:
+            relatorio.data_formatada_input = relatorio.data.strftime('%Y-%m-%d')
+        
+        return render_template('prontuario_relatorios.html', 
+                             relatorios=relatorios, 
+                             paciente_nome=paciente)
+    except Exception as e:
+        logging.error(f"Erro ao carregar relatórios médicos: {e}")
+        flash('Erro ao carregar relatórios médicos', 'error')
+        return redirect(url_for('prontuario.index'))
+
+@prontuario_bp.route('/prontuario/atestados/<paciente>')
+def prontuario_atestados(paciente):
+    """Página específica de atestados médicos"""
+    try:
+        atestados = db.session.query(AtestadoMedico).filter(
+            AtestadoMedico.paciente_nome.ilike(f'%{paciente}%')
+        ).order_by(AtestadoMedico.data.desc()).all()
+        
+        # Adicionar data formatada para input
+        for atestado in atestados:
+            atestado.data_formatada_input = atestado.data.strftime('%Y-%m-%d')
+        
+        return render_template('prontuario_atestados.html', 
+                             atestados=atestados, 
+                             paciente_nome=paciente)
+    except Exception as e:
+        logging.error(f"Erro ao carregar atestados médicos: {e}")
+        flash('Erro ao carregar atestados médicos', 'error')
+        return redirect(url_for('prontuario.index'))
+
+@prontuario_bp.route('/prontuario/alto_custo/<paciente>')
+def prontuario_alto_custo(paciente):
+    """Página específica de formulários alto custo"""
+    try:
+        formularios = db.session.query(FormularioAltoCusto).filter(
+            FormularioAltoCusto.paciente_nome.ilike(f'%{paciente}%')
+        ).order_by(FormularioAltoCusto.data.desc()).all()
+        
+        # Adicionar data formatada para input
+        for formulario in formularios:
+            formulario.data_formatada_input = formulario.data.strftime('%Y-%m-%d')
+        
+        return render_template('prontuario_alto_custo.html', 
+                             formularios=formularios, 
+                             paciente_nome=paciente)
+    except Exception as e:
+        logging.error(f"Erro ao carregar formulários alto custo: {e}")
+        flash('Erro ao carregar formulários alto custo', 'error')
+        return redirect(url_for('prontuario.index'))
+
+# APIs para salvar dados editados
+
+@prontuario_bp.route('/prontuario/salvar_receita', methods=['POST'])
+def salvar_receita():
+    """Salva alterações em receita médica"""
+    try:
+        dados = request.get_json()
+        receita = Receita.query.get(dados['id'])
+        
+        if receita:
+            receita.data = datetime.strptime(dados['data'], '%Y-%m-%d').date()
+            receita.medicamentos = dados['medicamentos']
+            receita.posologia = dados['posologia']
+            receita.observacoes = dados.get('observacoes', '')
+            receita.medico_nome = dados['medico_nome']
+            receita.medico_crm = dados['medico_crm']
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'Receita não encontrada'})
+    except Exception as e:
+        logging.error(f"Erro ao salvar receita: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@prontuario_bp.route('/prontuario/salvar_exame_lab', methods=['POST'])
+def salvar_exame_lab():
+    """Salva alterações em exame laboratorial"""
+    try:
+        dados = request.get_json()
+        exame = ExameLab.query.get(dados['id'])
+        
+        if exame:
+            exame.data = datetime.strptime(dados['data'], '%Y-%m-%d').date()
+            exame.exames_solicitados = dados['exames_solicitados']
+            exame.preparacao = dados.get('preparacao', '')
+            exame.observacoes = dados.get('observacoes', '')
+            exame.medico_nome = dados['medico_nome']
+            exame.medico_crm = dados['medico_crm']
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'Exame não encontrado'})
+    except Exception as e:
+        logging.error(f"Erro ao salvar exame: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@prontuario_bp.route('/prontuario/salvar_alto_custo', methods=['POST'])
+def salvar_alto_custo():
+    """Salva alterações em formulário alto custo"""
+    try:
+        dados = request.get_json()
+        formulario = FormularioAltoCusto.query.get(dados['id'])
+        
+        if formulario:
+            formulario.data = datetime.strptime(dados['data'], '%Y-%m-%d').date()
+            formulario.medicamento = dados['medicamento']
+            formulario.dosagem = dados['dosagem']
+            formulario.periodo_tratamento = dados['periodo_tratamento']
+            formulario.justificativa_clinica = dados['justificativa_clinica']
+            formulario.cid_10 = dados['cid_10']
+            formulario.observacoes = dados.get('observacoes', '')
+            formulario.medico_nome = dados['medico_nome']
+            formulario.medico_crm = dados['medico_crm']
+            
+            db.session.commit()
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'message': 'Formulário não encontrado'})
+    except Exception as e:
+        logging.error(f"Erro ao salvar formulário: {e}")
+        return jsonify({'success': False, 'message': str(e)})
