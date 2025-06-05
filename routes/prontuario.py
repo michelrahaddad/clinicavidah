@@ -903,12 +903,10 @@ def prontuario_exames_img(paciente):
     """Página específica de exames de imagem"""
     try:
         exames = db.session.query(ExameImg).filter(
-            ExameImg.paciente_nome.ilike(f'%{paciente}%')
-        ).order_by(ExameImg.data.desc()).all()
+            ExameImg.nome_paciente.ilike(f'%{paciente}%')
+        ).order_by(ExameImg.created_at.desc()).all()
         
-        # Adicionar data formatada para input
-        for exame in exames:
-            exame.data_formatada_input = exame.data.strftime('%Y-%m-%d')
+        # Remover processamento desnecessário
         
         return render_template('prontuario_exames_img.html', 
                              exames=exames, 

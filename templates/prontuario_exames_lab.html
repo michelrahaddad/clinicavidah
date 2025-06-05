@@ -126,19 +126,19 @@
     <div class="container">
         <!-- Navegação entre ícones -->
         <div class="icon-nav">
-            <a href="{{ url_for('prontuario.prontuario_receitas', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/receitas/{{ paciente_nome }}" class="icon-btn">
                 💊 Receitas Médicas
             </a>
-            <a href="{{ url_for('prontuario.prontuario_exames_img', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/exames_img/{{ paciente_nome }}" class="icon-btn">
                 🩻 Exames de Imagem
             </a>
-            <a href="{{ url_for('prontuario.prontuario_relatorios', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/relatorios/{{ paciente_nome }}" class="icon-btn">
                 🧾 Relatórios Médicos
             </a>
-            <a href="{{ url_for('prontuario.prontuario_atestados', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/atestados/{{ paciente_nome }}" class="icon-btn">
                 📄 Atestados Médicos
             </a>
-            <a href="{{ url_for('prontuario.prontuario_alto_custo', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/alto_custo/{{ paciente_nome }}" class="icon-btn">
                 💰💊 Alto Custo
             </a>
         </div>
@@ -246,7 +246,7 @@
 
         <!-- Botão voltar ao prontuário -->
         <div class="text-center mt-4 mb-4">
-            <a href="{{ url_for('prontuario.index') }}?busca_paciente={{ paciente_nome }}" 
+            <a href="/prontuario?busca_paciente={{ paciente_nome }}" 
                class="btn btn-lg btn-outline-primary">
                 <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
             </a>
