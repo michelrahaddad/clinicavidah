@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prontuário Debug - Sistema VIDAH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            color: #e0e0e0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .medical-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+            margin: 0.2rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .medical-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .medical-badge i {
+            font-size: 1rem;
+        }
+        
+        .receita-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+        
+        .lab-badge {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+        
+        .img-badge {
+            background: linear-gradient(135deg, #fd7e14, #e55a00);
+            box-shadow: 0 2px 8px rgba(253, 126, 20, 0.3);
+        }
+        
+        .relatorio-badge {
+            background: linear-gradient(135deg, #6f42c1, #563d7c);
+            box-shadow: 0 2px 8px rgba(111, 66, 193, 0.3);
+        }
+        
+        .atestado-badge {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+        
+        .alto-custo-badge {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #000;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        
+        .debug-info {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .table-dark-custom {
+            background: #2d2d2d;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table-dark-custom th {
+            background: #1a1a1a;
+            color: #50c878;
+            border: none;
+            padding: 1rem;
+        }
+        
+        .table-dark-custom td {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            border: 1px solid #404040;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Prontuário Debug - Badges Médicos</h1>
+        
+        <div class="debug-info">
+            <h3>Debug Info:</h3>
+            <p>Total de grupos: {{ resultados|length if resultados else 0 }}</p>
+            {% if resultados %}
+                {% for grupo in resultados %}
+                <div class="mb-2">
+                    <strong>{{ grupo.nome_paciente }} ({{ grupo.data }}):</strong>
+                    Receitas: {{ grupo.contadores.receita }}, 
+                    Lab: {{ grupo.contadores.exame_lab }}, 
+                    Img: {{ grupo.contadores.exame_img }}, 
+                    Relatórios: {{ grupo.contadores.relatorio }}, 
+                    Atestados: {{ grupo.contadores.atestado }}, 
+                    Alto Custo: {{ grupo.contadores.alto_custo }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        
+        {% if resultados %}
+        <div class="table-responsive">
+            <table class="table table-dark-custom">
+                <thead>
+                    <tr>
+                        <th>Paciente</th>
+                        <th>Data</th>
+                        <th>Documentos Médicos</th>
+                        <th>Médico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for grupo in resultados %}
+                    <tr>
+                        <td><strong>{{ grupo.nome_paciente }}</strong></td>
+                        <td>{{ grupo.data }}</td>
+                        <td>
+                            <div class="d-flex flex-wrap align-items-center">
+                                {% if grupo.contadores.receita > 0 %}
+                                    <span class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)">
+                                        <i class="fas fa-prescription-bottle-alt"></i>
+                                        {{ grupo.contadores.receita }}
+                                    </span>
+                                {% endif %}
+                                
+                                {% if grupo.contadores.exame_lab > 0 %}
+                                    <span class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)">
+                                        <i class="fas fa-vial"></i>
+                                        {{ grupo.contadores.exame_lab }}
+                                    </span>
+                                {% endif %}
+                                
+                                {% if grupo.contadores.exame_img > 0 %}
+                                    <span class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
+                                        <i class="fas fa-x-ray"></i>
+                                        {{ grupo.contadores.exame_img }}
+                                    </span>
+                                {% endif %}
+                                
+                                {% if grupo.contadores.relatorio > 0 %}
+                                    <span class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)">
+                                        <i class="fas fa-file-medical-alt"></i>
+                                        {{ grupo.contadores.relatorio }}
+                                    </span>
+                                {% endif %}
+                                
+                                {% if grupo.contadores.atestado > 0 %}
+                                    <span class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)">
+                                        <i class="fas fa-stamp"></i>
+                                        {{ grupo.contadores.atestado }}
+                                    </span>
+                                {% endif %}
+                                
+                                {% if grupo.contadores.alto_custo > 0 %}
+                                    <span class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        {{ grupo.contadores.alto_custo }}
+                                    </span>
+                                {% endif %}
+                                
+                                {% set total_docs = grupo.contadores.receita + grupo.contadores.exame_lab + grupo.contadores.exame_img + grupo.contadores.relatorio + grupo.contadores.atestado + grupo.contadores.alto_custo %}
+                                {% if total_docs == 0 %}
+                                    <span class="text-muted">Nenhum documento</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>{{ grupo.medico_nome }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center">
+            <h4>Nenhum resultado encontrado</h4>
+            <p>Faça uma busca para ver os badges médicos em ação.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

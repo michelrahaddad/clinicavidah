@@ -317,6 +317,76 @@ def prontuario():
         flash('Erro ao carregar prontuário.', 'error')
         return render_template('prontuario_modern.html', resultados=[])
 
+@prontuario_bp.route('/prontuario/debug')
+def prontuario_debug():
+    """Debug route for testing medical badges"""
+    try:
+        # Get sample data for debugging
+        busca_paciente = request.args.get('busca_paciente', 'Michel')
+        
+        # Similar logic to main route but simplified for debugging
+        resultados = []
+        
+        # Search in prescriptions
+        receitas = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico)
+        if busca_paciente:
+            receitas = receitas.filter(Receita.nome_paciente.ilike(f'%{busca_paciente}%'))
+        receitas = receitas.order_by(Receita.data.desc()).limit(10).all()
+        
+        for receita, medico_nome in receitas:
+            resultados.append({
+                'tipo': 'receita',
+                'data': receita.data,
+                'nome_paciente': receita.nome_paciente,
+                'medico_nome': medico_nome
+            })
+        
+        # Search in lab exams
+        exames_lab = db.session.query(ExameLab, Medico.nome.label('medico_nome')).join(Medico)
+        if busca_paciente:
+            exames_lab = exames_lab.filter(ExameLab.nome_paciente.ilike(f'%{busca_paciente}%'))
+        exames_lab = exames_lab.order_by(ExameLab.data.desc()).limit(10).all()
+        
+        for exame, medico_nome in exames_lab:
+            resultados.append({
+                'tipo': 'exame_lab',
+                'data': exame.data,
+                'nome_paciente': exame.nome_paciente,
+                'medico_nome': medico_nome
+            })
+        
+        # Group results by patient and date
+        grupos = {}
+        for resultado in resultados:
+            key = f"{resultado['nome_paciente']}|{resultado['data']}"
+            if key not in grupos:
+                grupos[key] = {
+                    'nome_paciente': resultado['nome_paciente'],
+                    'data': resultado['data'],
+                    'medico_nome': resultado['medico_nome'],
+                    'contadores': {
+                        'receita': 0,
+                        'exame_lab': 0,
+                        'exame_img': 0,
+                        'relatorio': 0,
+                        'atestado': 0,
+                        'alto_custo': 0
+                    }
+                }
+            
+            tipo = resultado['tipo']
+            grupos[key]['contadores'][tipo] += 1
+        
+        resultados_agrupados = list(grupos.values())
+        
+        return render_template('prontuario_debug.html', 
+                             resultados=resultados_agrupados,
+                             busca_paciente=busca_paciente)
+                             
+    except Exception as e:
+        logging.error(f'Prontuario debug error: {e}')
+        return render_template('prontuario_debug.html', resultados=[])
+
 @prontuario_bp.route('/prontuario/api/autocomplete_pacientes')
 def autocomplete_pacientes():
     """API endpoint for patient name autocomplete"""
