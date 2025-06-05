@@ -339,7 +339,7 @@
                 <div class="signature-area">
                     {% if assinatura and assinatura != 'assinatura' and assinatura.startswith('data:image') %}
                     <div class="signature-box">
-                        <img src="{{ assinatura }}" alt="Assinatura Digital" class="signature-img">
+                        <img src="{{ assinatura }}" alt="Assinatura Digital" class="signature-img" style="filter: brightness(0) contrast(100%) saturate(0);">
                         <div style="font-weight: bold; font-size: 9pt;">Dr. {{ medico }}</div>
                         <div style="font-size: 8pt;">CRM: {{ crm }}</div>
                         <div style="font-size: 8pt; color: #000; margin-top: 3px; font-style: italic; font-weight: bold;">Assinatura Digital</div>

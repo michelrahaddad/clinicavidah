@@ -94,7 +94,7 @@
         <div style="margin-bottom: 30px; border-top: 1px solid #ccc; width: 300px; margin-left: auto; margin-right: auto; padding-top: 15px;">
             {% if assinatura and assinatura != 'assinatura' and assinatura.startswith('data:image') %}
             <div style="margin-bottom: 10px;">
-                <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 60px; border: none;">
+                <img src="{{ assinatura }}" alt="Assinatura Digital" style="max-width: 200px; max-height: 60px; border: none; filter: brightness(0) contrast(100%) saturate(0);">
             </div>
             {% endif %}
             <div style="font-weight: bold; font-size: 12pt; color: #000; margin-bottom: 3px;">Dr. {{ medico }}</div>
