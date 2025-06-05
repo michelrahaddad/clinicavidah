@@ -873,32 +873,41 @@ def prontuario_receitas(paciente):
     """Página específica de receitas médicas"""
     try:
         receitas = db.session.query(Receita).filter(
-            Receita.paciente_nome.ilike(f'%{paciente}%')
-        ).order_by(Receita.data.desc()).all()
-        
-        # Adicionar data formatada para input
-        for receita in receitas:
-            receita.data_formatada_input = receita.data.strftime('%Y-%m-%d')
+            Receita.nome_paciente.ilike(f'%{paciente}%')
+        ).order_by(Receita.created_at.desc()).all()
         
         return render_template('prontuario_receitas.html', 
                              receitas=receitas, 
                              paciente_nome=paciente)
     except Exception as e:
         logging.error(f"Erro ao carregar receitas: {e}")
-        flash('Erro ao carregar receitas médicas', 'error')
-        return redirect(url_for('prontuario.index'))
+        return f"<h1>Receitas Médicas - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
 
 @prontuario_bp.route('/prontuario/exames_lab/<paciente>')
 def prontuario_exames_lab(paciente):
     """Página específica de exames laboratoriais"""
     try:
         exames = db.session.query(ExameLab).filter(
-            ExameLab.paciente_nome.ilike(f'%{paciente}%')
-        ).order_by(ExameLab.data.desc()).all()
+            ExameLab.nome_paciente.ilike(f'%{paciente}%')
+        ).order_by(ExameLab.created_at.desc()).all()
         
-        # Adicionar data formatada para input
+        # Adicionar campos necessários
         for exame in exames:
-            exame.data_formatada_input = exame.data.strftime('%Y-%m-%d')
+            # Converter data string para formato input
+            if isinstance(exame.data, str):
+                if '/' in exame.data:
+                    parts = exame.data.split('/')
+                    exame.data_formatada_input = f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
+                else:
+                    exame.data_formatada_input = exame.data
+            else:
+                exame.data_formatada_input = str(exame.data)
+            
+            # Adicionar campos ausentes
+            exame.exames_solicitados = getattr(exame, 'exames', '') or ''
+            exame.preparacao = ''
+            exame.observacoes = ''
+            exame.medico_crm = ''
         
         return render_template('prontuario_exames_lab.html', 
                              exames=exames, 
