@@ -21,7 +21,7 @@ prontuario_bp = Blueprint('prontuario', __name__)
 @prontuario_bp.route('/prontuario', methods=['GET'])
 def prontuario():
     """Display patient records"""
-    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -313,7 +313,7 @@ def prontuario():
 @prontuario_bp.route('/prontuario/api/autocomplete_pacientes')
 def autocomplete_pacientes():
     """API endpoint for patient name autocomplete"""
-    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return {'suggestions': []}
     
     term = request.args.get('q', '').strip()
@@ -363,7 +363,7 @@ def autocomplete_pacientes():
 @prontuario_bp.route('/prontuario/detalhes', methods=['GET'])
 def prontuario_detalhes():
     """Display detailed view of patient records for a specific date"""
-    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return redirect(url_for('auth.login'))
     
     try:
@@ -537,7 +537,7 @@ def prontuario_detalhes():
 @prontuario_bp.route('/prontuario/api/update_date', methods=['POST'])
 def update_date():
     """API endpoint to update document date"""
-    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return jsonify({'success': False, 'error': 'Sessão expirada'})
     
     try:
@@ -624,7 +624,7 @@ def update_date():
 @prontuario_bp.route('/prontuario/api/autocomplete', methods=['POST'])
 def autocomplete():
     """API endpoint for patient name autocomplete"""
-    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return jsonify({'success': False, 'error': 'Sessão expirada'})
     
     try:
