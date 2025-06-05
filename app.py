@@ -171,6 +171,12 @@ def create_app():
     app.register_blueprint(configuracoes_bp)
     app.register_blueprint(backup_bp)
     
+    # Add main route
+    @app.route('/')
+    def index():
+        from flask import redirect, url_for
+        return redirect(url_for('auth.login'))
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
