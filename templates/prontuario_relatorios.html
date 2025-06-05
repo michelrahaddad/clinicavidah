@@ -237,7 +237,7 @@
                         <label class="form-label">Data de Criação:</label>
                         <input type="text" 
                                class="edit-input" 
-                               value="{{ relatorio.created_at.strftime('%d/%m/%Y às %H:%M') }}" 
+                               value="{% if relatorio.created_at %}{{ relatorio.created_at.strftime('%d/%m/%Y às %H:%M') }}{% else %}Não informado{% endif %}" 
                                readonly>
                     </div>
                 </div>

@@ -254,7 +254,7 @@
                         <label class="form-label">Data de Criação:</label>
                         <input type="text" 
                                class="edit-input" 
-                               value="{{ atestado.created_at.strftime('%d/%m/%Y às %H:%M') }}" 
+                               value="{% if atestado.created_at %}{{ atestado.created_at.strftime('%d/%m/%Y às %H:%M') }}{% else %}Não informado{% endif %}" 
                                readonly>
                     </div>
                 </div>
