@@ -1326,7 +1326,13 @@ def editar_receita_especifica(receita_id):
             'receita_id': receita.id
         }
         
-        return render_template('receita_especifica.html', **dados_preenchidos)
+        # Get all prescriptions for the same doctor to build sidebar
+        receitas_medico = db.session.query(Receita).filter_by(id_medico=receita.id_medico).order_by(Receita.data.desc()).all()
+        
+        return render_template('receita_especifica.html', 
+                             receitas_medico=receitas_medico,
+                             receita_atual_id=receita.id,
+                             **dados_preenchidos)
         
     except Exception as e:
         logging.error(f'Error loading specific receita: {e}')
@@ -1372,7 +1378,13 @@ def editar_exame_lab_especifico(exame_id):
             'exame_id': exame.id
         }
         
-        return render_template('exame_lab_especifico.html', **dados_preenchidos)
+        # Get all lab exams for the same doctor to build sidebar
+        exames_medico = db.session.query(ExameLab).filter_by(id_medico=exame.id_medico).order_by(ExameLab.data.desc()).all()
+        
+        return render_template('exame_lab_especifico.html', 
+                             exames_medico=exames_medico,
+                             exame_atual_id=exame.id,
+                             **dados_preenchidos)
         
     except Exception as e:
         logging.error(f'Error loading specific exame lab: {e}')
@@ -1418,7 +1430,13 @@ def editar_exame_img_especifico(exame_id):
             'exame_id': exame.id
         }
         
-        return render_template('exame_img_especifico.html', **dados_preenchidos)
+        # Get all image exams for the same doctor to build sidebar
+        exames_medico = db.session.query(ExameImg).filter_by(id_medico=exame.id_medico).order_by(ExameImg.data.desc()).all()
+        
+        return render_template('exame_img_especifico.html', 
+                             exames_medico=exames_medico,
+                             exame_atual_id=exame.id,
+                             **dados_preenchidos)
         
     except Exception as e:
         logging.error(f'Error loading specific exame img: {e}')
