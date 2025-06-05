@@ -16,7 +16,7 @@ def index():
 def login():
     """Handle user login"""
     if request.method == 'GET':
-        return render_template('login_simples.html')
+        return render_template('login.html')
     
     if request.method == 'POST':
         nome = request.form.get('nome', '').strip()
@@ -25,7 +25,7 @@ def login():
         
         if not nome or not senha:
             flash('Nome e senha são obrigatórios.', 'error')
-            return render_template('login_simples.html')
+            return render_template('login.html')
         
         try:
             logging.info(f'Login attempt - Nome: {nome}, CRM: {crm}')
@@ -68,60 +68,7 @@ def login():
                     flash(f'Bem-vindo, Administrador {admin.nome}!', 'success')
                     logging.info(f'Admin login successful for: {nome}')
                     
-                    # Redirecionamento com JavaScript para garantir funcionamento
-                    return f"""
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Redirecionando...</title>
-                        <style>
-                            body {{
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                color: white;
-                                font-family: Arial, sans-serif;
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                height: 100vh;
-                                margin: 0;
-                            }}
-                            .spinner {{
-                                border: 4px solid rgba(255,255,255,0.3);
-                                border-top: 4px solid white;
-                                border-radius: 50%;
-                                width: 40px;
-                                height: 40px;
-                                animation: spin 1s linear infinite;
-                                margin: 0 auto 20px;
-                            }}
-                            @keyframes spin {{
-                                0% {{ transform: rotate(0deg); }}
-                                100% {{ transform: rotate(360deg); }}
-                            }}
-                        </style>
-                    </head>
-                    <body>
-                        <div style="text-align: center;">
-                            <div class="spinner"></div>
-                            <h2>Redirecionando para o Painel Administrativo...</h2>
-                            <p>Aguarde um momento...</p>
-                        </div>
-                        <script>
-                            // Múltiplas estratégias de redirecionamento
-                            setTimeout(function() {{
-                                try {{
-                                    window.location.href = '/admin/dashboard';
-                                }} catch(e) {{
-                                    window.location.replace('/admin/dashboard');
-                                }}
-                            }}, 1000);
-                            
-                            // Fallback imediato
-                            window.location.assign('/admin/dashboard');
-                        </script>
-                    </body>
-                    </html>
-                    """
+                    return redirect(url_for('prontuario.buscar_paciente'))
                 else:
                     logging.warning(f'Invalid password for admin: {nome}')
             
@@ -149,7 +96,7 @@ def login():
             logging.error(f'Login error: {e}')
             flash('Erro interno. Tente novamente.', 'error')
     
-    return render_template('login_simples.html')
+    return render_template('login.html')
 
 @auth_bp.route('/logout')
 def logout():
