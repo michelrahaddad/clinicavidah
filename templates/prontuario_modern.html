@@ -526,16 +526,14 @@
                                     
                                     {% if grupo.contadores.exame_lab > 0 %}
                                         <div class="document-counter-badge lab" 
-                                             
                                              title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratoriais">
-                                            <i class="fas fa-flask"></i>
+                                            <i class="fas fa-vial"></i>
                                             <span class="counter">{{ grupo.contadores.exame_lab }}</span>
                                         </div>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.exame_img > 0 %}
                                         <div class="document-counter-badge img" 
-                                             
                                              title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
                                             <i class="fas fa-x-ray"></i>
                                             <span class="counter">{{ grupo.contadores.exame_img }}</span>
@@ -544,27 +542,24 @@
                                     
                                     {% if grupo.contadores.relatorio > 0 %}
                                         <div class="document-counter-badge relatorio" 
-                                             
-                                             title="{{ grupo.contadores.relatorio }} Relatório(s)">
-                                            <i class="fas fa-file-medical"></i>
+                                             title="{{ grupo.contadores.relatorio }} Relatório(s) Médicos">
+                                            <i class="fas fa-file-medical-alt"></i>
                                             <span class="counter">{{ grupo.contadores.relatorio }}</span>
                                         </div>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.atestado > 0 %}
                                         <div class="document-counter-badge atestado" 
-                                             
-                                             title="{{ grupo.contadores.atestado }} Atestado(s)">
-                                            <i class="fas fa-certificate"></i>
+                                             title="{{ grupo.contadores.atestado }} Atestado(s) Médicos">
+                                            <i class="fas fa-stamp"></i>
                                             <span class="counter">{{ grupo.contadores.atestado }}</span>
                                         </div>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.alto_custo > 0 %}
                                         <div class="document-counter-badge alto-custo" 
-                                             
                                              title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
-                                            <i class="fas fa-dollar-sign"></i>
+                                            <i class="fas fa-money-bill-wave"></i>
                                             <span class="counter">{{ grupo.contadores.alto_custo }}</span>
                                         </div>
                                     {% endif %}
