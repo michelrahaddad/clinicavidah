@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receita #{{ receita.id }} - Sistema VIDAH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4a90e2;
+            --secondary-blue: #357abd;
+            --accent-green: #50c878;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-light: #e0e0e0;
+            --border-color: #404040;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #2a2a2a 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .document-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .document-title {
+            color: var(--text-light);
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-edit {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-edit:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .btn-pdf {
+            background: #fd7e14;
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-pdf:hover {
+            background: #e8660d;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .content-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .edit-input, .edit-textarea {
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 0.75rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .edit-input:focus, .edit-textarea:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            outline: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .medication-section {
+            background: rgba(74, 144, 226, 0.1);
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .medication-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .medication-header {
+            color: var(--primary-blue);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .icon-nav {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            padding: 0.8rem 1.2rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .icon-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        .btn-save {
+            background: var(--accent-green);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+            width: 100%;
+        }
+
+        .btn-save:hover {
+            background: #45b26b;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            background: #6c757d;
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .text-display {
+            background: transparent;
+            color: var(--text-light);
+            border: none;
+            padding: 0.5rem 0;
+        }
+
+        .medication-display {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .today-badge {
+            background: linear-gradient(135deg, #ffc107, #ff8c00);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .document-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .medication-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header Section -->
+        <div class="header-section">
+            <div class="document-header">
+                <h1 class="document-title">
+                    Receita #{{ receita.id }}
+                    {% if data_formatada == (moment().format('DD/MM/YYYY') if moment else '') %}
+                    <span class="today-badge">Hoje</span>
+                    {% endif %}
+                </h1>
+                <div class="action-buttons">
+                    <button class="btn-edit" onclick="toggleEdit()">
+                        <i class="fas fa-edit"></i>
+                        <span id="edit-text">Editar</span>
+                    </button>
+                    <a href="/prontuario/medicamentos/{{ receita.id }}/pdf" class="btn-pdf" target="_blank">
+                        <i class="fas fa-file-pdf"></i>
+                        PDF
+                    </a>
+                </div>
+            </div>
+
+            <!-- Patient and Basic Info -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Data:</label>
+                    <input type="date" class="edit-input text-display" value="{{ receita.data.strftime('%Y-%m-%d') if receita.data else '' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Paciente:</label>
+                    <input type="text" id="nome_paciente" class="edit-input text-display" value="{{ receita.nome_paciente or '' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Médico:</label>
+                    <input type="text" class="edit-input text-display" value="{{ medico.nome if medico else 'N/A' }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data de Criação:</label>
+                    <input type="text" class="edit-input text-display" value="{{ receita.data.strftime('%d/%m/%Y às %H:%M') if receita.data else 'N/A' }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medications Section -->
+        <div class="content-section">
+            <form id="medicationsForm">
+                <h3 class="medication-header">
+                    <i class="fas fa-pills"></i>
+                    Medicamentos:
+                </h3>
+
+                <div id="medications-container">
+                    {% for medicamento in medicamentos %}
+                    <div class="medication-section" data-index="{{ medicamento.index }}">
+                        <div class="medication-grid">
+                            <div class="form-group">
+                                <label class="form-label">Princípio Ativo:</label>
+                                <input type="text" name="principio_ativo[]" class="edit-input text-display" 
+                                       value="{{ medicamento.principio_ativo }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Conc.:</label>
+                                <input type="text" name="concentracao[]" class="edit-input text-display" 
+                                       value="{{ medicamento.concentracao }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Via:</label>
+                                <input type="text" name="via[]" class="edit-input text-display" 
+                                       value="{{ medicamento.via }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Freq:</label>
+                                <input type="text" name="frequencia[]" class="edit-input text-display" 
+                                       value="{{ medicamento.frequencia }}" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Qtd:</label>
+                                <input type="text" name="quantidade[]" class="edit-input text-display" 
+                                       value="{{ medicamento.quantidade }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" class="btn-save" id="saveBtn" style="display: none;" onclick="saveMedications()">
+                    <i class="fas fa-save me-2"></i>Salvar Alterações
+                </button>
+            </form>
+        </div>
+
+        <!-- Navigation Icons -->
+        <div class="icon-nav">
+            <a href="/prontuario/receitas?busca_paciente={{ receita.nome_paciente }}" class="icon-btn">
+                <i class="fas fa-prescription-bottle-alt"></i>
+                Receitas
+            </a>
+            <a href="/prontuario/exames_lab?busca_paciente={{ receita.nome_paciente }}" class="icon-btn">
+                <i class="fas fa-vial"></i>
+                Exames Lab
+            </a>
+            <a href="/prontuario/exames_img?busca_paciente={{ receita.nome_paciente }}" class="icon-btn">
+                <i class="fas fa-x-ray"></i>
+                Exames Img
+            </a>
+            <a href="/prontuario/relatorios?busca_paciente={{ receita.nome_paciente }}" class="icon-btn">
+                <i class="fas fa-file-medical-alt"></i>
+                Relatórios
+            </a>
+            <a href="/prontuario/atestados?busca_paciente={{ receita.nome_paciente }}" class="icon-btn">
+                <i class="fas fa-certificate"></i>
+                Atestados
+            </a>
+            <a href="/prontuario/alto_custo?busca_paciente={{ receita.nome_paciente }}" class="icon-btn">
+                <i class="fas fa-dollar-sign"></i>
+                Alto Custo
+            </a>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-4">
+            <a href="/prontuario?busca_paciente={{ receita.nome_paciente }}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Prontuário
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let isEditing = false;
+
+        function toggleEdit() {
+            isEditing = !isEditing;
+            const inputs = document.querySelectorAll('.edit-input:not([readonly])');
+            const textDisplays = document.querySelectorAll('.text-display');
+            const editBtn = document.getElementById('edit-text');
+            const saveBtn = document.getElementById('saveBtn');
+
+            if (isEditing) {
+                // Enable editing
+                textDisplays.forEach(input => {
+                    if (input.id !== 'nome_paciente' || input.name) {
+                        input.removeAttribute('readonly');
+                        input.classList.remove('text-display');
+                    }
+                });
+                editBtn.textContent = 'Cancelar';
+                saveBtn.style.display = 'block';
+            } else {
+                // Disable editing
+                textDisplays.forEach(input => {
+                    input.setAttribute('readonly', true);
+                    input.classList.add('text-display');
+                });
+                editBtn.textContent = 'Editar';
+                saveBtn.style.display = 'none';
+                // Reload page to reset values
+                window.location.reload();
+            }
+        }
+
+        function saveMedications() {
+            const formData = new FormData();
+            const form = document.getElementById('medicationsForm');
+            
+            // Get patient name
+            const nomeInput = document.getElementById('nome_paciente');
+            if (nomeInput) {
+                formData.append('nome_paciente', nomeInput.value);
+            }
+
+            // Get all medication inputs
+            const principios = form.querySelectorAll('input[name="principio_ativo[]"]');
+            const concentracoes = form.querySelectorAll('input[name="concentracao[]"]');
+            const vias = form.querySelectorAll('input[name="via[]"]');
+            const frequencias = form.querySelectorAll('input[name="frequencia[]"]');
+            const quantidades = form.querySelectorAll('input[name="quantidade[]"]');
+
+            principios.forEach(input => formData.append('principio_ativo[]', input.value));
+            concentracoes.forEach(input => formData.append('concentracao[]', input.value));
+            vias.forEach(input => formData.append('via[]', input.value));
+            frequencias.forEach(input => formData.append('frequencia[]', input.value));
+            quantidades.forEach(input => formData.append('quantidade[]', input.value));
+
+            fetch(`/prontuario/medicamentos/{{ receita.id }}/salvar`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Medicamentos salvos com sucesso!');
+                    toggleEdit(); // Exit edit mode
+                    window.location.reload(); // Refresh to show updated data
+                } else {
+                    alert('Erro ao salvar: ' + (data.error || 'Erro desconhecido'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao salvar medicamentos');
+            });
+        }
+
+        console.log('Sistema Médico VIDAH - Medicamentos carregado');
+    </script>
+</body>
+</html>

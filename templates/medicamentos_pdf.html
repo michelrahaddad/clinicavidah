@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titulo }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            color: #007bff;
+            margin: 0;
+            font-size: 24pt;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            color: #666;
+            font-size: 14pt;
+            margin-top: 5px;
+        }
+        
+        .patient-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .patient-info h3 {
+            margin: 0 0 10px 0;
+            color: #007bff;
+            font-size: 14pt;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .medications-section {
+            margin-bottom: 30px;
+        }
+        
+        .medications-section h3 {
+            color: #007bff;
+            border-bottom: 1px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            font-size: 16pt;
+        }
+        
+        .medication-item {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .medication-name {
+            font-weight: bold;
+            font-size: 14pt;
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+        
+        .medication-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 11pt;
+        }
+        
+        .detail-item {
+            display: flex;
+        }
+        
+        .detail-label {
+            font-weight: bold;
+            color: #495057;
+            min-width: 80px;
+        }
+        
+        .detail-value {
+            color: #333;
+        }
+        
+        .doctor-info {
+            margin-top: 40px;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            width: 300px;
+            margin: 40px auto 10px;
+        }
+        
+        .doctor-details {
+            color: #666;
+            font-size: 11pt;
+        }
+        
+        .footer {
+            position: fixed;
+            bottom: 1cm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+        }
+        
+        .prescription-note {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 11pt;
+            color: #1565c0;
+        }
+        
+        .prescription-note strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ titulo }}</h1>
+        <div class="subtitle">Sistema Médico VIDAH</div>
+    </div>
+    
+    <div class="patient-info">
+        <h3>Informações do Paciente</h3>
+        <div class="info-row">
+            <strong>Nome:</strong> {{ nome_paciente }}
+        </div>
+        <div class="info-row">
+            <strong>Data:</strong> {{ data }}
+        </div>
+    </div>
+    
+    <div class="medications-section">
+        <h3>Medicamentos Prescritos</h3>
+        
+        {% for medicamento in medicamentos %}
+        {% set parts = medicamento.split(' - ') %}
+        {% set nome_concentracao = parts[0] if parts|length > 0 else medicamento %}
+        {% set via = parts[1] if parts|length > 1 else 'Oral' %}
+        {% set frequencia = parts[2] if parts|length > 2 else '2x' %}
+        {% set quantidade = parts[3] if parts|length > 3 else '30 comprimidos' %}
+        
+        <div class="medication-item">
+            <div class="medication-name">{{ loop.index }}. {{ nome_concentracao }}</div>
+            <div class="medication-details">
+                <div class="detail-item">
+                    <span class="detail-label">Via:</span>
+                    <span class="detail-value">{{ via }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Frequência:</span>
+                    <span class="detail-value">{{ frequencia }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Quantidade:</span>
+                    <span class="detail-value">{{ quantidade }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Duração:</span>
+                    <span class="detail-value">Conforme prescrição</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="prescription-note">
+        <strong>Instruções Importantes:</strong>
+        • Tomar os medicamentos conforme prescrição médica<br>
+        • Não interromper o tratamento sem orientação médica<br>
+        • Em caso de reações adversas, procurar atendimento médico<br>
+        • Manter os medicamentos fora do alcance de crianças
+    </div>
+    
+    <div class="doctor-info">
+        <div class="signature-line"></div>
+        <div class="doctor-details">
+            <strong>{{ medico_nome }}</strong><br>
+            CRM: {{ medico_crm }}<br>
+            Data: {{ data }}
+        </div>
+    </div>
+    
+    <div class="footer">
+        Sistema Médico VIDAH - Documento gerado em {{ data }}
+    </div>
+</body>
+</html>
