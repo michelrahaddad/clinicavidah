@@ -126,19 +126,19 @@
     <div class="container">
         <!-- Navegação entre ícones -->
         <div class="icon-nav">
-            <a href="{{ url_for('prontuario.prontuario_exames_lab', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/exames_lab/{{ paciente_nome }}" class="icon-btn">
                 🧪 Exames Laboratoriais
             </a>
-            <a href="{{ url_for('prontuario.prontuario_exames_img', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/exames_img/{{ paciente_nome }}" class="icon-btn">
                 🩻 Exames de Imagem
             </a>
-            <a href="{{ url_for('prontuario.prontuario_relatorios', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/relatorios/{{ paciente_nome }}" class="icon-btn">
                 🧾 Relatórios Médicos
             </a>
-            <a href="{{ url_for('prontuario.prontuario_atestados', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/atestados/{{ paciente_nome }}" class="icon-btn">
                 📄 Atestados Médicos
             </a>
-            <a href="{{ url_for('prontuario.prontuario_alto_custo', paciente=paciente_nome) }}" class="icon-btn">
+            <a href="/prontuario/alto_custo/{{ paciente_nome }}" class="icon-btn">
                 💰💊 Alto Custo
             </a>
         </div>
@@ -169,10 +169,10 @@
                     <div class="col-md-3">
                         <label class="form-label">Data:</label>
                         <div class="d-flex align-items-center">
-                            <input type="date" 
+                            <input type="text" 
                                    class="edit-input" 
                                    id="data-{{ receita.id }}" 
-                                   value="{{ receita.data_formatada_input }}" 
+                                   value="{{ receita.data }}" 
                                    readonly>
                             <button class="data-atual-btn" onclick="definirDataAtual({{ receita.id }})">
                                 Hoje
@@ -190,36 +190,35 @@
 
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <label class="form-label">Posologia:</label>
+                        <label class="form-label">Posologias:</label>
                         <textarea class="edit-input" 
-                                  id="posologia-{{ receita.id }}" 
+                                  id="posologias-{{ receita.id }}" 
                                   rows="2" 
-                                  readonly>{{ receita.posologia }}</textarea>
+                                  readonly>{{ receita.posologias }}</textarea>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Observações:</label>
+                        <label class="form-label">Durações:</label>
                         <textarea class="edit-input" 
-                                  id="observacoes-{{ receita.id }}" 
+                                  id="duracoes-{{ receita.id }}" 
                                   rows="2" 
-                                  readonly>{{ receita.observacoes or '' }}</textarea>
+                                  readonly>{{ receita.duracoes }}</textarea>
                     </div>
                 </div>
 
                 <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Vias:</label>
+                        <textarea class="edit-input" 
+                                  id="vias-{{ receita.id }}" 
+                                  rows="2" 
+                                  readonly>{{ receita.vias }}</textarea>
+                    </div>
                     <div class="col-md-4">
                         <label class="form-label">Médico:</label>
                         <input type="text" 
                                class="edit-input" 
                                id="medico-{{ receita.id }}" 
                                value="{{ receita.medico_nome }}" 
-                               readonly>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">CRM:</label>
-                        <input type="text" 
-                               class="edit-input" 
-                               id="crm-{{ receita.id }}" 
-                               value="{{ receita.medico_crm }}" 
                                readonly>
                     </div>
                     <div class="col-md-4">
@@ -246,7 +245,7 @@
 
         <!-- Botão voltar ao prontuário -->
         <div class="text-center mt-4 mb-4">
-            <a href="{{ url_for('prontuario.index') }}?busca_paciente={{ paciente_nome }}" 
+            <a href="/prontuario?busca_paciente={{ paciente_nome }}" 
                class="btn btn-lg btn-outline-primary">
                 <i class="fas fa-arrow-left me-2"></i>Voltar ao Prontuário
             </a>
