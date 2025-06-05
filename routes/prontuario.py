@@ -1,7 +1,7 @@
 from sqlalchemy import or_
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
 from models import Prontuario, Receita, ExameLab, ExameImg, Medico, RelatorioMedico, AtestadoMedico, FormularioAltoCusto, Paciente
-from app import db
+from main import db
 from utils.forms import sanitizar_entrada
 import logging
 from datetime import datetime

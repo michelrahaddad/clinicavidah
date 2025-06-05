@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from models import Medico, Administrador
-from app import db
+from main import db
 from werkzeug.security import check_password_hash
 from datetime import datetime
 import logging

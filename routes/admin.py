@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify, send_from_directory, Response
 from models import Medico, Receita, ExameLab, ExameImg, Agendamento, BackupConfig, Administrador, LogSistema
-from app import db
+from main import db
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from sqlalchemy import text
