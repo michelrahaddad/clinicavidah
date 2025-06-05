@@ -2,7 +2,7 @@ import psutil
 import logging
 from datetime import datetime
 from flask import jsonify
-from app import db
+from main import db
 
 def check_system_health():
     """Monitor system health metrics"""
