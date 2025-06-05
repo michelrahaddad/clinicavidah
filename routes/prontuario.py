@@ -271,10 +271,24 @@ def prontuario():
                     logging.warning(f"Error processing high cost form {formulario.id}: {e}")
                     continue
         
+        # Function to normalize patient names for grouping
+        def normalizar_nome_paciente(nome):
+            """Normalize patient name to avoid duplicates due to typos"""
+            if not nome:
+                return ""
+            # Convert to lowercase, remove extra spaces, and standardize common variations
+            nome_norm = ' '.join(nome.lower().strip().split())
+            # Fix common typos for Michel
+            if 'michel' in nome_norm and 'raineri' in nome_norm:
+                if 'haddad' in nome_norm or 'ahddad' in nome_norm:
+                    return "michel raineri haddad"
+            return nome_norm
+
         # Group results by patient and date with medical document counters
         grupos = {}
         for resultado in resultados:
-            key = f"{resultado['nome_paciente']}|{resultado['data']}"
+            nome_normalizado = normalizar_nome_paciente(resultado['nome_paciente'])
+            key = f"{nome_normalizado}|{resultado['data']}"
             if key not in grupos:
                 grupos[key] = {
                     'nome_paciente': resultado['nome_paciente'],
