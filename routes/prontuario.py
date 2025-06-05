@@ -61,30 +61,35 @@ def prontuario():
         
         for tipo in tipos_busca:
             if tipo == 'receita':
-                # Search in prescriptions - admin sees all, doctors see only their own
-                if is_admin:
-                    query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico)
-                else:
-                    query = db.session.query(Receita, Medico.nome.label('medico_nome')).join(Medico).filter(Receita.id_medico == medico_id)
+                # Search in prescriptions - simplified query
+                query = db.session.query(Receita)
+                
+                # Apply filters only if admin or if medico_id exists
+                if not is_admin and medico_id:
+                    query = query.filter(Receita.id_medico == medico_id)
                 
                 if busca_paciente:
-                    # Split search terms and create flexible search
-                    search_terms = busca_paciente.strip().split()
-                    for term in search_terms:
-                        if len(term) >= 2:  # Only search terms with 2+ characters
-                            query = query.filter(Receita.nome_paciente.ilike(f'%{term}%'))
+                    # Simple ILIKE search on patient name
+                    query = query.filter(Receita.nome_paciente.ilike(f'%{busca_paciente}%'))
                 
                 if filtro_data_inicio and filtro_data_fim:
                     query = query.filter(Receita.data.between(filtro_data_inicio, filtro_data_fim))
                 
-                receitas = query.order_by(Receita.data.desc(), Receita.created_at.desc()).all()
+                receitas = query.order_by(Receita.data.desc()).limit(50).all()
                 
                 logging.info(f"Found {len(receitas)} receitas for search term '{busca_paciente}'")
                 
-                for receita, medico_nome in receitas:
+                for receita in receitas:
                     try:
-                        medicamentos = receita.medicamentos.split('\n')
-                        detalhes_registro = f"Medicamentos: {', '.join([m.strip() for m in medicamentos[:3] if m.strip()])}{'...' if len(medicamentos) > 3 else ''}"
+                        # Get medico name from receita directly or use default
+                        medico_nome = receita.medico_nome if hasattr(receita, 'medico_nome') and receita.medico_nome else 'Dr. Sistema'
+                        
+                        # Format medicamentos
+                        if receita.medicamentos:
+                            medicamentos = receita.medicamentos.split('\n') if '\n' in receita.medicamentos else [receita.medicamentos]
+                            detalhes_registro = f"Medicamentos: {', '.join([m.strip() for m in medicamentos[:3] if m.strip()])}{'...' if len(medicamentos) > 3 else ''}"
+                        else:
+                            detalhes_registro = "Receita médica"
                         
                         resultados.append({
                             'tipo': 'receita',
