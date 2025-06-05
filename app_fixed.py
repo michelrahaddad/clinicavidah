@@ -33,20 +33,20 @@ def create_app():
     # Register blueprints
     try:
         from routes.auth import auth_bp
+        from routes.dashboard import dashboard_bp
         from routes.prontuario import prontuario_bp
         from routes.receita import receita_bp
         from routes.exames_lab import exames_lab_bp
         from routes.exames_img import exames_img_bp
-        from routes.dashboard import dashboard_bp
         from routes.configuracoes import configuracoes_bp
         
         app.register_blueprint(auth_bp, url_prefix='/auth')
-        app.register_blueprint(prontuario_bp, url_prefix='/prontuario')
-        app.register_blueprint(receita_bp, url_prefix='/receita')
-        app.register_blueprint(exames_lab_bp, url_prefix='/exames_lab')
-        app.register_blueprint(exames_img_bp, url_prefix='/exames_img')
-        app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
-        app.register_blueprint(configuracoes_bp, url_prefix='/configuracoes')
+        app.register_blueprint(dashboard_bp)
+        app.register_blueprint(prontuario_bp)
+        app.register_blueprint(receita_bp)
+        app.register_blueprint(exames_lab_bp)
+        app.register_blueprint(exames_img_bp)
+        app.register_blueprint(configuracoes_bp)
         
         logging.info("Core blueprints registered successfully")
     except Exception as e:
@@ -64,7 +64,7 @@ def create_app():
     # Root route
     @app.route('/')
     def index():
-        return redirect(url_for('auth.login'))
+        return redirect('/auth/login')
     
     # Error handlers
     @app.errorhandler(404)
