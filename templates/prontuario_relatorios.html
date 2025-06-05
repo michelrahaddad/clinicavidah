@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulários Alto Custo - Sistema VIDAH</title>
+    <title>Relatórios Médicos - Sistema VIDAH</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -110,7 +110,7 @@
             cursor: pointer;
         }
 
-        .no-formularios {
+        .no-relatorios {
             text-align: center;
             padding: 4rem 2rem;
             background: var(--card-bg);
@@ -140,8 +140,8 @@
     <div class="header-gradient">
         <div class="container">
             <h1 class="text-center text-white">
-                <i class="fas fa-dollar-sign me-3"></i>
-                💰💊 Formulários Alto Custo - {{ paciente_nome }}
+                <i class="fas fa-file-medical me-3"></i>
+                🧾 Relatórios Médicos - {{ paciente_nome }}
             </h1>
         </div>
     </div>
@@ -158,26 +158,26 @@
             <a href="/prontuario/exames_img/{{ paciente_nome }}" class="icon-btn">
                 🩻 Exames de Imagem
             </a>
-            <a href="/prontuario/relatorios/{{ paciente_nome }}" class="icon-btn">
-                🧾 Relatórios Médicos
-            </a>
             <a href="/prontuario/atestados/{{ paciente_nome }}" class="icon-btn">
                 📄 Atestados Médicos
             </a>
+            <a href="/prontuario/alto_custo/{{ paciente_nome }}" class="icon-btn">
+                💰💊 Alto Custo
+            </a>
         </div>
 
-        <!-- Lista de formulários alto custo -->
-        {% for formulario in formularios %}
+        <!-- Lista de relatórios médicos -->
+        {% for relatorio in relatorios %}
         <div class="card-custom">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
-                    <i class="fas fa-dollar-sign me-2"></i>
-                    Formulário Alto Custo #{{ formulario.id }}
+                    <i class="fas fa-file-medical me-2"></i>
+                    Relatório Médico #{{ relatorio.id }}
                 </h5>
                 <div>
-                    <button class="btn btn-editar" onclick="toggleEdit({{ formulario.id }})">
+                    <button class="btn btn-editar" onclick="toggleEdit({{ relatorio.id }})">
                         <i class="fas fa-edit me-1"></i>
-                        <span id="btn-text-{{ formulario.id }}">Editar</span>
+                        <span id="btn-text-{{ relatorio.id }}">Editar</span>
                     </button>
                 </div>
             </div>
@@ -188,83 +188,39 @@
                         <div class="d-flex align-items-center">
                             <input type="text" 
                                    class="edit-input" 
-                                   id="data-{{ formulario.id }}" 
-                                   value="{{ formulario.data }}" 
+                                   id="data-{{ relatorio.id }}" 
+                                   value="{{ relatorio.data }}" 
                                    readonly>
-                            <button class="data-atual-btn" onclick="definirDataAtual({{ formulario.id }})">
+                            <button class="data-atual-btn" onclick="definirDataAtual({{ relatorio.id }})">
                                 Hoje
                             </button>
                         </div>
                     </div>
                     <div class="col-md-3">
-                        <label class="form-label">Peso:</label>
-                        <input type="text" 
-                               class="edit-input" 
-                               id="peso-{{ formulario.id }}" 
-                               value="{{ formulario.peso }}" 
-                               readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Altura:</label>
-                        <input type="text" 
-                               class="edit-input" 
-                               id="altura-{{ formulario.id }}" 
-                               value="{{ formulario.altura }}" 
-                               readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Nome da Mãe:</label>
-                        <input type="text" 
-                               class="edit-input" 
-                               id="nome-mae-{{ formulario.id }}" 
-                               value="{{ formulario.nome_mae }}" 
-                               readonly>
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Medicamento:</label>
-                        <textarea class="edit-input" 
-                                  id="medicamento-{{ formulario.id }}" 
-                                  rows="3" 
-                                  readonly>{{ formulario.medicamento }}</textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Quantidade:</label>
-                        <textarea class="edit-input" 
-                                  id="quantidade-{{ formulario.id }}" 
-                                  rows="3" 
-                                  readonly>{{ formulario.quantidade }}</textarea>
-                    </div>
-                </div>
-
-                <div class="row mt-3">
-                    <div class="col-md-3">
                         <label class="form-label">CID-10:</label>
                         <input type="text" 
                                class="edit-input" 
-                               id="cid-{{ formulario.id }}" 
-                               value="{{ formulario.cid_codigo }}" 
+                               id="cid-{{ relatorio.id }}" 
+                               value="{{ relatorio.cid_codigo }}" 
                                readonly>
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-6">
                         <label class="form-label">Descrição CID:</label>
                         <input type="text" 
                                class="edit-input" 
-                               id="cid-desc-{{ formulario.id }}" 
-                               value="{{ formulario.cid_descricao }}" 
+                               id="cid-desc-{{ relatorio.id }}" 
+                               value="{{ relatorio.cid_descricao }}" 
                                readonly>
                     </div>
                 </div>
 
                 <div class="row mt-3">
                     <div class="col-md-12">
-                        <label class="form-label">Anamnese:</label>
+                        <label class="form-label">Relatório:</label>
                         <textarea class="edit-input" 
-                                  id="anamnese-{{ formulario.id }}" 
-                                  rows="4" 
-                                  readonly>{{ formulario.anamnese }}</textarea>
+                                  id="relatorio-{{ relatorio.id }}" 
+                                  rows="5" 
+                                  readonly>{{ relatorio.relatorio_texto }}</textarea>
                     </div>
                 </div>
 
@@ -273,15 +229,15 @@
                         <label class="form-label">Médico:</label>
                         <input type="text" 
                                class="edit-input" 
-                               id="medico-{{ formulario.id }}" 
-                               value="{{ formulario.medico_nome }}" 
+                               id="medico-{{ relatorio.id }}" 
+                               value="{{ relatorio.medico_nome }}" 
                                readonly>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Data de Criação:</label>
                         <input type="text" 
                                class="edit-input" 
-                               value="{{ formulario.created_at.strftime('%d/%m/%Y às %H:%M') }}" 
+                               value="{{ relatorio.created_at.strftime('%d/%m/%Y às %H:%M') }}" 
                                readonly>
                     </div>
                 </div>
@@ -289,12 +245,12 @@
         </div>
         {% endfor %}
 
-        {% if not formularios %}
-        <div class="no-formularios">
+        {% if not relatorios %}
+        <div class="no-relatorios">
             <div class="text-center">
-                <i class="fas fa-dollar-sign fa-3x text-muted mb-3"></i>
-                <h4>Nenhum formulário alto custo encontrado</h4>
-                <p class="text-muted">Não há formulários de alto custo registrados para este paciente.</p>
+                <i class="fas fa-file-medical fa-3x text-muted mb-3"></i>
+                <h4>Nenhum relatório médico encontrado</h4>
+                <p class="text-muted">Não há relatórios médicos registrados para este paciente.</p>
             </div>
         </div>
         {% endif %}
@@ -313,14 +269,9 @@
         function toggleEdit(id) {
             const inputs = [
                 document.getElementById(`data-${id}`),
-                document.getElementById(`peso-${id}`),
-                document.getElementById(`altura-${id}`),
-                document.getElementById(`nome-mae-${id}`),
-                document.getElementById(`medicamento-${id}`),
-                document.getElementById(`quantidade-${id}`),
                 document.getElementById(`cid-${id}`),
                 document.getElementById(`cid-desc-${id}`),
-                document.getElementById(`anamnese-${id}`),
+                document.getElementById(`relatorio-${id}`),
                 document.getElementById(`medico-${id}`)
             ];
             
@@ -342,7 +293,7 @@
             
             if (isReadonly) {
                 btnText.textContent = 'Salvar';
-                btnText.parentElement.onclick = () => salvarFormulario(id);
+                btnText.parentElement.onclick = () => salvarRelatorio(id);
             } else {
                 btnText.textContent = 'Editar';
                 btnText.parentElement.onclick = () => toggleEdit(id);
@@ -355,22 +306,17 @@
             document.getElementById(`data-${id}`).value = dataFormatada;
         }
         
-        function salvarFormulario(id) {
+        function salvarRelatorio(id) {
             const dados = {
                 id: id,
                 data: document.getElementById(`data-${id}`).value,
-                peso: document.getElementById(`peso-${id}`).value,
-                altura: document.getElementById(`altura-${id}`).value,
-                nome_mae: document.getElementById(`nome-mae-${id}`).value,
-                medicamento: document.getElementById(`medicamento-${id}`).value,
-                quantidade: document.getElementById(`quantidade-${id}`).value,
                 cid_codigo: document.getElementById(`cid-${id}`).value,
                 cid_descricao: document.getElementById(`cid-desc-${id}`).value,
-                anamnese: document.getElementById(`anamnese-${id}`).value,
+                relatorio_texto: document.getElementById(`relatorio-${id}`).value,
                 medico_nome: document.getElementById(`medico-${id}`).value
             };
             
-            fetch('/prontuario/salvar_alto_custo', {
+            fetch('/prontuario/salvar_relatorio', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -380,15 +326,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Formulário salvo com sucesso!');
+                    alert('Relatório salvo com sucesso!');
                     toggleEdit(id);
                 } else {
-                    alert('Erro ao salvar formulário: ' + data.message);
+                    alert('Erro ao salvar relatório: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                alert('Erro ao salvar formulário');
+                alert('Erro ao salvar relatório');
             });
         }
     </script>

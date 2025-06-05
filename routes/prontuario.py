@@ -920,12 +920,8 @@ def prontuario_relatorios(paciente):
     """Página específica de relatórios médicos"""
     try:
         relatorios = db.session.query(RelatorioMedico).filter(
-            RelatorioMedico.paciente_nome.ilike(f'%{paciente}%')
-        ).order_by(RelatorioMedico.data.desc()).all()
-        
-        # Adicionar data formatada para input
-        for relatorio in relatorios:
-            relatorio.data_formatada_input = relatorio.data.strftime('%Y-%m-%d')
+            RelatorioMedico.nome_paciente.ilike(f'%{paciente}%')
+        ).order_by(RelatorioMedico.created_at.desc()).all()
         
         return render_template('prontuario_relatorios.html', 
                              relatorios=relatorios, 
@@ -939,12 +935,8 @@ def prontuario_atestados(paciente):
     """Página específica de atestados médicos"""
     try:
         atestados = db.session.query(AtestadoMedico).filter(
-            AtestadoMedico.paciente_nome.ilike(f'%{paciente}%')
-        ).order_by(AtestadoMedico.data.desc()).all()
-        
-        # Adicionar data formatada para input
-        for atestado in atestados:
-            atestado.data_formatada_input = atestado.data.strftime('%Y-%m-%d')
+            AtestadoMedico.nome_paciente.ilike(f'%{paciente}%')
+        ).order_by(AtestadoMedico.created_at.desc()).all()
         
         return render_template('prontuario_atestados.html', 
                              atestados=atestados, 
@@ -958,12 +950,8 @@ def prontuario_alto_custo(paciente):
     """Página específica de formulários alto custo"""
     try:
         formularios = db.session.query(FormularioAltoCusto).filter(
-            FormularioAltoCusto.paciente_nome.ilike(f'%{paciente}%')
-        ).order_by(FormularioAltoCusto.data.desc()).all()
-        
-        # Adicionar data formatada para input
-        for formulario in formularios:
-            formulario.data_formatada_input = formulario.data.strftime('%Y-%m-%d')
+            FormularioAltoCusto.nome_paciente.ilike(f'%{paciente}%')
+        ).order_by(FormularioAltoCusto.created_at.desc()).all()
         
         return render_template('prontuario_alto_custo.html', 
                              formularios=formularios, 
