@@ -99,4 +99,126 @@
 </div>
 
 
+<script>
+// Signature pad functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('signatureCanvas');
+    const ctx = canvas.getContext('2d');
+    const clearBtn = document.getElementById('clearSignature');
+    const assinaturaInput = document.getElementById('assinaturaData');
+    
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    // Set canvas size properly
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+    
+    // Drawing functions
+    function startDrawing(e) {
+        isDrawing = true;
+        [lastX, lastY] = getMousePos(e);
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        
+        const [currentX, currentY] = getMousePos(e);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+        
+        [lastX, lastY] = [currentX, currentY];
+        
+        // Save signature data
+        assinaturaInput.value = canvas.toDataURL();
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+    
+    function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        let clientX, clientY;
+        if (e.touches && e.touches[0]) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        return [
+            (clientX - rect.left) * scaleX / 2,
+            (clientY - rect.top) * scaleY / 2
+        ];
+    }
+
+    // Mouse events
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+    
+    // Touch events for mobile
+    canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        startDrawing(e);
+    });
+    canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+        draw(e);
+    });
+    canvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
+        stopDrawing();
+    });
+
+    // Clear signature
+    clearBtn.addEventListener('click', function() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        assinaturaInput.value = '';
+    });
+
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (!assinaturaInput.value) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Por favor, faça sua assinatura digital antes de continuar.');
+            return false;
+        }
+        
+        // Additional validation
+        const nome = document.getElementById('nome').value.trim();
+        const crm = document.getElementById('crm').value.trim();
+        const senha = document.getElementById('senha').value;
+        
+        if (!nome || !crm || !senha || senha.length < 6) {
+            e.preventDefault();
+            e.stopPropagation();
+            alert('Por favor, preencha todos os campos obrigatórios.');
+            return false;
+        }
+        
+        return true;
+    });
+});
+</script>
+
 {% endblock %}

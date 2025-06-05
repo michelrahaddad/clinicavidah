@@ -8,10 +8,7 @@ medicos_bp = Blueprint('medicos', __name__)
 
 @medicos_bp.route('/cadastrar_medico', methods=['GET', 'POST'])
 def cadastrar_medico():
-    if 'usuario' not in session and 'admin_usuario' not in session:
-        return redirect(url_for('auth.login'))
-
-    """Register new doctor"""
+    """Register new doctor with signature integration"""
     if request.method == 'POST':
         try:
             nome = request.form.get('nome', '').strip()
@@ -19,32 +16,31 @@ def cadastrar_medico():
             senha = request.form.get('senha', '')
             assinatura = request.form.get('assinatura', '')
             
-            if not nome or not crm or not senha or not assinatura:
-                flash('Todos os campos são obrigatórios, incluindo a assinatura digital.', 'error')
+            if not nome or not crm or not senha:
+                flash('Nome, CRM e senha são obrigatórios.', 'error')
                 return render_template('cadastro_medico.html')
             
-            # Check if CRM already exists - force fresh query
-            from sqlalchemy import text
-            db.session.commit()  # Ensure any pending changes are committed
-            result = db.session.execute(text("SELECT id FROM medicos WHERE crm = :crm"), {'crm': crm}).fetchone()
-            if result:
+            if not assinatura:
+                flash('A assinatura digital é obrigatória para validação dos documentos médicos.', 'error')
+                return render_template('cadastro_medico.html')
+            
+            # Check if CRM already exists
+            existing_medico = Medico.query.filter_by(crm=crm).first()
+            if existing_medico:
                 flash('CRM já cadastrado no sistema!', 'error')
                 return render_template('cadastro_medico.html')
             
-            # Hash password and insert doctor
+            # Hash password and create new doctor
             senha_hash = generate_password_hash(senha)
             
-            # Create new doctor with proper SQLAlchemy syntax
-            from sqlalchemy import text
-            db.session.execute(text(
-                "INSERT INTO medicos (nome, crm, senha, assinatura) VALUES (:nome, :crm, :senha, :assinatura)"
-            ), {
-                'nome': nome,
-                'crm': crm, 
-                'senha': senha_hash,
-                'assinatura': assinatura
-            })
+            novo_medico = Medico(
+                nome=nome,
+                crm=crm,
+                senha=senha_hash,
+                assinatura=assinatura
+            )
             
+            db.session.add(novo_medico)
             db.session.commit()
             
             flash('Médico cadastrado com sucesso! Faça login para continuar.', 'success')
@@ -52,6 +48,7 @@ def cadastrar_medico():
             return redirect(url_for('auth.login'))
             
         except Exception as e:
+            db.session.rollback()
             logging.error(f'Doctor registration error: {e}')
             flash('Erro interno ao cadastrar médico. Tente novamente.', 'error')
     
