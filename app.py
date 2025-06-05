@@ -146,7 +146,6 @@ def create_app():
     from routes.consultas import consultas_bp
     from routes.configuracoes import configuracoes_bp
     from routes.backup import backup_bp
-    from routes.medicamentos import medicamentos_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
