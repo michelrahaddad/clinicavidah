@@ -2,7 +2,7 @@ import sqlite3
 import logging
 from datetime import datetime
 from models import Medico, Paciente, Receita, ExameLab, ExameImg, Agendamento, Prontuario
-from app import db
+from main import db
 from werkzeug.security import generate_password_hash
 import os
 

@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
-from models import Receita, ExameLab, ExameImg, Consulta, Paciente, Medico, db
+from models import Receita, ExameLab, ExameImg, Consulta, Paciente, Medico
+from main import db
 from datetime import datetime, timedelta
 import logging
 from sqlalchemy import func, extract
