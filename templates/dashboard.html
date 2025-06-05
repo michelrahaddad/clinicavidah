@@ -41,6 +41,23 @@
     .detailed-stats-list::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.5);
     }
+
+    .dashboard-btn {
+        height: 120px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
+        min-height: 120px !important;
+        max-height: 120px !important;
+    }
+
+    .dashboard-btn .btn-text {
+        font-size: 0.9rem;
+        line-height: 1.2;
+        margin-top: 5px;
+    }
 </style>
 {% endblock %}
 
@@ -76,51 +93,51 @@
             </h3>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('prontuario.prontuario') }}" class="btn btn-outline-secondary w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-file-medical fa-2x d-block mb-2"></i>
-                Prontuário
+                <span class="btn-text">Prontuário</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('pacientes.novo_paciente') }}" class="btn btn-outline-info w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('pacientes.novo_paciente') }}" class="btn btn-outline-info w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-user-plus fa-2x d-block mb-2"></i>
-                Novo Paciente
+                <span class="btn-text">Novo Paciente</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('receita.receita') }}" class="btn btn-outline-primary w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-prescription-bottle-alt fa-2x d-block mb-2"></i>
-                Nova Receita
+                <span class="btn-text">Nova Receita</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-x-ray fa-2x d-block mb-2"></i>
-                Exames Imagem
+                <span class="btn-text">Exames Imagem</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-flask fa-2x d-block mb-2"></i>
-                Exames Lab
+                <span class="btn-text">Exames Lab</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('relatorio_medico.relatorio_medico') }}" class="btn btn-outline-info w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('relatorio_medico.relatorio_medico') }}" class="btn btn-outline-info w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-file-medical-alt fa-2x d-block mb-2"></i>
-                Relatório Médico
+                <span class="btn-text">Relatório<br>Médico</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('atestado_medico.atestado_medico') }}" class="btn btn-outline-danger w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('atestado_medico.atestado_medico') }}" class="btn btn-outline-danger w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-certificate fa-2x d-block mb-2"></i>
-                Atestado Médico
+                <span class="btn-text">Atestado<br>Médico</span>
             </a>
         </div>
         <div class="col-md-6 col-lg-3 mb-3">
-            <a href="{{ url_for('formulario_alto_custo.formulario_alto_custo') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card">
+            <a href="{{ url_for('formulario_alto_custo.formulario_alto_custo') }}" class="btn btn-outline-warning w-100 py-3 neural-btn glass-card dashboard-btn">
                 <i class="fas fa-dollar-sign fa-2x d-block mb-2"></i>
-                Alto Custo
+                <span class="btn-text">Alto Custo</span>
             </a>
         </div>
     </div>
