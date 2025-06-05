@@ -569,44 +569,33 @@
                                 <div class="document-badges-container">
                                     {% set total_docs = grupo.contadores.receita + grupo.contadores.exame_lab + grupo.contadores.exame_img + grupo.contadores.relatorio + grupo.contadores.atestado + grupo.contadores.alto_custo %}
                                     
-                                    {% if grupo.contadores.receita > 0 %}
-                                        <span class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)">
-                                            💊 {{ grupo.contadores.receita }}
-                                        </span>
-                                    {% endif %}
+                                    <!-- Sempre mostrar todos os tipos de documentos médicos organizados cronologicamente -->
+                                    <span class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.receita == 0 else '' }}">
+                                        💊 {{ grupo.contadores.receita }}
+                                    </span>
                                     
-                                    {% if grupo.contadores.exame_lab > 0 %}
-                                        <span class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)">
-                                            🧪 {{ grupo.contadores.exame_lab }}
-                                        </span>
-                                    {% endif %}
+                                    <span class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_lab == 0 else '' }}">
+                                        🧪 {{ grupo.contadores.exame_lab }}
+                                    </span>
                                     
-                                    {% if grupo.contadores.exame_img > 0 %}
-                                        <span class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
-                                            🩻 {{ grupo.contadores.exame_img }}
-                                        </span>
-                                    {% endif %}
+                                    <span class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem" style="{{ 'opacity: 0.3;' if grupo.contadores.exame_img == 0 else '' }}">
+                                        🩻 {{ grupo.contadores.exame_img }}
+                                    </span>
                                     
-                                    {% if grupo.contadores.relatorio > 0 %}
-                                        <span class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)">
-                                            🧾 {{ grupo.contadores.relatorio }}
-                                        </span>
-                                    {% endif %}
+                                    <span class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.relatorio == 0 else '' }}">
+                                        🧾 {{ grupo.contadores.relatorio }}
+                                    </span>
                                     
-                                    {% if grupo.contadores.atestado > 0 %}
-                                        <span class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)">
-                                            📄 {{ grupo.contadores.atestado }}
-                                        </span>
-                                    {% endif %}
+                                    <span class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)" style="{{ 'opacity: 0.3;' if grupo.contadores.atestado == 0 else '' }}">
+                                        📄 {{ grupo.contadores.atestado }}
+                                    </span>
                                     
-                                    {% if grupo.contadores.alto_custo > 0 %}
-                                        <span class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
-                                            💰💊 {{ grupo.contadores.alto_custo }}
-                                        </span>
-                                    {% endif %}
+                                    <span class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo" style="{{ 'opacity: 0.3;' if grupo.contadores.alto_custo == 0 else '' }}">
+                                        💰💊 {{ grupo.contadores.alto_custo }}
+                                    </span>
                                     
                                     {% if total_docs == 0 %}
-                                        <span class="text-muted">Nenhum documento</span>
+                                        <div class="mt-2"><span class="text-muted small">Nenhum documento registrado</span></div>
                                     {% endif %}
                                 </div>
                             </td>
