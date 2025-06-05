@@ -45,9 +45,10 @@ def create_black_signature(signature_data):
         enhancer = ImageEnhance.Contrast(grayscale)
         high_contrast = enhancer.enhance(5.0)
         
-        # Aplica threshold para binarizar (preto/branco)
-        threshold = 200
-        binary = high_contrast.point(lambda p: 0 if p < threshold else 255, mode='1')
+        # Aplica threshold para binarizar (preto/branco) 
+        def threshold_func(pixel):
+            return 0 if pixel < 200 else 255
+        binary = high_contrast.point(threshold_func, mode='1')
         
         # Converte de volta para RGB
         final_image = binary.convert('RGB')
