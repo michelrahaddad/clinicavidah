@@ -686,6 +686,10 @@
                                         div.onclick = function() {
                                             buscaPacienteInput.value = suggestion;
                                             suggestionsDiv.style.display = 'none';
+                                            // Executar busca automaticamente
+                                            if (searchForm) {
+                                                searchForm.submit();
+                                            }
                                         };
                                         suggestionsDiv.appendChild(div);
                                     });
