@@ -1,11 +1,67 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário Alto Custo Específico - Sistema VIDAH</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Future Theme -->
+    <link href="{{ url_for('static', filename='css/future-theme.css') }}" rel="stylesheet">
+    <!-- UX Improvements -->
+    <link href="{{ url_for('static', filename='css/ux-improvements.css') }}" rel="stylesheet">
+</head>
+<body>
 
-{% block title %}Formulário Alto Custo Específico - Sistema VIDAH{% endblock %}
-
-{% block content %}
 <div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar com lista de formulários alto custo -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar-alto-custo" style="background: #2d2d2d; border-right: 1px solid #404040; min-height: 100vh; padding: 1rem;">
+            <div class="sidebar-header text-center mb-4">
+                <h5 class="text-primary fw-bold">
+                    <i class="fas fa-dollar-sign me-2"></i>
+                    Prontuário Alto Custo
+                </h5>
+            </div>
+            
+            <div class="alto-custo-lista">
+                {% if formularios_medico %}
+                    {% for formulario in formularios_medico %}
+                    <div class="formulario-item mb-2 p-2 rounded cursor-pointer" 
+                         onclick="carregarFormulario({{ formulario.id }})"
+                         style="background: {% if formulario.id == formulario_atual_id %}#4a90e2{% else %}#404040{% endif %}; 
+                                color: white; cursor: pointer; transition: all 0.3s;"
+                         onmouseover="this.style.background='#4a90e2'" 
+                         onmouseout="this.style.background='{% if formulario.id == formulario_atual_id %}#4a90e2{% else %}#404040{% endif %}'">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-light fw-bold">Formulário {{ loop.index }}</small>
+                                <br>
+                                <small class="text-muted">{{ formulario.data.strftime('%d/%m/%Y') }}</small>
+                            </div>
+                            <div>
+                                <i class="fas fa-dollar-sign text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <small class="text-light">{{ formulario.nome_paciente[:20] }}{% if formulario.nome_paciente|length > 20 %}...{% endif %}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-muted text-center p-3">
+                        <i class="fas fa-dollar-sign fa-2x mb-2"></i>
+                        <p>Nenhum formulário encontrado</p>
+                    </div>
+                {% endif %}
+            </div>
+        </nav>
+
         <!-- Main content -->
-        <main class="col-12 px-4 content-wrapper">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content-wrapper">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2 text-primary">
                     <i class="fas fa-dollar-sign me-2"></i>

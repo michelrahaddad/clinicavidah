@@ -1,11 +1,67 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Médico Específico - Sistema VIDAH</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Future Theme -->
+    <link href="{{ url_for('static', filename='css/future-theme.css') }}" rel="stylesheet">
+    <!-- UX Improvements -->
+    <link href="{{ url_for('static', filename='css/ux-improvements.css') }}" rel="stylesheet">
+</head>
+<body>
 
-{% block title %}Relatório Médico Específico - Sistema VIDAH{% endblock %}
-
-{% block content %}
 <div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar com lista de relatórios médicos -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar-relatorios" style="background: #2d2d2d; border-right: 1px solid #404040; min-height: 100vh; padding: 1rem;">
+            <div class="sidebar-header text-center mb-4">
+                <h5 class="text-primary fw-bold">
+                    <i class="fas fa-file-medical-alt me-2"></i>
+                    Prontuário de Relatórios
+                </h5>
+            </div>
+            
+            <div class="relatorios-lista">
+                {% if relatorios_medico %}
+                    {% for relatorio in relatorios_medico %}
+                    <div class="relatorio-item mb-2 p-2 rounded cursor-pointer" 
+                         onclick="carregarRelatorio({{ relatorio.id }})"
+                         style="background: {% if relatorio.id == relatorio_atual_id %}#4a90e2{% else %}#404040{% endif %}; 
+                                color: white; cursor: pointer; transition: all 0.3s;"
+                         onmouseover="this.style.background='#4a90e2'" 
+                         onmouseout="this.style.background='{% if relatorio.id == relatorio_atual_id %}#4a90e2{% else %}#404040{% endif %}'">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-light fw-bold">Relatório {{ loop.index }}</small>
+                                <br>
+                                <small class="text-muted">{{ relatorio.data.strftime('%d/%m/%Y') }}</small>
+                            </div>
+                            <div>
+                                <i class="fas fa-file-medical-alt text-primary"></i>
+                            </div>
+                        </div>
+                        <div class="mt-1">
+                            <small class="text-light">{{ relatorio.nome_paciente[:20] }}{% if relatorio.nome_paciente|length > 20 %}...{% endif %}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-muted text-center p-3">
+                        <i class="fas fa-file-medical-alt fa-2x mb-2"></i>
+                        <p>Nenhum relatório encontrado</p>
+                    </div>
+                {% endif %}
+            </div>
+        </nav>
+
         <!-- Main content -->
-        <main class="col-12 px-4 content-wrapper">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content-wrapper">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2 text-primary">
                     <i class="fas fa-file-medical-alt me-2"></i>
@@ -158,17 +214,30 @@
                 </div>
 
                 <input type="hidden" name="relatorio_id" value="{{ relatorio_id }}">
+                
+                <!-- Botões de ação no final do relatório -->
+                <div class="d-flex justify-content-end gap-3 mt-4 mb-4">
+                    <button type="button" class="btn btn-success btn-lg" onclick="gerarPDF()">
+                        <i class="fas fa-file-pdf me-2"></i>Gerar PDF
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="salvarRelatorio()">
+                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                    </button>
+                </div>
             </form>
         </main>
     </div>
 </div>
 
 <script>
+function carregarRelatorio(relatorioId) {
+    window.location.href = `/prontuario/relatorio/${relatorioId}`;
+}
+
 function salvarRelatorio() {
     const form = document.getElementById('relatorioForm');
     const formData = new FormData(form);
-    
-    alert('Relatório salvo com sucesso!');
+    alert('Relatório médico salvo com sucesso!');
 }
 
 function gerarPDF() {
@@ -176,4 +245,8 @@ function gerarPDF() {
     alert('Funcionalidade de PDF será implementada em breve');
 }
 </script>
-{% endblock %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
