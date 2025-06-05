@@ -2,6 +2,7 @@ from sqlalchemy import or_
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, make_response, jsonify
 from utils.db import get_db_connection, insert_patient_if_not_exists
 from utils.forms import validar_medicamentos, sanitizar_entrada
+from utils.image_processing import create_black_signature
 from models import Medico, Receita, Prontuario, Paciente, Medicamento
 from utils.forms import sanitizar_entrada
 from app import db
@@ -221,7 +222,7 @@ def salvar_receita():
                                      vias=vias,
                                      medico=medico.nome if medico else "Médico não encontrado",
                                      crm=medico.crm if medico else "CRM não disponível",
-                                     assinatura=medico.assinatura if medico else None,
+                                     assinatura=create_black_signature(medico.assinatura) if medico and medico.assinatura else None,
                                      data=formatar_data_brasileira(data),
                                      zip=zip)
             
