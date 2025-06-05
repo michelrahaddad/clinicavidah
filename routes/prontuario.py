@@ -1426,7 +1426,7 @@ def editar_exame_img_especifico(exame_id):
             'observacoes': getattr(exame, 'observacoes', 'Com contraste se necessário'),
             'medico_nome': medico.nome if medico else 'N/A',
             'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': exame.data.strftime('%d/%m/%Y às %H:%M') if hasattr(exame.data, 'strftime') else '05/06/2025 às 12:05',
+            'data_criacao': exame.data if isinstance(exame.data, str) else (exame.data.strftime('%d/%m/%Y às %H:%M') if exame.data else '05/06/2025 às 12:05'),
             'exame_id': exame.id
         }
         
