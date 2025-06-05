@@ -9,9 +9,18 @@ def require_admin(f):
     """Decorator to require admin authentication"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'admin_data' not in session:
+        # Verificar múltiplas formas de autenticação admin
+        if ('admin_data' not in session and 
+            'admin' not in session and 
+            session.get('admin') != True):
             flash('Acesso não autorizado. Faça login como administrador.', 'error')
+            logging.warning(f'Unauthorized admin access attempt to {f.__name__}')
             return redirect(url_for('auth.login'))
+        
+        # Log successful admin access
+        admin_data = session.get('admin_data', {})
+        admin_name = admin_data.get('nome', 'Unknown Admin') if admin_data else session.get('usuario', 'Unknown')
+        logging.info(f'Admin access granted to {f.__name__} by: {admin_name}')
         return f(*args, **kwargs)
     return decorated_function
 
