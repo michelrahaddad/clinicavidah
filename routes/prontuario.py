@@ -891,31 +891,12 @@ def prontuario_exames_lab(paciente):
             ExameLab.nome_paciente.ilike(f'%{paciente}%')
         ).order_by(ExameLab.created_at.desc()).all()
         
-        # Adicionar campos necessários
-        for exame in exames:
-            # Converter data string para formato input
-            if isinstance(exame.data, str):
-                if '/' in exame.data:
-                    parts = exame.data.split('/')
-                    exame.data_formatada_input = f"{parts[2]}-{parts[1].zfill(2)}-{parts[0].zfill(2)}"
-                else:
-                    exame.data_formatada_input = exame.data
-            else:
-                exame.data_formatada_input = str(exame.data)
-            
-            # Adicionar campos ausentes
-            exame.exames_solicitados = getattr(exame, 'exames', '') or ''
-            exame.preparacao = ''
-            exame.observacoes = ''
-            exame.medico_crm = ''
-        
         return render_template('prontuario_exames_lab.html', 
                              exames=exames, 
                              paciente_nome=paciente)
     except Exception as e:
         logging.error(f"Erro ao carregar exames laboratoriais: {e}")
-        flash('Erro ao carregar exames laboratoriais', 'error')
-        return redirect(url_for('prontuario.index'))
+        return f"<h1>Exames Laboratoriais - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
 
 @prontuario_bp.route('/prontuario/exames_img/<paciente>')
 def prontuario_exames_img(paciente):
@@ -934,8 +915,7 @@ def prontuario_exames_img(paciente):
                              paciente_nome=paciente)
     except Exception as e:
         logging.error(f"Erro ao carregar exames de imagem: {e}")
-        flash('Erro ao carregar exames de imagem', 'error')
-        return redirect(url_for('prontuario.index'))
+        return f"<h1>Exames de Imagem - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
 
 @prontuario_bp.route('/prontuario/relatorios/<paciente>')
 def prontuario_relatorios(paciente):
@@ -954,8 +934,7 @@ def prontuario_relatorios(paciente):
                              paciente_nome=paciente)
     except Exception as e:
         logging.error(f"Erro ao carregar relatórios médicos: {e}")
-        flash('Erro ao carregar relatórios médicos', 'error')
-        return redirect(url_for('prontuario.index'))
+        return f"<h1>Relatórios Médicos - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
 
 @prontuario_bp.route('/prontuario/atestados/<paciente>')
 def prontuario_atestados(paciente):
@@ -974,8 +953,7 @@ def prontuario_atestados(paciente):
                              paciente_nome=paciente)
     except Exception as e:
         logging.error(f"Erro ao carregar atestados médicos: {e}")
-        flash('Erro ao carregar atestados médicos', 'error')
-        return redirect(url_for('prontuario.index'))
+        return f"<h1>Atestados Médicos - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
 
 @prontuario_bp.route('/prontuario/alto_custo/<paciente>')
 def prontuario_alto_custo(paciente):
@@ -994,8 +972,7 @@ def prontuario_alto_custo(paciente):
                              paciente_nome=paciente)
     except Exception as e:
         logging.error(f"Erro ao carregar formulários alto custo: {e}")
-        flash('Erro ao carregar formulários alto custo', 'error')
-        return redirect(url_for('prontuario.index'))
+        return f"<h1>Formulários Alto Custo - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
 
 # APIs para salvar dados editados
 
