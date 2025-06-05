@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - Sistema VIDAH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #4a90e2;
+            --secondary-blue: #357abd;
+            --accent-green: #50c878;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-light: #e0e0e0;
+            --border-color: #404040;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #2a2a2a 100%);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .card-custom {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #3a3a3a 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="header-gradient">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="text-white mb-0">
+                        <i class="fas fa-chart-line me-3"></i>
+                        Relatórios Gerenciais
+                    </h1>
+                    <p class="text-white-50 mb-0">Análises e estatísticas do sistema médico</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/relatorios/exportar" class="btn btn-light">
+                        <i class="fas fa-download me-2"></i>Exportar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Estatísticas Gerais -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-prescription-bottle-alt fa-2x text-primary mb-2"></i>
+                    <div class="stat-number">{{ total_receitas or 0 }}</div>
+                    <div class="text-muted">Receitas Totais</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-vial fa-2x text-info mb-2"></i>
+                    <div class="stat-number">{{ total_exames_lab or 0 }}</div>
+                    <div class="text-muted">Exames Lab</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-x-ray fa-2x text-warning mb-2"></i>
+                    <div class="stat-number">{{ total_exames_img or 0 }}</div>
+                    <div class="text-muted">Exames Imagem</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <i class="fas fa-users fa-2x text-success mb-2"></i>
+                    <div class="stat-number">{{ total_pacientes or 0 }}</div>
+                    <div class="text-muted">Pacientes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas Mensais -->
+        <div class="card-custom">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">
+                    <i class="fas fa-calendar-alt me-2"></i>Estatísticas do Mês Atual
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <h4 class="text-primary">{{ receitas_mes or 0 }}</h4>
+                            <small class="text-muted">Receitas</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <h4 class="text-info">{{ exames_lab_mes or 0 }}</h4>
+                            <small class="text-muted">Exames Lab</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3 border rounded">
+                            <h4 class="text-warning">{{ exames_img_mes or 0 }}</h4>
+                            <small class="text-muted">Exames Imagem</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="card-custom">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">
+                    <i class="fas fa-tools me-2"></i>Ações Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <a href="/relatorios/detalhado" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search me-2"></i>Relatório Detalhado
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/relatorios/estatisticas" class="btn btn-outline-info w-100">
+                            <i class="fas fa-chart-bar me-2"></i>Estatísticas Avançadas
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="/relatorios/exportar" class="btn btn-outline-success w-100">
+                            <i class="fas fa-file-export me-2"></i>Exportar Dados
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegação -->
+        <div class="text-center mt-4">
+            <a href="/dashboard" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log('Sistema Médico VIDAH - Relatórios carregado');
+    </script>
+</body>
+</html>
