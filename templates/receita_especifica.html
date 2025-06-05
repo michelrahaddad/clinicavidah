@@ -1,16 +1,30 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receita Médica Específica - Sistema VIDAH</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom Future Theme -->
+    <link href="{{ url_for('static', filename='css/future-theme.css') }}" rel="stylesheet">
+    <!-- UX Improvements -->
+    <link href="{{ url_for('static', filename='css/ux-improvements.css') }}" rel="stylesheet">
+</head>
+<body>
 
-{% block title %}Receita Médica Específica - Sistema VIDAH{% endblock %}
 
-{% block content %}
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar com lista de receitas -->
         <nav class="col-md-3 col-lg-2 d-md-block sidebar-receitas" style="background: #2d2d2d; border-right: 1px solid #404040; min-height: 100vh; padding: 1rem;">
             <div class="sidebar-header text-center mb-4">
                 <h5 class="text-primary fw-bold">
-                    <i class="fas fa-prescription-bottle-alt me-2"></i>
-                    Receitas do Médico
+                    <i class="fas fa-file-medical me-2"></i>
+                    Prontuário de Receitas
                 </h5>
             </div>
             
@@ -183,6 +197,16 @@
                 </div>
 
                 <input type="hidden" name="receita_id" value="{{ receita_id }}">
+                
+                <!-- Botões de ação no final da receita -->
+                <div class="d-flex justify-content-end gap-3 mt-4 mb-4">
+                    <button type="button" class="btn btn-success btn-lg" onclick="gerarPDF()">
+                        <i class="fas fa-file-pdf me-2"></i>Gerar PDF
+                    </button>
+                    <button type="button" class="btn btn-primary btn-lg" onclick="salvarReceita()">
+                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                    </button>
+                </div>
             </form>
         </main>
     </div>
