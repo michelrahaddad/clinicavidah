@@ -4,6 +4,7 @@ from models import Prontuario, Receita, ExameLab, ExameImg, Medico, RelatorioMed
 from app import db
 from utils.forms import sanitizar_entrada
 import logging
+from datetime import datetime
 
 def sanitizar_entrada(valor):
     """Sanitiza entrada de usuário"""
@@ -14,6 +15,27 @@ def sanitizar_entrada(valor):
     import re
     valor = re.sub(r'[<>"\']', '', str(valor))
     return valor.strip()
+
+def formatar_data_brasileira(data):
+    """Converte data para o formato brasileiro DD/MM/AAAA"""
+    if isinstance(data, str):
+        try:
+            # Tenta converter string para datetime
+            if '-' in data:
+                data_obj = datetime.strptime(data, '%Y-%m-%d')
+            else:
+                return data  # Já está no formato brasileiro
+        except:
+            return data
+    elif isinstance(data, datetime):
+        data_obj = data
+    else:
+        try:
+            data_obj = datetime.strptime(str(data), '%Y-%m-%d')
+        except:
+            return str(data)
+    
+    return data_obj.strftime('%d/%m/%Y')
 
 
 prontuario_bp = Blueprint('prontuario', __name__)
@@ -92,7 +114,7 @@ def prontuario():
                         
                         resultados.append({
                             'tipo': 'receita',
-                            'data': receita.data,
+                            'data': formatar_data_brasileira(receita.data),
                             'id_registro': receita.id,
                             'nome_paciente': receita.nome_paciente,
                             'medico_nome': medico_nome,
@@ -119,7 +141,7 @@ def prontuario():
                     try:
                         resultados.append({
                             'tipo': 'exame_lab',
-                            'data': exame.data,
+                            'data': formatar_data_brasileira(exame.data),
                             'id_registro': exame.id,
                             'nome_paciente': exame.nome_paciente,
                             'medico_nome': 'Dr. Michel',
@@ -146,7 +168,7 @@ def prontuario():
                     try:
                         resultados.append({
                             'tipo': 'exame_img',
-                            'data': exame.data,
+                            'data': formatar_data_brasileira(exame.data),
                             'id_registro': exame.id,
                             'nome_paciente': exame.nome_paciente,
                             'medico_nome': 'Dr. Michel',
