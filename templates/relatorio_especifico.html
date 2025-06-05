@@ -4,35 +4,8 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar">
-            <div class="position-sticky pt-3">
-                <div class="sidebar-header text-center mb-4">
-                    <div class="sidebar-logo">
-                        <i class="fas fa-heartbeat fa-2x text-primary mb-2"></i>
-                        <h4 class="text-white fw-bold">VIDAH</h4>
-                        <p class="text-muted small">Sistema Médico</p>
-                    </div>
-                </div>
-                
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.dashboard') }}">
-                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('prontuario.prontuario') }}">
-                            <i class="fas fa-file-medical me-2"></i>Prontuário
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
         <!-- Main content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content-wrapper">
+        <main class="col-12 px-4 content-wrapper">
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h1 class="h2 text-primary">
                     <i class="fas fa-file-medical-alt me-2"></i>
