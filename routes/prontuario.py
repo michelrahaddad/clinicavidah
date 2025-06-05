@@ -1322,7 +1322,7 @@ def editar_receita_especifica(receita_id):
             'via': 'Oral',
             'medico_nome': medico.nome if medico else 'N/A',
             'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': receita.data.strftime('%d/%m/%Y às %H:%M') if hasattr(receita.data, 'strftime') else '05/06/2025 às 12:05',
+            'data_criacao': receita.data if isinstance(receita.data, str) else (receita.data.strftime('%d/%m/%Y às %H:%M') if receita.data else '05/06/2025 às 12:05'),
             'receita_id': receita.id
         }
         
@@ -1475,11 +1475,17 @@ def editar_relatorio_especifico(relatorio_id):
             'observacoes': getattr(relatorio, 'observacoes', 'Acompanhamento regular'),
             'medico_nome': medico.nome if medico else 'N/A',
             'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': relatorio.data.strftime('%d/%m/%Y às %H:%M') if hasattr(relatorio.data, 'strftime') else '05/06/2025 às 12:05',
+            'data_criacao': relatorio.data if isinstance(relatorio.data, str) else (relatorio.data.strftime('%d/%m/%Y às %H:%M') if relatorio.data else '05/06/2025 às 12:05'),
             'relatorio_id': relatorio.id
         }
         
-        return render_template('relatorio_especifico.html', **dados_preenchidos)
+        # Get all reports for the same doctor to build sidebar
+        relatorios_medico = db.session.query(RelatorioMedico).filter_by(id_medico=relatorio.id_medico).order_by(RelatorioMedico.data.desc()).all()
+        
+        return render_template('relatorio_especifico.html', 
+                             relatorios_medico=relatorios_medico,
+                             relatorio_atual_id=relatorio.id,
+                             **dados_preenchidos)
         
     except Exception as e:
         logging.error(f'Error loading specific relatorio: {e}')
@@ -1518,11 +1524,17 @@ def editar_atestado_especifico(atestado_id):
             'observacoes': getattr(atestado, 'observacoes', 'Repouso domiciliar'),
             'medico_nome': medico.nome if medico else 'N/A',
             'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': atestado.data.strftime('%d/%m/%Y às %H:%M') if hasattr(atestado.data, 'strftime') else '05/06/2025 às 12:05',
+            'data_criacao': atestado.data if isinstance(atestado.data, str) else (atestado.data.strftime('%d/%m/%Y às %H:%M') if atestado.data else '05/06/2025 às 12:05'),
             'atestado_id': atestado.id
         }
         
-        return render_template('atestado_especifico.html', **dados_preenchidos)
+        # Get all certificates for the same doctor to build sidebar
+        atestados_medico = db.session.query(AtestadoMedico).filter_by(id_medico=atestado.id_medico).order_by(AtestadoMedico.data.desc()).all()
+        
+        return render_template('atestado_especifico.html', 
+                             atestados_medico=atestados_medico,
+                             atestado_atual_id=atestado.id,
+                             **dados_preenchidos)
         
     except Exception as e:
         logging.error(f'Error loading specific atestado: {e}')
@@ -1557,11 +1569,17 @@ def editar_alto_custo_especifico(alto_custo_id):
             'observacoes': getattr(alto_custo, 'observacoes', 'Conforme protocolo'),
             'medico_nome': medico.nome if medico else 'N/A',
             'medico_crm': medico.crm if medico else 'N/A',
-            'data_criacao': alto_custo.data.strftime('%d/%m/%Y às %H:%M') if hasattr(alto_custo.data, 'strftime') else '05/06/2025 às 12:05',
+            'data_criacao': alto_custo.data if isinstance(alto_custo.data, str) else (alto_custo.data.strftime('%d/%m/%Y às %H:%M') if alto_custo.data else '05/06/2025 às 12:05'),
             'alto_custo_id': alto_custo.id
         }
         
-        return render_template('alto_custo_especifico.html', **dados_preenchidos)
+        # Get all high-cost forms for the same doctor to build sidebar
+        formularios_medico = db.session.query(FormularioAltoCusto).filter_by(id_medico=alto_custo.id_medico).order_by(FormularioAltoCusto.data.desc()).all()
+        
+        return render_template('alto_custo_especifico.html', 
+                             formularios_medico=formularios_medico,
+                             alto_custo_atual_id=alto_custo.id,
+                             **dados_preenchidos)
         
     except Exception as e:
         logging.error(f'Error loading specific alto custo: {e}')
