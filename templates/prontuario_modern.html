@@ -332,13 +332,64 @@
             box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
         }
 
-        .counter {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.25rem 0.5rem;
+        .document-badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .medical-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.6rem;
             border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: 600;
-            min-width: 24px;
-            text-align: center;
+            color: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .medical-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .medical-badge i {
+            font-size: 0.9rem;
+        }
+
+        .receita-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+        }
+
+        .lab-badge {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+        }
+
+        .img-badge {
+            background: linear-gradient(135deg, #fd7e14, #e55a00);
+            box-shadow: 0 2px 6px rgba(253, 126, 20, 0.3);
+        }
+
+        .relatorio-badge {
+            background: linear-gradient(135deg, #6f42c1, #563d7c);
+            box-shadow: 0 2px 6px rgba(111, 66, 193, 0.3);
+        }
+
+        .atestado-badge {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.3);
+        }
+
+        .alto-custo-badge {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #000;
+            box-shadow: 0 2px 6px rgba(255, 193, 7, 0.3);
         }
 
         .empty-state {
@@ -515,53 +566,53 @@
                             </td>
                             <td>{{ grupo.data }}</td>
                             <td>
-                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                <div class="document-badges-container">
+                                    {% set total_docs = grupo.contadores.receita + grupo.contadores.exame_lab + grupo.contadores.exame_img + grupo.contadores.relatorio + grupo.contadores.atestado + grupo.contadores.alto_custo %}
+                                    
                                     {% if grupo.contadores.receita > 0 %}
-                                        <div class="document-counter-badge" 
-                                             title="{{ grupo.contadores.receita }} Receita(s) Médicas">
+                                        <span class="medical-badge receita-badge" title="{{ grupo.contadores.receita }} Receita(s) Médica(s)">
                                             <i class="fas fa-prescription-bottle-alt"></i>
-                                            <span class="counter">{{ grupo.contadores.receita }}</span>
-                                        </div>
+                                            {{ grupo.contadores.receita }}
+                                        </span>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.exame_lab > 0 %}
-                                        <div class="document-counter-badge lab" 
-                                             title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratoriais">
+                                        <span class="medical-badge lab-badge" title="{{ grupo.contadores.exame_lab }} Exame(s) Laboratorial(is)">
                                             <i class="fas fa-vial"></i>
-                                            <span class="counter">{{ grupo.contadores.exame_lab }}</span>
-                                        </div>
+                                            {{ grupo.contadores.exame_lab }}
+                                        </span>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.exame_img > 0 %}
-                                        <div class="document-counter-badge img" 
-                                             title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
+                                        <span class="medical-badge img-badge" title="{{ grupo.contadores.exame_img }} Exame(s) de Imagem">
                                             <i class="fas fa-x-ray"></i>
-                                            <span class="counter">{{ grupo.contadores.exame_img }}</span>
-                                        </div>
+                                            {{ grupo.contadores.exame_img }}
+                                        </span>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.relatorio > 0 %}
-                                        <div class="document-counter-badge relatorio" 
-                                             title="{{ grupo.contadores.relatorio }} Relatório(s) Médicos">
+                                        <span class="medical-badge relatorio-badge" title="{{ grupo.contadores.relatorio }} Relatório(s) Médico(s)">
                                             <i class="fas fa-file-medical-alt"></i>
-                                            <span class="counter">{{ grupo.contadores.relatorio }}</span>
-                                        </div>
+                                            {{ grupo.contadores.relatorio }}
+                                        </span>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.atestado > 0 %}
-                                        <div class="document-counter-badge atestado" 
-                                             title="{{ grupo.contadores.atestado }} Atestado(s) Médicos">
+                                        <span class="medical-badge atestado-badge" title="{{ grupo.contadores.atestado }} Atestado(s) Médico(s)">
                                             <i class="fas fa-stamp"></i>
-                                            <span class="counter">{{ grupo.contadores.atestado }}</span>
-                                        </div>
+                                            {{ grupo.contadores.atestado }}
+                                        </span>
                                     {% endif %}
                                     
                                     {% if grupo.contadores.alto_custo > 0 %}
-                                        <div class="document-counter-badge alto-custo" 
-                                             title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
+                                        <span class="medical-badge alto-custo-badge" title="{{ grupo.contadores.alto_custo }} Formulário(s) Alto Custo">
                                             <i class="fas fa-money-bill-wave"></i>
-                                            <span class="counter">{{ grupo.contadores.alto_custo }}</span>
-                                        </div>
+                                            {{ grupo.contadores.alto_custo }}
+                                        </span>
+                                    {% endif %}
+                                    
+                                    {% if total_docs == 0 %}
+                                        <span class="text-muted">Nenhum documento</span>
                                     {% endif %}
                                 </div>
                             </td>
