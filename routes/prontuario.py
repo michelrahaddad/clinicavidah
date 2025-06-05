@@ -1,6 +1,6 @@
 from sqlalchemy import or_
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
-from models import Prontuario, Receita, ExameLab, ExameImg, Medico, RelatorioMedico, AtestadoMedico, FormularioAltoCusto
+from models import Prontuario, Receita, ExameLab, ExameImg, Medico, RelatorioMedico, AtestadoMedico, FormularioAltoCusto, Paciente
 from app import db
 from utils.forms import sanitizar_entrada
 import logging
@@ -735,7 +735,7 @@ def autocomplete():
 @prontuario_bp.route('/api/pacientes')
 def get_pacientes():
     """API para buscar pacientes - funciona para médicos e administradores"""
-    if 'usuario' not in session and 'admin_usuario' not in session and 'admin_usuario' not in session:
+    if 'usuario' not in session and 'admin_usuario' not in session:
         return jsonify([])
     
     try:
