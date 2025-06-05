@@ -25,10 +25,11 @@
                                        name="nome" 
                                        id="nome"
                                        class="form-control form-control-lg" 
-                                       style="background-color: white; color: black; border: 1px solid #ddd;"
+                                       style="background-color: white !important; color: black !important; border: 1px solid #ddd !important;"
                                        placeholder="Digite seu nome completo"
+                                       value=""
                                        required>
-                                <label for="nome" class="text-light">
+                                <label for="nome" style="color: #666 !important;">
                                     <i class="fas fa-user me-2 text-primary"></i>Nome Completo
                                 </label>
                             </div>
@@ -43,9 +44,10 @@
                                        name="crm" 
                                        id="crm"
                                        class="form-control form-control-lg" 
-                                       style="background-color: rgba(255,255,255,0.9); color: #333; border: 1px solid #ddd;"
-                                       placeholder="Ex: 123456-SP">
-                                <label for="crm" class="text-light">
+                                       style="background-color: white !important; color: black !important; border: 1px solid #ddd !important;"
+                                       placeholder="Ex: 123456-SP"
+                                       value="">
+                                <label for="crm" style="color: #666 !important;">
                                     <i class="fas fa-id-card me-2 text-info"></i>CRM
                                 </label>
                             </div>
@@ -61,10 +63,11 @@
                                        name="senha" 
                                        id="senha"
                                        class="form-control form-control-lg" 
-                                       style="background-color: white; color: black; border: 1px solid #ddd;"
+                                       style="background-color: white !important; color: black !important; border: 1px solid #ddd !important;"
                                        placeholder="Digite sua senha"
+                                       value=""
                                        required>
-                                <label for="senha" class="text-light">
+                                <label for="senha" style="color: #666 !important;">
                                     <i class="fas fa-lock me-2 text-warning"></i>Senha
                                 </label>
                             </div>
@@ -133,6 +136,35 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
+}
+
+/* Forçar estilos dos inputs */
+.form-control {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid #ddd !important;
+}
+
+.form-control:focus {
+    background-color: white !important;
+    color: black !important;
+    border-color: #007bff !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.form-floating > label {
+    color: #666 !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #007bff !important;
+}
+
+/* Placeholder styling */
+.form-control::placeholder {
+    color: #999 !important;
+    opacity: 1 !important;
 }
 </style>
 
