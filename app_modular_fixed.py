@@ -64,12 +64,12 @@ def register_blueprints(app):
     """Registra todos os blueprints da aplicação"""
     try:
         # Import blueprints
-        from auth_simple import auth_simple
+        from auth_simple import auth_bp
         from blueprints.dashboard import dashboard_bp
         from routes.medical import medical_bp
         
         # Register blueprints
-        app.register_blueprint(auth_simple, url_prefix='/auth')
+        app.register_blueprint(auth_bp)
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
         app.register_blueprint(medical_bp)
         

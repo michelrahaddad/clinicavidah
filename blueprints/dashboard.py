@@ -1,213 +1,187 @@
 """
-Blueprint do Dashboard - Sistema Médico VIDAH
+Blueprint do Dashboard - Sistema Médico VIDAH (Versão Corrigida)
 Painel principal com estatísticas e acesso rápido
 """
-from flask import Blueprint, render_template, session, redirect, url_for, jsonify
-from sqlalchemy import func, desc
+from flask import Blueprint, render_template, session, request, jsonify, redirect, url_for
 from datetime import datetime, timedelta
-from functools import wraps
+from sqlalchemy import func
+import calendar
 import logging
+import traceback
 
 # Import database and models
 from core.database import db
 from models import Paciente, Receita, ExameLab, ExameImg, Medico, AtestadoMedico
 
-
-import logging
-import traceback
-
-# Configurar logging detalhado
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
-)
 logger = logging.getLogger(__name__)
-
 
 def sanitize_input(text):
     """Sanitiza entrada do usuário"""
     if not text:
         return ""
-    return str(text).strip()
-
-
-dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
-
+    import re
+    return re.sub(r'[<>"\']', '', str(text))
 
 def require_auth():
     """Decorator para verificar autenticação"""
     def decorator(f):
-        @wraps(f)
         def decorated_function(*args, **kwargs):
             if 'usuario' not in session:
-                return redirect(url_for('auth.login'))
+                return redirect('/auth/login')
             return f(*args, **kwargs)
+        decorated_function.__name__ = f.__name__
         return decorated_function
     return decorator
 
+# Blueprint
+dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
 @dashboard_bp.route('/')
 @require_auth()
 def index():
     """Dashboard principal do sistema"""
-    user = session.get('usuario') or session.get('admin_usuario')
-    user_type = session.get('usuario_tipo', 'medico')
-    
-    if not user:
-        return redirect(url_for('auth.login'))
-    
     try:
-        # Estatísticas gerais
+        logger.info("=== CARREGANDO DASHBOARD ===")
+        user = session.get('usuario')
+        logger.info(f"Usuario da sessão: {user}")
+        
+        if not user:
+            logger.warning("Usuário não encontrado na sessão")
+            return redirect('/auth/login')
+        
+        user_type = user.get('tipo', 'medico')
+        logger.info(f"Tipo de usuário: {user_type}")
+        
+        # Calcular estatísticas
         stats = get_dashboard_statistics(user_type, user)
+        logger.info(f"Estatísticas calculadas: {stats}")
         
         # Atividades recentes
-        recent_activities = get_recent_activities(user_type, user)
+        activities = get_recent_activities(user_type, user)
+        logger.info(f"Atividades encontradas: {len(activities)}")
         
         # Dados para gráficos
         chart_data = get_chart_data(user_type, user)
+        logger.info(f"Dados do gráfico: {chart_data}")
         
         logger.info(f"Dashboard loaded for {user} ({user_type})")
         
         return render_template('dashboard.html', 
-                             stats=stats,
-                             recent_activities=recent_activities,
+                             stats=stats, 
+                             activities=activities,
                              chart_data=chart_data,
-                             user=user,
-                             user_type=user_type)
+                             user=user)
                              
     except Exception as e:
-        print(f"Dashboard error for {user}: {str(e)}")
-        return render_template('dashboard.html',
-                             stats={},
-                             recent_activities=[],
+        logger.error(f"Erro crítico no dashboard: {e}")
+        logger.error(traceback.format_exc())
+        # Retornar dashboard com dados vazios em caso de erro
+        return render_template('dashboard.html', 
+                             stats={}, 
+                             activities=[],
                              chart_data={},
-                             user=user,
-                             user_type=user_type,
-                             error="Erro ao carregar dashboard")
-
+                             user=session.get('usuario', {}))
 
 @dashboard_bp.route('/api/stats')
 @require_auth()
 def api_stats():
     """API para estatísticas do dashboard"""
-    user = session.get('usuario') or session.get('admin_usuario')
-    user_type = session.get('usuario_tipo', 'medico')
-    
     try:
+        user = session.get('usuario')
+        user_type = user.get('tipo', 'medico')
         stats = get_dashboard_statistics(user_type, user)
         return jsonify(stats)
     except Exception as e:
-        logger.error(f"Stats API error: {str(e)}")
-        return jsonify({'error': 'Erro ao carregar estatísticas'}), 500
-
+        logger.error(f"Erro na API de stats: {e}")
+        return jsonify({})
 
 @dashboard_bp.route('/api/activities')
 @require_auth()
 def api_activities():
     """API para atividades recentes"""
-    user = session.get('usuario') or session.get('admin_usuario')
-    user_type = session.get('usuario_tipo', 'medico')
-    
     try:
+        user = session.get('usuario')
+        user_type = user.get('tipo', 'medico')
         activities = get_recent_activities(user_type, user)
         return jsonify(activities)
     except Exception as e:
-        logger.error(f"Activities API error: {str(e)}")
-        return jsonify({'error': 'Erro ao carregar atividades'}), 500
-
+        logger.error(f"Erro na API de atividades: {e}")
+        return jsonify([])
 
 def get_dashboard_statistics(user_type, user):
     """Calcula estatísticas para o dashboard"""
     stats = {}
     
-    logger.info(f"=== INICIANDO CÁLCULO DE ESTATÍSTICAS ===")
+    logger.info(f"=== CALCULANDO ESTATÍSTICAS ===")
     logger.info(f"User type: {user_type}")
     logger.info(f"User data: {user}")
-    logger.info(f"User type is dict: {isinstance(user, dict)}")
     
     try:
-        # Data de hoje e última semana
-        today = datetime.now().date()
-        week_ago = today - timedelta(days=7)
-        month_ago = today - timedelta(days=30)
-        
-        if user_type == 'admin':
-            # Estatísticas administrativas
-            stats['total_receitas'] = logger.debug("Executando query: contagem de receitas")
-        db.session.query(func.count(Receita.id)).scalar() or 0
-        logger.debug(f"Resultado da query: {result}")
-            stats['total_exames_lab'] = logger.debug("Executando query: contagem de exames lab")
-        db.session.query(func.count(ExameLab.id)).scalar() or 0
-        logger.debug(f"Resultado da query: {result}")
-            stats['total_exames_img'] = logger.debug("Executando query: contagem de exames img")
-        db.session.query(func.count(ExameImg.id)).scalar() or 0
-        logger.debug(f"Resultado da query: {result}")
-            stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).scalar() or 0
-            stats['total_pacientes'] = logger.debug("Executando query: contagem de pacientes")
-        db.session.query(func.count(Paciente.id)).scalar() or 0
-        logger.debug(f"Resultado da query: {result}")
-            stats['total_medicos'] = logger.debug("Executando query: contagem de médicos")
-        db.session.query(func.count(Medico.id)).scalar() or 0
-        logger.debug(f"Resultado da query: {result}")
+        if user_type == 'medico':
+            # Buscar médico no banco
+            medico = db.session.query(Medico).filter_by(nome=user['nome']).first()
+            logger.info(f"Médico encontrado: {medico.nome if medico else 'None'}")
             
-            # Atividades da semana
-            stats['receitas_semana'] = logger.debug("Executando query: contagem de receitas")
-        result = db.session.query(func.count(Receita.id)).filter(
-                func.date(Receita.data_criacao) >= week_ago
-            ).scalar() or 0
-            
-            stats['exames_semana'] = (
-                logger.debug("Executando query: contagem de exames lab")
-        result = db.session.query(func.count(ExameLab.id)).filter(
-                    func.date(ExameLab.created_at) >= week_ago
-                ).scalar() or 0
-            ) + (
-                logger.debug("Executando query: contagem de exames img")
-        result = db.session.query(func.count(ExameImg.id)).filter(
-                    func.date(ExameImg.created_at) >= week_ago
-                ).scalar() or 0
-            )
-            
-        else:
-            # Estatísticas do médico - corrigindo query com user sendo dict
-            user_name = user.get('nome') if isinstance(user, dict) else user
-            medico = db.session.query(Medico).filter_by(nome=user_name).first()
             if medico:
-                stats['total_receitas'] = logger.debug("Executando query: contagem de receitas")
-        result = db.session.query(func.count(Receita.id)).filter_by(id_medico=medico.id).scalar() or 0
-                stats['total_exames_lab'] = logger.debug("Executando query: contagem de exames lab")
-        result = db.session.query(func.count(ExameLab.id)).filter_by(id_medico=medico.id).scalar() or 0
-                stats['total_exames_img'] = logger.debug("Executando query: contagem de exames img")
-        result = db.session.query(func.count(ExameImg.id)).filter_by(id_medico=medico.id).scalar() or 0
+                # Estatísticas do médico específico
+                logger.debug("Contando receitas...")
+                stats['total_receitas'] = db.session.query(func.count(Receita.id)).filter_by(id_medico=medico.id).scalar() or 0
+                logger.debug(f"Receitas: {stats['total_receitas']}")
+                
+                logger.debug("Contando exames lab...")
+                stats['total_exames_lab'] = db.session.query(func.count(ExameLab.id)).filter_by(id_medico=medico.id).scalar() or 0
+                logger.debug(f"Exames Lab: {stats['total_exames_lab']}")
+                
+                logger.debug("Contando exames img...")
+                stats['total_exames_img'] = db.session.query(func.count(ExameImg.id)).filter_by(id_medico=medico.id).scalar() or 0
+                logger.debug(f"Exames Img: {stats['total_exames_img']}")
+                
+                logger.debug("Contando atestados...")
                 stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).filter_by(id_medico=medico.id).scalar() or 0
+                logger.debug(f"Atestados: {stats['total_atestados']}")
                 
-                # Pacientes únicos atendidos
-                stats['total_pacientes'] = db.session.query(func.count(func.distinct(Receita.nome_paciente))).filter_by(id_medico=medico.id).scalar() or 0
+                # Contar pacientes únicos
+                logger.debug("Contando pacientes únicos...")
+                pacientes_ids = db.session.query(Receita.id_paciente).filter_by(id_medico=medico.id).distinct().all()
+                stats['total_pacientes'] = len(pacientes_ids)
+                logger.debug(f"Pacientes únicos: {stats['total_pacientes']}")
                 
-                # Atividades da semana
-                stats['receitas_semana'] = logger.debug("Executando query: contagem de receitas")
-        result = db.session.query(func.count(Receita.id)).filter(
-                    Receita.id_medico == medico.id,
-                    func.date(Receita.data_criacao) >= week_ago
-                ).scalar() or 0
-                
-                stats['exames_semana'] = (
-                    logger.debug("Executando query: contagem de exames lab")
-        result = db.session.query(func.count(ExameLab.id)).filter(
-                        ExameLab.id_medico == medico.id,
-                        func.date(ExameLab.created_at) >= week_ago
-                    ).scalar() or 0
-                ) + (
-                    logger.debug("Executando query: contagem de exames img")
-        result = db.session.query(func.count(ExameImg.id)).filter(
-                        ExameImg.id_medico == medico.id,
-                        func.date(ExameImg.created_at) >= week_ago
-                    ).scalar() or 0
-                )
+            else:
+                logger.warning("Médico não encontrado - retornando estatísticas zeradas")
+                stats = {
+                    'total_receitas': 0,
+                    'total_exames_lab': 0,
+                    'total_exames_img': 0,
+                    'total_atestados': 0,
+                    'total_pacientes': 0
+                }
         
-        # Calcular tendências
-        stats['receitas_mes'] = get_monthly_count(Receita, user_type, user, month_ago)
-        stats['exames_mes'] = get_monthly_count(ExameLab, user_type, user, month_ago) + get_monthly_count(ExameImg, user_type, user, month_ago)
+        elif user_type == 'admin':
+            # Estatísticas gerais para administradores
+            logger.debug("Calculando estatísticas de admin...")
+            stats['total_receitas'] = db.session.query(func.count(Receita.id)).scalar() or 0
+            stats['total_exames_lab'] = db.session.query(func.count(ExameLab.id)).scalar() or 0
+            stats['total_exames_img'] = db.session.query(func.count(ExameImg.id)).scalar() or 0
+            stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).scalar() or 0
+            stats['total_pacientes'] = db.session.query(func.count(Paciente.id)).scalar() or 0
+            stats['total_medicos'] = db.session.query(func.count(Medico.id)).scalar() or 0
+        
+        # Adicionar estatísticas do mês atual
+        now = datetime.now()
+        month_start = datetime(now.year, now.month, 1)
+        
+        if user_type == 'medico' and medico:
+            stats['receitas_mes'] = db.session.query(func.count(Receita.id)).filter(
+                Receita.id_medico == medico.id,
+                Receita.data_criacao >= month_start
+            ).scalar() or 0
+        else:
+            stats['receitas_mes'] = db.session.query(func.count(Receita.id)).filter(
+                Receita.data_criacao >= month_start
+            ).scalar() or 0
+        
+        logger.info(f"Estatísticas finais: {stats}")
+        return stats
         
     except Exception as e:
         logger.error(f"=== ERRO CRÍTICO NO CÁLCULO DE ESTATÍSTICAS ===")
@@ -217,141 +191,123 @@ def get_dashboard_statistics(user_type, user):
         logger.error(traceback.format_exc())
         logger.error(f"User type: {user_type}")
         logger.error(f"User data: {user}")
-        stats = {
+        
+        # Retornar estatísticas zeradas em caso de erro
+        return {
             'total_receitas': 0,
             'total_exames_lab': 0,
             'total_exames_img': 0,
             'total_atestados': 0,
             'total_pacientes': 0,
-            'receitas_semana': 0,
-            'exames_semana': 0
+            'receitas_mes': 0
         }
-    
-    return stats
-
 
 def get_monthly_count(model, user_type, user, month_ago):
     """Conta registros do último mês"""
     try:
-        query = db.session.query(func.count(model.id))
+        now = datetime.now()
+        target_month = now.month - month_ago
+        target_year = now.year
         
-        if user_type != 'admin' and hasattr(model, 'medico'):
-            query = query.filter(model.medico == user)
+        if target_month <= 0:
+            target_month += 12
+            target_year -= 1
         
-        if hasattr(model, 'data_criacao'):
-            query = query.filter(func.date(model.data_criacao) >= month_ago)
+        month_start = datetime(target_year, target_month, 1)
+        month_end = datetime(target_year, target_month, calendar.monthrange(target_year, target_month)[1])
         
-        return query.scalar() or 0
-    except:
+        if user_type == 'medico':
+            medico = db.session.query(Medico).filter_by(nome=user['nome']).first()
+            if medico:
+                return db.session.query(func.count(model.id)).filter(
+                    model.id_medico == medico.id,
+                    model.data_criacao >= month_start,
+                    model.data_criacao <= month_end
+                ).scalar() or 0
+        else:
+            return db.session.query(func.count(model.id)).filter(
+                model.data_criacao >= month_start,
+                model.data_criacao <= month_end
+            ).scalar() or 0
+        
         return 0
-
+    except Exception as e:
+        logger.error(f"Erro ao contar registros mensais: {e}")
+        return 0
 
 def get_recent_activities(user_type, user):
     """Busca atividades recentes do usuário"""
-    activities = []
-    
     try:
-        if user_type == 'admin':
-            # Atividades administrativas
-            receitas = db.session.query(Receita).order_by(Receita.data_criacao.desc()).limit(5).all()
-            for receita in receitas:
-                activities.append({
-                    'tipo': 'Receita',
-                    'descricao': f'Receita para {receita.nome_paciente}',
-                    'data': receita.data_criacao.strftime('%d/%m/%Y %H:%M') if receita.data_criacao else receita.data,
-                    'medico': receita.medico_nome
-                })
-        else:
-            # Atividades do médico
-            user_name = user.get('nome') if isinstance(user, dict) else user
-            medico = db.session.query(Medico).filter_by(nome=user_name).first()
-            
+        activities = []
+        
+        if user_type == 'medico':
+            medico = db.session.query(Medico).filter_by(nome=user['nome']).first()
             if medico:
-                receitas = db.session.query(Receita).filter_by(id_medico=medico.id).order_by(Receita.data_criacao.desc()).limit(5).all()
+                # Receitas recentes
+                receitas = db.session.query(Receita).filter_by(id_medico=medico.id)\
+                    .order_by(Receita.data_criacao.desc()).limit(5).all()
+                
                 for receita in receitas:
                     activities.append({
                         'tipo': 'Receita',
                         'descricao': f'Receita para {receita.nome_paciente}',
                         'data': receita.data_criacao.strftime('%d/%m/%Y %H:%M') if receita.data_criacao else receita.data,
-                        'medico': receita.medico_nome
+                        'icon': 'fa-prescription-bottle-alt'
                     })
                 
-                # Adicionar exames
-                exames_lab = db.session.query(ExameLab).filter_by(id_medico=medico.id).order_by(ExameLab.created_at.desc()).limit(3).all()
-                for exame in exames_lab:
+                # Exames recentes
+                exames = db.session.query(ExameLab).filter_by(id_medico=medico.id)\
+                    .order_by(ExameLab.created_at.desc()).limit(3).all()
+                
+                for exame in exames:
                     activities.append({
                         'tipo': 'Exame Lab',
-                        'descricao': f'Exames para {exame.nome_paciente}',
-                        'data': exame.created_at.strftime('%d/%m/%Y %H:%M') if exame.created_at else exame.data,
-                        'medico': exame.medico_nome
+                        'descricao': f'Exame para {exame.nome_paciente}',
+                        'data': exame.created_at.strftime('%d/%m/%Y %H:%M') if hasattr(exame, 'created_at') and exame.created_at else exame.data,
+                        'icon': 'fa-flask'
                     })
         
+        # Ordenar por data (mais recentes primeiro)
+        activities.sort(key=lambda x: x['data'], reverse=True)
+        return activities[:10]
+        
     except Exception as e:
-        logger.error(f"Error getting activities: {str(e)}")
-    
-    return activities[:10]  # Limitar a 10 atividades
-
+        logger.error(f"Erro ao buscar atividades: {e}")
+        return []
 
 def get_chart_data(user_type, user):
     """Dados para gráficos do dashboard"""
-    chart_data = {
-        'labels': ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-        'receitas': [0, 0, 0, 0, 0, 0],
-        'exames': [0, 0, 0, 0, 0, 0]
-    }
-    
     try:
-        from datetime import datetime, timedelta
-        now = datetime.now()
+        chart_data = {
+            'labels': [],
+            'receitas': [],
+            'exames': []
+        }
         
-        if user_type == 'admin':
-            # Dados administrativos dos últimos 6 meses
-            for i in range(6):
-                month_start = (now.replace(day=1) - timedelta(days=30*i))
-                month_end = month_start + timedelta(days=30)
-                
-                receitas_count = logger.debug("Executando query: contagem de receitas")
-        result = db.session.query(func.count(Receita.id)).filter(
-                    Receita.data_criacao >= month_start,
-                    Receita.data_criacao < month_end
-                ).scalar() or 0
-                
-                exames_count = (
-                    logger.debug("Executando query: contagem de exames lab")
-        result = db.session.query(func.count(ExameLab.id)).filter(
-                        ExameLab.created_at >= month_start,
-                        ExameLab.created_at < month_end
-                    ).scalar() or 0
-                ) + (
-                    logger.debug("Executando query: contagem de exames img")
-        result = db.session.query(func.count(ExameImg.id)).filter(
-                        ExameImg.created_at >= month_start,
-                        ExameImg.created_at < month_end
-                    ).scalar() or 0
-                )
-                
-                chart_data['receitas'][5-i] = receitas_count
-                chart_data['exames'][5-i] = exames_count
-        else:
-            # Dados do médico
-            user_name = user.get('nome') if isinstance(user, dict) else user
-            medico = db.session.query(Medico).filter_by(nome=user_name).first()
+        # Últimos 6 meses
+        for i in range(5, -1, -1):
+            now = datetime.now()
+            month = now.month - i
+            year = now.year
             
-            if medico:
-                for i in range(6):
-                    month_start = (now.replace(day=1) - timedelta(days=30*i))
-                    month_end = month_start + timedelta(days=30)
-                    
-                    receitas_count = logger.debug("Executando query: contagem de receitas")
-        result = db.session.query(func.count(Receita.id)).filter(
-                        Receita.id_medico == medico.id,
-                        Receita.data_criacao >= month_start,
-                        Receita.data_criacao < month_end
-                    ).scalar() or 0
-                    
-                    chart_data['receitas'][5-i] = receitas_count
+            if month <= 0:
+                month += 12
+                year -= 1
+            
+            month_name = calendar.month_name[month][:3]  # Jan, Feb, etc
+            chart_data['labels'].append(month_name)
+            
+            # Contar receitas do mês
+            receitas_count = get_monthly_count(Receita, user_type, user, i)
+            chart_data['receitas'].append(receitas_count)
+            
+            # Contar exames do mês (lab + img)
+            exames_lab_count = get_monthly_count(ExameLab, user_type, user, i)
+            exames_img_count = get_monthly_count(ExameImg, user_type, user, i)
+            chart_data['exames'].append(exames_lab_count + exames_img_count)
+        
+        return chart_data
         
     except Exception as e:
-        logger.error(f"Error getting chart data: {str(e)}")
-    
-    return chart_data
+        logger.error(f"Erro ao gerar dados do gráfico: {e}")
+        return {'labels': [], 'receitas': [], 'exames': []}
