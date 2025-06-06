@@ -48,9 +48,21 @@
     <!-- Neural Background -->
     <div class="neural-bg"></div>
     
-    <!-- Return to Dashboard Button (only show on non-dashboard pages) -->
+    <!-- Return Button (only show on non-dashboard pages) -->
     {% if request.endpoint != 'dashboard.dashboard' and session.usuario %}
     <div class="position-fixed" style="top: 20px; right: 20px; z-index: 1050;">
+        {% if 'prontuario' in request.endpoint and 'receitas' in request.endpoint %}
+        <!-- Botão para voltar ao prontuário nas páginas de receitas -->
+        <a href="{{ url_for('prontuario.prontuario') }}" 
+           class="btn neural-btn rounded-circle p-3 dashboard-btn" 
+           title="Voltar ao Prontuário"
+           style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); border: none; box-shadow: 0 8px 32px rgba(40, 167, 69, 0.3);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="white" opacity="0.9"/>
+            </svg>
+        </a>
+        {% else %}
+        <!-- Botão padrão para voltar ao dashboard -->
         <a href="{{ url_for('dashboard.dashboard') }}" 
            class="btn neural-btn rounded-circle p-3 dashboard-btn" 
            title="Voltar ao Dashboard"
@@ -66,6 +78,7 @@
                 <circle cx="17.5" cy="17.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
             </svg>
         </a>
+        {% endif %}
     </div>
     {% endif %}
     
