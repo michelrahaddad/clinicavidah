@@ -660,22 +660,21 @@ def gerar_pdf_receita_cronologia(receita_id):
         while len(duracoes_list) < max_len:
             duracoes_list.append('')
         
-        # Gerar PDF
+        # Gerar PDF com dados completos integrados do banco de dados
         pdf_html = render_template('receita_pdf.html',
-                                 paciente=paciente.nome if paciente else receita.nome_paciente,
-                                 cpf=paciente.cpf if paciente else '',
-                                 idade=paciente.idade if paciente else '',
-                                 endereco=paciente.endereco if paciente else '',
-                                 cidade_uf=paciente.cidade_uf if paciente else '',
+                                 nome_paciente=paciente.nome if paciente else receita.nome_paciente,
+                                 cpf_paciente=paciente.cpf if paciente else '',
+                                 idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade > 0 else '',
+                                 endereco_paciente=paciente.endereco if paciente else '',
+                                 cidade_uf_paciente=paciente.cidade_uf if paciente else '',
                                  medicamentos=medicamentos_list,
                                  posologias=posologias_list,
-                                 vias=vias_list,
-                                 frequencias=frequencias_list,
                                  duracoes=duracoes_list,
+                                 vias=vias_list,
                                  medico=medico.nome if medico else receita.medico_nome,
                                  crm=medico.crm if medico else '',
                                  data=formatar_data_brasileira(receita.data),
-                                 assinatura=medico.assinatura if medico else None,
+                                 assinatura=medico.assinatura if medico and medico.assinatura else None,
                                  zip=zip)
         
         try:
