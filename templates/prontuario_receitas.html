@@ -125,9 +125,7 @@
                                     <button type="button" class="btn btn-outline-success" onclick="adicionarMedicamento({{ receita.id }})">
                                         <i class="fas fa-plus"></i> Adicionar Medicamento
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary" onclick="salvarReceita({{ receita.id }})">
-                                        <i class="fas fa-save"></i> Salvar Alterações
-                                    </button>
+
                                     <form style="display: inline;" action="/receita/pdf/{{ receita.id }}" method="get" target="_blank">
                                         <button type="submit" class="btn btn-outline-info">
                                             <i class="fas fa-file-pdf"></i> Gerar PDF
@@ -161,6 +159,7 @@
 // Inicialização do sistema
 document.addEventListener('DOMContentLoaded', function() {
     setupMedicamentAutocomplete();
+    configurarSalvamentoAutomatico();
     console.log('Sistema Médico VIDAH carregado');
     
     // Mostrar primeira receita automaticamente
@@ -353,15 +352,9 @@ function removerMedicamento(button) {
     }
 }
 
-// Função para salvar receita
-function salvarReceita(receitaId) {
+// Salvamento automático ao modificar campos
+function salvarAutomatico(receitaId) {
     const form = document.getElementById(`receita-form-${receitaId}`);
-    
-    // Mostrar loading
-    const button = form.querySelector('[onclick*="salvarReceita"]');
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
-    button.disabled = true;
     
     // Usar FormData do próprio formulário para capturar todos os dados
     const formData = new FormData(form);
@@ -378,29 +371,40 @@ function salvarReceita(receitaId) {
     })
     .then(data => {
         if (data.success) {
-            // Mostrar sucesso
-            button.innerHTML = '<i class="fas fa-check"></i> Salvo!';
-            button.className = 'btn btn-success';
-            
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.className = 'btn btn-outline-primary';
-                button.disabled = false;
-            }, 2000);
+            // Mostrar indicador de salvamento discreto
+            console.log('Receita salva automaticamente');
         } else {
-            throw new Error(data.error || 'Erro ao salvar');
+            console.error('Erro ao salvar automaticamente:', data.error);
         }
     })
     .catch(error => {
         console.error('Erro ao salvar receita:', error);
-        button.innerHTML = '<i class="fas fa-times"></i> Erro';
-        button.className = 'btn btn-danger';
+    });
+}
+
+// Adicionar eventos de salvamento automático
+function configurarSalvamentoAutomatico() {
+    // Configurar salvamento automático para todos os formulários de receita
+    document.querySelectorAll('[id^="receita-form-"]').forEach(form => {
+        const receitaId = form.id.split('-')[2];
         
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.className = 'btn btn-outline-primary';
-            button.disabled = false;
-        }, 2000);
+        // Adicionar eventos para todos os inputs, selects e textareas
+        form.querySelectorAll('input, select, textarea').forEach(campo => {
+            // Debounce para evitar muitas requisições
+            let timeout;
+            
+            campo.addEventListener('input', function() {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    salvarAutomatico(receitaId);
+                }, 500); // Aguarda 500ms após parar de digitar
+            });
+            
+            campo.addEventListener('change', function() {
+                clearTimeout(timeout);
+                salvarAutomatico(receitaId);
+            });
+        });
     });
 }
 
