@@ -213,27 +213,7 @@
         </div>
     </form>
     
-    <!-- Navigation Buttons - Robust Implementation -->
-    <div class="container-fluid mt-5">
-        <div class="row justify-content-center">
-            <div class="col-12 text-center">
-                <h5 class="text-light mb-4">Navegação Rápida</h5>
-                <div class="d-flex justify-content-center gap-4 flex-wrap">
-                    <a href="/exames_img" 
-                       class="btn btn-outline-info btn-lg px-4 py-3"
-                       style="border-radius: 20px; min-width: 200px; font-weight: 600; text-decoration: none;">
-                        <i class="fas fa-x-ray me-2"></i>Exames de Imagem
-                    </a>
-                    <a href="/exames_lab" 
-                       class="btn btn-outline-success btn-lg px-4 py-3"
-                       style="border-radius: 20px; min-width: 200px; font-weight: 600; text-decoration: none;"
-                       id="exames-lab-button">
-                        <i class="fas fa-vials me-2"></i>Exames Lab
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <script>
@@ -241,16 +221,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     setupPatientAutocomplete();
     setupMedicamentAutocomplete();
-    
-    // Configuração simples e robusta para botão Exames Lab
-    const examLabBtn = document.getElementById('exames-lab-button');
-    if (examLabBtn) {
-        console.log('Botão Exames Lab configurado');
-        examLabBtn.addEventListener('click', function(e) {
-            console.log('Clique no botão Exames Lab detectado');
-            // Não prevenir comportamento padrão para links simples
-        });
-    }
 });
 
 function setupPatientAutocomplete() {
