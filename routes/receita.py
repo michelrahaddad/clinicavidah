@@ -814,11 +814,45 @@ def gerar_pdf_receita_cronologia(receita_id):
         while len(duracoes_list) < max_len:
             duracoes_list.append('')
         
+        # Process signature for PDF visibility - CRITICAL FIX
+        assinatura_para_pdf = None
+        temp_sig_path = None
+        
+        if medico and medico.assinatura and medico.assinatura != 'assinatura':
+            try:
+                import base64
+                import tempfile
+                
+                if medico.assinatura.startswith('data:image'):
+                    # Process signature to make it black and visible
+                    processed_signature = create_black_signature(medico.assinatura)
+                    
+                    # Extract base64 data from processed signature
+                    header, data = processed_signature.split(',', 1)
+                    image_data = base64.b64decode(data)
+                    
+                    # Create temporary file
+                    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
+                    temp_file.write(image_data)
+                    temp_file.close()
+                    temp_sig_path = temp_file.name
+                    
+                    # Use file URL for WeasyPrint
+                    assinatura_para_pdf = f"file://{temp_sig_path}"
+                    logging.info(f'PDF Cronologia - Assinatura processada e salva: {temp_sig_path}')
+                else:
+                    assinatura_para_pdf = medico.assinatura
+                    
+            except Exception as e:
+                logging.error(f'Erro ao processar assinatura cronologia: {e}')
+                assinatura_para_pdf = None
+        
         # Log completo dos dados do médico para debug da assinatura
         logging.info(f'PDF - Médico encontrado: {medico.nome if medico else "NENHUM"}')
         logging.info(f'PDF - CRM: {medico.crm if medico else "NENHUM"}')
         logging.info(f'PDF - Assinatura presente: {bool(medico and medico.assinatura)}')
         logging.info(f'PDF - Tamanho da assinatura: {len(medico.assinatura) if medico and medico.assinatura else 0} caracteres')
+        logging.info(f'PDF - Assinatura processada para uso: {assinatura_para_pdf is not None}')
         
         # Gerar PDF com dados completos integrados do banco de dados
         pdf_html = render_template('receita_pdf.html',
@@ -834,7 +868,7 @@ def gerar_pdf_receita_cronologia(receita_id):
                                  medico=medico.nome if medico else receita.medico_nome,
                                  crm=medico.crm if medico else '',
                                  data=formatar_data_brasileira(receita.data),
-                                 assinatura=medico.assinatura if medico and medico.assinatura and medico.assinatura != 'assinatura' else None,
+                                 assinatura=assinatura_para_pdf,
                                  zip=zip)
         
         try:
@@ -844,6 +878,15 @@ def gerar_pdf_receita_cronologia(receita_id):
             logging.info(f'Template data: paciente={paciente.nome if paciente else receita.nome_paciente}')
             
             pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+            
+            # Clean up temporary signature file
+            if temp_sig_path:
+                try:
+                    import os
+                    os.unlink(temp_sig_path)
+                    logging.info(f'PDF Cronologia - Arquivo temporário removido: {temp_sig_path}')
+                except Exception as e:
+                    logging.error(f'Erro ao remover arquivo temporário cronologia: {e}')
             
             response = make_response(pdf_file)
             response.headers['Content-Type'] = 'application/pdf'
