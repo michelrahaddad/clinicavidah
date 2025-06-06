@@ -1,17 +1,19 @@
-import sqlite3
 import logging
 from datetime import datetime
 from models import Medico, Paciente, Receita, ExameLab, ExameImg, Agendamento, Prontuario
 from app import db
 from werkzeug.security import generate_password_hash
 import os
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 def get_db_connection():
-    """Get database connection for legacy compatibility"""
-    # This is for backward compatibility with uploaded files
-    # Modern code should use SQLAlchemy models directly
-    conn = sqlite3.connect('vidah_medical.db')
-    conn.row_factory = sqlite3.Row
+    """Get PostgreSQL database connection"""
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable not set")
+    
+    conn = psycopg2.connect(database_url, cursor_factory=RealDictCursor)
     return conn
 
 def insert_patient_if_not_exists(nome_paciente, cpf=None, email=None, telefone=None):
