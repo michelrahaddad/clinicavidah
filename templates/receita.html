@@ -208,7 +208,7 @@
             </a>
             <button type="submit" 
                     class="btn btn-success btn-lg px-5 py-3" 
-                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); pointer-events: auto; position: relative; z-index: 1000;">
                 <i class="fas fa-file-pdf me-2"></i>GERAR PDF
             </button>
         </div>
@@ -218,12 +218,34 @@
 </div>
 
 <script>
-// Inicialização do autocomplete
+// Inicialização do sistema
 document.addEventListener('DOMContentLoaded', function() {
     setupPatientAutocomplete();
     setupMedicamentAutocomplete();
+    setupPdfButtonFix();
     console.log('Sistema Médico VIDAH carregado');
 });
+
+function setupPdfButtonFix() {
+    // Garante que o botão PDF seja clicável
+    const form = document.getElementById('receita-form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    if (submitBtn) {
+        // Remove qualquer interferência
+        submitBtn.style.pointerEvents = 'auto';
+        submitBtn.style.zIndex = '9999';
+        submitBtn.style.position = 'relative';
+        
+        // Adiciona listener de backup
+        submitBtn.addEventListener('click', function(e) {
+            console.log('Clique no botão PDF detectado');
+            // Permite o comportamento padrão do submit
+        });
+        
+        console.log('Botão PDF configurado e pronto');
+    }
+}
 
 function setupPatientAutocomplete() {
     const nomeInput = document.getElementById('nome_paciente');
