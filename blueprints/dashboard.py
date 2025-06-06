@@ -24,7 +24,6 @@ def require_auth():
 
 @dashboard_bp.route('/')
 @require_auth()
-@log_action('dashboard_access')
 def index():
     """Dashboard principal do sistema"""
     user = session.get('usuario') or session.get('admin_usuario')
