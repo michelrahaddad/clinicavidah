@@ -22,23 +22,23 @@ def format_cpf(cpf):
         return f"{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:11]}"
     return cpf
 
-def sanitizar_entrada(texto):
+def sanitizar_entrada(valor):
     """Sanitize input text with enhanced security"""
-    if not texto:
+    if not valor:
         return ""
     
     # Convert to string and strip whitespace
-    texto = str(texto).strip()
+    valor = str(valor).strip()
     
     # Remove potentially dangerous characters
-    texto = re.sub(r'[<>\"\'%;()&+]', '', texto)
+    valor = re.sub(r'[<>\"\'%;()&+]', '', valor)
     
     # Remove script tags and other dangerous patterns
-    texto = re.sub(r'<script.*?</script>', '', texto, flags=re.IGNORECASE | re.DOTALL)
-    texto = re.sub(r'javascript:', '', texto, flags=re.IGNORECASE)
-    texto = re.sub(r'on\w+\s*=', '', texto, flags=re.IGNORECASE)
+    valor = re.sub(r'<script.*?</script>', '', valor, flags=re.IGNORECASE | re.DOTALL)
+    valor = re.sub(r'javascript:', '', valor, flags=re.IGNORECASE)
+    valor = re.sub(r'on\w+\s*=', '', valor, flags=re.IGNORECASE)
     
-    return texto
+    return valor
 
 def validar_data(data_str):
     """Validate date format YYYY-MM-DD"""

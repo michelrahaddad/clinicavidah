@@ -6,16 +6,6 @@ from utils.forms import sanitizar_entrada
 import logging
 from datetime import datetime
 
-def sanitizar_entrada(valor):
-    """Sanitiza entrada de usuário"""
-    if not valor:
-        return ""
-    
-    # Remove caracteres perigosos
-    import re
-    valor = re.sub(r'[<>"\']', '', str(valor))
-    return valor.strip()
-
 def formatar_data_brasileira(data):
     """Converte data para o formato brasileiro DD/MM/AAAA"""
     if isinstance(data, str):

@@ -4,7 +4,6 @@ from utils.db import get_db_connection, insert_patient_if_not_exists
 from utils.forms import validar_medicamentos, sanitizar_entrada
 from utils.image_processing import create_black_signature
 from models import Medico, Receita, Prontuario, Paciente, Medicamento
-from utils.forms import sanitizar_entrada
 from app import db
 from datetime import datetime
 import logging
