@@ -73,10 +73,15 @@ def register_blueprints(app):
         
         logger.info("Blueprints registrados com sucesso")
         
-    except ImportError as e:
-        logger.error(f"Erro ao importar blueprints: {e}")
-        # Fallback para não quebrar a aplicação
-        pass
+    except Exception as e:
+        logger.error(f"Erro ao importar/registrar blueprints: {e}")
+        # Create simple fallback routes
+        from flask import request, render_template
+        @app.route('/auth/login', methods=['GET', 'POST'])
+        def fallback_login():
+            if request.method == 'GET':
+                return render_template('login.html')
+            return "Auth fallback active"
 
 
 def register_main_routes(app):

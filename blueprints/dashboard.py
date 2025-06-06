@@ -10,7 +10,7 @@ import logging
 
 # Import database and models
 from core.database import db
-from models import Paciente, Receita, ExamesLab, ExamesImg, Medico, Atestado
+from models import Paciente, Receita, ExameLab, ExameImg, Medico, AtestadoMedico
 
 logger = logging.getLogger(__name__)
 
@@ -112,9 +112,9 @@ def get_dashboard_statistics(user_type, user):
         if user_type == 'admin':
             # Estatísticas administrativas
             stats['total_receitas'] = db.session.query(func.count(Receita.id)).scalar() or 0
-            stats['total_exames_lab'] = db.session.query(func.count(ExamesLab.id)).scalar() or 0
-            stats['total_exames_img'] = db.session.query(func.count(ExamesImg.id)).scalar() or 0
-            stats['total_atestados'] = db.session.query(func.count(Atestado.id)).scalar() or 0
+            stats['total_exames_lab'] = db.session.query(func.count(ExameLab.id)).scalar() or 0
+            stats['total_exames_img'] = db.session.query(func.count(ExameImg.id)).scalar() or 0
+            stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).scalar() or 0
             stats['total_pacientes'] = db.session.query(func.count(Paciente.id)).scalar() or 0
             stats['total_medicos'] = db.session.query(func.count(Medico.id)).scalar() or 0
             
