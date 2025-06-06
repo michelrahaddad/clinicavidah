@@ -422,8 +422,11 @@ def gerar_pdf_receita(receita_id):
                 import tempfile
                 
                 if medico.assinatura.startswith('data:image'):
-                    # Extract base64 data
-                    header, data = medico.assinatura.split(',', 1)
+                    # Process signature to make it black and visible
+                    processed_signature = create_black_signature(medico.assinatura)
+                    
+                    # Extract base64 data from processed signature
+                    header, data = processed_signature.split(',', 1)
                     image_data = base64.b64decode(data)
                     
                     # Create temporary file
@@ -434,7 +437,7 @@ def gerar_pdf_receita(receita_id):
                     
                     # Use file URL for WeasyPrint
                     assinatura_para_pdf = f"file://{temp_sig_path}"
-                    logging.info(f'Assinatura salva em arquivo temporário: {temp_sig_path}')
+                    logging.info(f'Assinatura processada e salva em arquivo temporário: {temp_sig_path}')
                 else:
                     assinatura_para_pdf = medico.assinatura
                     
