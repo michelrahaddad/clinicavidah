@@ -56,62 +56,35 @@
                             </h4>
                         </div>
                         <div class="card-body p-4" style="overflow-y: auto;">
-                            <!-- Cabeçalho Receita Médica -->
-                            <div class="text-center mb-4">
-                                <h5 class="text-light mb-3">Receita Médica</h5>
-                                <div class="text-muted small">
-                                    <div class="mb-2">Dados do Paciente</div>
-                                    <div class="fw-bold mb-1">Nome do Paciente *</div>
-                                    <div class="mb-2">{{ paciente_nome }}</div>
-                                    <div class="mb-1">CPF</div>
-                                    <div class="mb-2">000.000.000-00</div>
-                                    <div class="mb-1">Idade</div>
-                                    <div class="mb-2">--</div>
-                                    <div class="mb-1">Endereço</div>
-                                    <div class="mb-2">Endereço não informado</div>
-                                    <div class="mb-1">Cidade/UF</div>
-                                    <div class="mb-3">Cidade/UF</div>
-                                </div>
+                            <!-- Paciente -->
+                            <div class="mb-4">
+                                <h6 class="text-light mb-2">{{ paciente_nome }}</h6>
                             </div>
                             
                             <!-- Medicamentos Prescritos -->
                             <div class="mb-4">
-                                <h6 class="text-light mb-3">Medicamentos Prescritos</h6>
-                                <div class="text-muted small mb-3">
-                                    Formato: [Princípio ativo] / [Conc.] / [Via] / [Freq] / [Qtd]
-                                </div>
-                                
                                 {% for loop_index in range(receita.medicamentos|length) %}
                                 <div class="medicamento-info mb-3 p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px;">
-                                    <h6 class="text-info mb-3">Medicamento {{ loop_index + 1 }}</h6>
                                     <div class="text-light">
                                         <div class="mb-2">
-                                            <small class="text-muted">Princípio ativo</small><br>
-                                            <span class="fw-bold">Ex: {{ receita.medicamentos[loop_index].medicamento }}</span>
+                                            <span class="fw-bold">{{ receita.medicamentos[loop_index].medicamento }}</span>
                                         </div>
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="mb-2">
-                                                    <small class="text-muted">Conc.</small><br>
                                                     <span>{{ receita.medicamentos[loop_index].posologia }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-2">
-                                                    <small class="text-muted">Via</small><br>
                                                     <span>{{ receita.medicamentos[loop_index].via or 'Oral' }}</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-2">
-                                                    <small class="text-muted">Freq</small><br>
-                                                    <span>3x</span>
+                                                    <span>{{ receita.medicamentos[loop_index].duracao }}</span>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="mb-2">
-                                            <small class="text-muted">Qtd</small><br>
-                                            <span>{{ receita.medicamentos[loop_index].duracao }}</span>
                                         </div>
                                     </div>
                                 </div>
