@@ -11,23 +11,23 @@
         </div>
     </div>
     
-    <div class="row" style="height: 80vh;">
-        <!-- Coluna esquerda - Cronologia clicável (30% da largura) -->
-        <div class="col-md-3">
-            <div class="card glass-card h-100">
-                <div class="card-header text-center py-3">
-                    <h5 class="mb-0 text-light">
+    <div class="row" style="min-height: 80vh;">
+        <!-- Coluna esquerda - Cronologia clicável (25% da largura) -->
+        <div class="col-3" style="height: 80vh;">
+            <div class="card glass-card" style="height: 100%;">
+                <div class="card-header text-center py-2">
+                    <h6 class="mb-0 text-light">
                         <strong>Cronologia receitas</strong>
-                    </h5>
+                    </h6>
                 </div>
-                <div class="card-body p-3" style="overflow-y: auto;">
+                <div class="card-body p-2" style="overflow-y: auto; height: calc(100% - 60px);">
                     {% if receitas %}
                     <div class="cronologia-list">
                         {% for receita in receitas %}
-                        <div class="cronologia-item mb-3" data-receita-id="{{ receita.id }}" onclick="mostrarReceita({{ receita.id }})" style="cursor: pointer;">
-                            <div class="d-flex align-items-center justify-content-between p-3 rounded" style="background: rgba(255, 255, 255, 0.05); transition: all 0.3s ease;">
-                                <div class="text-light fw-bold" style="font-size: 1.1rem;">{{ receita.data }}</div>
-                                <div style="font-size: 2rem;">💊</div>
+                        <div class="cronologia-item mb-2" data-receita-id="{{ receita.id }}" onclick="mostrarReceita({{ receita.id }})" style="cursor: pointer;">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background: rgba(255, 255, 255, 0.05); transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div class="text-light fw-bold" style="font-size: 1rem;">{{ receita.data }}</div>
+                                <div style="font-size: 1.5rem;">💊</div>
                             </div>
                         </div>
                         {% endfor %}
@@ -42,9 +42,9 @@
             </div>
         </div>
         
-        <!-- Coluna direita - Receita única (70% da largura) -->
-        <div class="col-md-9">
-            <div id="receita-container">
+        <!-- Coluna direita - Receita única (75% da largura) -->
+        <div class="col-9" style="height: 80vh;">
+            <div id="receita-container" style="height: 100%;">
                 <!-- Estado inicial quando nenhuma receita está selecionada -->
                 <div id="receita-vazia" class="card glass-card text-center h-100 d-flex align-items-center justify-content-center">
                     <div>
