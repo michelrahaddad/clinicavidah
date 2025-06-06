@@ -412,11 +412,35 @@ def gerar_pdf_receita(receita_id):
                 medicamentos_unicos.append(med.strip())
                 seen.add(med.strip())
         
-        # Use the same signature pattern as working templates
+        # Create temporary signature file for WeasyPrint compatibility
         assinatura_para_pdf = None
+        temp_sig_path = None
+        
         if medico and medico.assinatura and medico.assinatura != 'assinatura':
-            assinatura_para_pdf = medico.assinatura
-            logging.info(f'Assinatura sendo passada para PDF: {len(assinatura_para_pdf)} caracteres')
+            try:
+                import base64
+                import tempfile
+                
+                if medico.assinatura.startswith('data:image'):
+                    # Extract base64 data
+                    header, data = medico.assinatura.split(',', 1)
+                    image_data = base64.b64decode(data)
+                    
+                    # Create temporary file
+                    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
+                    temp_file.write(image_data)
+                    temp_file.close()
+                    temp_sig_path = temp_file.name
+                    
+                    # Use file URL for WeasyPrint
+                    assinatura_para_pdf = f"file://{temp_sig_path}"
+                    logging.info(f'Assinatura salva em arquivo temporário: {temp_sig_path}')
+                else:
+                    assinatura_para_pdf = medico.assinatura
+                    
+            except Exception as e:
+                logging.error(f'Erro ao processar assinatura: {e}')
+                assinatura_para_pdf = None
         else:
             logging.info('Assinatura não disponível para PDF')
         
@@ -437,6 +461,15 @@ def gerar_pdf_receita(receita_id):
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+        
+        # Clean up temporary signature file
+        if temp_sig_path:
+            try:
+                import os
+                os.unlink(temp_sig_path)
+                logging.info(f'Arquivo temporário removido: {temp_sig_path}')
+            except Exception as cleanup_error:
+                logging.warning(f'Erro ao remover arquivo temporário: {cleanup_error}')
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
