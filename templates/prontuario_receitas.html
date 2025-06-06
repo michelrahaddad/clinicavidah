@@ -134,9 +134,11 @@
                                     <button type="button" class="btn btn-outline-primary" onclick="salvarReceita({{ receita.id }})">
                                         <i class="fas fa-save"></i> Salvar Alterações
                                     </button>
-                                    <button type="button" class="btn btn-outline-info" onclick="gerarPdfReceita({{ receita.id }})">
-                                        <i class="fas fa-file-pdf"></i> Gerar PDF
-                                    </button>
+                                    <form style="display: inline;" action="/receita/pdf/{{ receita.id }}" method="get" target="_blank">
+                                        <button type="submit" class="btn btn-outline-info">
+                                            <i class="fas fa-file-pdf"></i> Gerar PDF
+                                        </button>
+                                    </form>
                                 </div>
                             </form>
                         </div>
@@ -403,7 +405,6 @@ function atualizarNumerosMedicamentos(receitaId) {
 // Função para salvar receita
 function salvarReceita(receitaId) {
     const form = document.getElementById(`receita-form-${receitaId}`);
-    const formData = new FormData(form);
     
     // Mostrar loading
     const button = form.querySelector('[onclick*="salvarReceita"]');
@@ -411,11 +412,49 @@ function salvarReceita(receitaId) {
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
     button.disabled = true;
     
+    // Coletar dados do formulário manualmente
+    const formData = new FormData();
+    
+    // Data da receita
+    const dataReceita = form.querySelector('[name="data_receita"]');
+    if (dataReceita && dataReceita.value) {
+        formData.append('data_receita', dataReceita.value);
+    }
+    
+    // Medicamentos
+    const medicamentInputs = form.querySelectorAll('[name^="principio_ativo_"]');
+    medicamentInputs.forEach((input, index) => {
+        if (input.value.trim()) {
+            formData.append(`principio_ativo_${index}`, input.value.trim());
+            
+            // Posologia
+            const posologia = form.querySelector(`[name="posologia_${index}"]`);
+            if (posologia) formData.append(`posologia_${index}`, posologia.value);
+            
+            // Via
+            const via = form.querySelector(`[name="via_${index}"]`);
+            if (via) formData.append(`via_${index}`, via.value);
+            
+            // Frequência
+            const frequencia = form.querySelector(`[name="frequencia_${index}"]`);
+            if (frequencia) formData.append(`frequencia_${index}`, frequencia.value);
+            
+            // Duração
+            const duracao = form.querySelector(`[name="duracao_${index}"]`);
+            if (duracao) formData.append(`duracao_${index}`, duracao.value);
+        }
+    });
+    
     fetch(`/receita/editar/${receitaId}`, {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Mostrar sucesso
@@ -444,49 +483,7 @@ function salvarReceita(receitaId) {
     });
 }
 
-// Função para gerar PDF
-function gerarPdfReceita(receitaId) {
-    const button = document.querySelector(`[onclick*="gerarPdfReceita(${receitaId})"]`);
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-    button.disabled = true;
-    
-    fetch(`/receita/pdf/${receitaId}`, {
-        method: 'GET'
-    })
-    .then(response => {
-        if (response.ok) {
-            return response.blob();
-        }
-        throw new Error('Erro ao gerar PDF');
-    })
-    .then(blob => {
-        // Criar link para download
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `receita_${receitaId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        
-        // Restaurar botão
-        button.innerHTML = originalText;
-        button.disabled = false;
-    })
-    .catch(error => {
-        console.error('Erro ao gerar PDF:', error);
-        button.innerHTML = '<i class="fas fa-times"></i> Erro';
-        button.className = 'btn btn-danger';
-        
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.className = 'btn btn-outline-info';
-            button.disabled = false;
-        }, 2000);
-    });
-}
+
 </script>
 
 <style>
