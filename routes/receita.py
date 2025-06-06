@@ -294,20 +294,29 @@ def gerar_pdf_reimprimir_receita(receita_obj):
         # Get complete patient data
         paciente = Paciente.query.get(receita_obj.id_paciente)
         
+        # Process medications to avoid duplicates
+        medicamentos_raw = receita_obj.medicamentos.split(',')
+        medicamentos_unicos = []
+        seen = set()
+        for med in medicamentos_raw:
+            if med.strip() and med.strip() not in seen:
+                medicamentos_unicos.append(med.strip())
+                seen.add(med.strip())
+        
         pdf_html = render_template('receita_pdf.html',
                                  nome_paciente=receita_obj.nome_paciente,
                                  cpf_paciente=paciente.cpf if paciente else None,
                                  idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
                                  endereco_paciente=paciente.endereco if paciente else None,
                                  cidade_uf_paciente=paciente.cidade_uf if paciente else None,
-                                 medicamentos=receita_obj.medicamentos.split(','),
-                                 posologias=receita_obj.posologias.split(','),
-                                 duracoes=receita_obj.duracoes.split(','),
-                                 vias=receita_obj.vias.split(','),
+                                 medicamentos=medicamentos_unicos,
+                                 posologias=receita_obj.posologias.split(',')[:len(medicamentos_unicos)],
+                                 duracoes=receita_obj.duracoes.split(',')[:len(medicamentos_unicos)],
+                                 vias=receita_obj.vias.split(',')[:len(medicamentos_unicos)],
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
                                  data=data_atual,
-                                 assinatura=medico.assinatura if medico else None,
+                                 assinatura=medico.assinatura if medico and medico.assinatura else None,
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
@@ -343,17 +352,32 @@ def gerar_pdf_receita(receita_id):
         duracoes = receita_obj.duracoes.split(',')
         vias = receita_obj.vias.split(',')
         
+        # Get complete patient data
+        paciente = Paciente.query.get(receita_obj.id_paciente)
+        
+        # Process medications to avoid duplicates
+        medicamentos_unicos = []
+        seen = set()
+        for med in medicamentos:
+            if med.strip() and med.strip() not in seen:
+                medicamentos_unicos.append(med.strip())
+                seen.add(med.strip())
+        
         # Generate PDF
         pdf_html = render_template('receita_pdf.html',
-                                 paciente=receita_obj.nome_paciente,
-                                 medicamentos=medicamentos,
-                                 posologias=posologias,
-                                 duracoes=duracoes,
-                                 vias=vias,
+                                 nome_paciente=receita_obj.nome_paciente,
+                                 cpf_paciente=paciente.cpf if paciente else None,
+                                 idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
+                                 endereco_paciente=paciente.endereco if paciente else None,
+                                 cidade_uf_paciente=paciente.cidade_uf if paciente else None,
+                                 medicamentos=medicamentos_unicos,
+                                 posologias=posologias[:len(medicamentos_unicos)],
+                                 duracoes=duracoes[:len(medicamentos_unicos)],
+                                 vias=vias[:len(medicamentos_unicos)],
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
                                  data=formatar_data_brasileira(receita_obj.data),
-                                 assinatura=medico.assinatura if medico else None,
+                                 assinatura=medico.assinatura if medico and medico.assinatura else None,
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
@@ -397,16 +421,29 @@ def reimprimir_receita(receita_id):
         # Get complete patient data
         paciente = db.session.query(Paciente).get(receita_obj.id_paciente)
         
+        # Process medications to avoid duplicates
+        medicamentos_raw = receita_obj.medicamentos.split(',')
+        medicamentos_unicos = []
+        seen = set()
+        for med in medicamentos_raw:
+            if med.strip() and med.strip() not in seen:
+                medicamentos_unicos.append(med.strip())
+                seen.add(med.strip())
+        
         pdf_html = render_template('receita_pdf.html',
-                                 paciente=receita_obj.nome_paciente,
-                                 medicamentos=receita_obj.medicamentos.split(','),
-                                 posologias=receita_obj.posologias.split(','),
-                                 duracoes=receita_obj.duracoes.split(','),
-                                 vias=receita_obj.vias.split(','),
+                                 nome_paciente=receita_obj.nome_paciente,
+                                 cpf_paciente=paciente.cpf if paciente else None,
+                                 idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
+                                 endereco_paciente=paciente.endereco if paciente else None,
+                                 cidade_uf_paciente=paciente.cidade_uf if paciente else None,
+                                 medicamentos=medicamentos_unicos,
+                                 posologias=receita_obj.posologias.split(',')[:len(medicamentos_unicos)],
+                                 duracoes=receita_obj.duracoes.split(',')[:len(medicamentos_unicos)],
+                                 vias=receita_obj.vias.split(',')[:len(medicamentos_unicos)],
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
                                  data=data_atual,
-                                 assinatura=medico.assinatura if medico else None,
+                                 assinatura=medico.assinatura if medico and medico.assinatura else None,
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
