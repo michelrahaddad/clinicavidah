@@ -870,15 +870,52 @@ def get_pacientes():
 
 @prontuario_bp.route('/prontuario/receitas/<paciente>')
 def prontuario_receitas(paciente):
-    """Página específica de receitas médicas"""
+    """Página cronológica de receitas médicas com colunas organizadas por data"""
     try:
-        receitas = db.session.query(Receita).filter(
+        # Buscar todas as receitas do paciente com dados do médico
+        receitas = db.session.query(Receita, Medico.nome.label('medico_nome')).join(
+            Medico, Receita.id_medico == Medico.id
+        ).filter(
             Receita.nome_paciente.ilike(f'%{paciente}%')
-        ).order_by(Receita.created_at.desc()).all()
+        ).order_by(Receita.data.desc()).all()
+        
+        # Organizar receitas por data cronológica
+        receitas_organizadas = []
+        for receita, medico_nome in receitas:
+            # Processar medicamentos individuais
+            medicamentos_list = []
+            if receita.medicamentos:
+                medicamentos_raw = receita.medicamentos.split('\n')
+                posologias_raw = receita.posologias.split('\n') if receita.posologias else []
+                duracoes_raw = receita.duracoes.split('\n') if receita.duracoes else []
+                vias_raw = receita.vias.split('\n') if receita.vias else []
+                
+                for i, med in enumerate(medicamentos_raw):
+                    if med.strip():
+                        medicamentos_list.append({
+                            'medicamento': med.strip(),
+                            'posologia': posologias_raw[i].strip() if i < len(posologias_raw) else '',
+                            'duracao': duracoes_raw[i].strip() if i < len(duracoes_raw) else '',
+                            'via': vias_raw[i].strip() if i < len(vias_raw) else ''
+                        })
+            
+            receitas_organizadas.append({
+                'id': receita.id,
+                'data': formatar_data_brasileira(receita.data),
+                'data_original': receita.data,
+                'medicamentos': medicamentos_list,
+                'observacoes': receita.observacoes or '',
+                'medico_nome': medico_nome,
+                'total_medicamentos': len(medicamentos_list),
+                'crm': getattr(receita, 'crm', ''),
+                'especialidade': getattr(receita, 'especialidade', '')
+            })
         
         return render_template('prontuario_receitas.html', 
-                             receitas=receitas, 
-                             paciente_nome=paciente)
+                             receitas=receitas_organizadas,
+                             paciente_nome=paciente,
+                             total_receitas=len(receitas_organizadas))
+                             
     except Exception as e:
         logging.error(f"Erro ao carregar receitas: {e}")
         return f"<h1>Receitas Médicas - {paciente}</h1><p>Erro: {str(e)}</p><a href='/prontuario'>Voltar</a>", 500
