@@ -927,7 +927,7 @@ def prontuario_receitas(paciente):
             receitas_organizadas.append({
                 'id': receita.id,
                 'data': formatar_data_brasileira(receita.data),
-                'data_iso': receita.data.strftime('%Y-%m-%d') if receita.data else '',
+                'data_iso': receita.data.strftime('%Y-%m-%d') if hasattr(receita.data, 'strftime') else receita.data,
                 'data_original': receita.data,
                 'medicamentos': medicamentos_list,
                 'medico_nome': medico_nome,
