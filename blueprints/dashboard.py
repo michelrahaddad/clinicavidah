@@ -52,7 +52,7 @@ def index():
                              user_type=user_type)
                              
     except Exception as e:
-        logger.error(f"Dashboard error for {user}: {str(e)}")
+        print(f"Dashboard error for {user}: {str(e)}")
         return render_template('dashboard.html',
                              stats={},
                              recent_activities=[],
