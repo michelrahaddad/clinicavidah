@@ -412,7 +412,14 @@ def gerar_pdf_receita(receita_id):
                 medicamentos_unicos.append(med.strip())
                 seen.add(med.strip())
         
-        # Generate PDF
+        # Generate PDF with explicit signature debug
+        assinatura_para_pdf = None
+        if medico and medico.assinatura and medico.assinatura != 'assinatura':
+            assinatura_para_pdf = medico.assinatura
+            logging.info(f'Assinatura sendo passada para PDF: {len(assinatura_para_pdf)} caracteres')
+        else:
+            logging.info('Assinatura não disponível para PDF')
+        
         pdf_html = render_template('receita_pdf.html',
                                  nome_paciente=receita_obj.nome_paciente,
                                  cpf_paciente=paciente.cpf if paciente else None,
@@ -426,7 +433,7 @@ def gerar_pdf_receita(receita_id):
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
                                  data=formatar_data_brasileira(receita_obj.data),
-                                 assinatura=medico.assinatura if medico and medico.assinatura else None,
+                                 assinatura=assinatura_para_pdf,
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
