@@ -213,19 +213,26 @@
         </div>
     </form>
     
-    <!-- Navigation Icons -->
-    <div class="d-flex justify-content-center gap-3 mt-4" style="position: relative; z-index: 1000; clear: both;">
-        <a href="{{ url_for('exames_img.exames_img') }}" 
-           class="btn btn-outline-info" 
-           style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 1001; display: inline-block; text-decoration: none;">
-            <i class="fas fa-x-ray me-2"></i>Exames de Imagem
-        </a>
-        <button type="button" 
-                class="btn btn-outline-success"
-                style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 1001; display: inline-block;"
-                onclick="window.location.href='{{ url_for('exames_lab.exames_lab') }}'">
-            <i class="fas fa-vials me-2"></i>Exames Lab
-        </button>
+    <!-- Navigation Buttons - Robust Implementation -->
+    <div class="container-fluid mt-5">
+        <div class="row justify-content-center">
+            <div class="col-12 text-center">
+                <h5 class="text-light mb-4">Navegação Rápida</h5>
+                <div class="d-flex justify-content-center gap-4 flex-wrap">
+                    <a href="/exames_img" 
+                       class="btn btn-outline-info btn-lg px-4 py-3"
+                       style="border-radius: 20px; min-width: 200px; font-weight: 600; text-decoration: none;">
+                        <i class="fas fa-x-ray me-2"></i>Exames de Imagem
+                    </a>
+                    <a href="/exames_lab" 
+                       class="btn btn-outline-success btn-lg px-4 py-3"
+                       style="border-radius: 20px; min-width: 200px; font-weight: 600; text-decoration: none;"
+                       id="exames-lab-button">
+                        <i class="fas fa-vials me-2"></i>Exames Lab
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -235,13 +242,13 @@ document.addEventListener('DOMContentLoaded', function() {
     setupPatientAutocomplete();
     setupMedicamentAutocomplete();
     
-    // Garantir que botões de navegação funcionem
-    const examLabBtn = document.querySelector('button[onclick*="exames_lab"]');
+    // Configuração simples e robusta para botão Exames Lab
+    const examLabBtn = document.getElementById('exames-lab-button');
     if (examLabBtn) {
+        console.log('Botão Exames Lab configurado');
         examLabBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            window.location.href = '/exames_lab';
+            console.log('Clique no botão Exames Lab detectado');
+            // Não prevenir comportamento padrão para links simples
         });
     }
 });
