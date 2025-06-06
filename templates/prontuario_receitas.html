@@ -341,8 +341,9 @@ function adicionarMedicamento(receitaId) {
     
     container.appendChild(newItem);
     
-    // Reconfigurar autocomplete para o novo input
+    // Reconfigurar autocomplete e salvamento automático para o novo input
     setupMedicamentAutocomplete();
+    configurarSalvamentoAutomatico();
 }
 
 function removerMedicamento(button) {
@@ -406,6 +407,193 @@ function configurarSalvamentoAutomatico() {
             });
         });
     });
+}
+
+// Sistema de autocomplete para medicamentos
+function setupMedicamentAutocomplete() {
+    const medicamentInputs = document.querySelectorAll('.medicamento-autocomplete');
+    console.log('Inputs encontrados para autocomplete:', medicamentInputs.length);
+    
+    medicamentInputs.forEach((input, index) => {
+        console.log(`Configurando input ${index}:`, input.name);
+        
+        // Remove listeners anteriores
+        input.removeEventListener('input', handleAutocomplete);
+        input.removeEventListener('keydown', handleKeydown);
+        
+        // Adiciona novos listeners
+        input.addEventListener('input', handleAutocomplete);
+        input.addEventListener('keydown', handleKeydown);
+    });
+    
+    console.log('Sistema de autocomplete inteligente inicializado');
+}
+
+function handleAutocomplete(e) {
+    const input = e.target;
+    const query = input.value.trim().toLowerCase();
+    
+    if (query.length < 2) {
+        clearSuggestions('medicament');
+        return;
+    }
+    
+    fetch(`/api/medicamentos?q=${encodeURIComponent(query)}&limit=10`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.medicamentos) {
+                showSuggestions(data.medicamentos, input, 'medicament');
+            }
+        })
+        .catch(error => {
+            console.error('Erro no autocomplete:', error);
+        });
+}
+
+function handleKeydown(e) {
+    const suggestionsList = document.getElementById('suggestions-medicament');
+    if (!suggestionsList || suggestionsList.style.display === 'none') return;
+    
+    const items = suggestionsList.querySelectorAll('.suggestion-item');
+    let currentIndex = Array.from(items).findIndex(item => item.classList.contains('active'));
+    
+    switch(e.key) {
+        case 'ArrowDown':
+            e.preventDefault();
+            currentIndex = (currentIndex + 1) % items.length;
+            updateActiveItem(items, currentIndex);
+            break;
+        case 'ArrowUp':
+            e.preventDefault();
+            currentIndex = currentIndex <= 0 ? items.length - 1 : currentIndex - 1;
+            updateActiveItem(items, currentIndex);
+            break;
+        case 'Enter':
+            e.preventDefault();
+            const activeItem = items[currentIndex];
+            if (activeItem) {
+                activeItem.click();
+            }
+            break;
+        case 'Escape':
+            clearSuggestions('medicament');
+            break;
+    }
+}
+
+function showSuggestions(medicamentos, input, type) {
+    clearSuggestions(type);
+    
+    if (!medicamentos || medicamentos.length === 0) return;
+    
+    const container = document.createElement('div');
+    container.id = `suggestions-${type}`;
+    container.className = 'autocomplete-suggestions';
+    container.style.cssText = `
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(30, 30, 30, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    `;
+    
+    medicamentos.forEach((med, index) => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        if (index === 0) item.classList.add('active');
+        
+        item.style.cssText = `
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        `;
+        
+        item.innerHTML = `
+            <div style="font-weight: bold;">${med.nome}</div>
+            <small style="color: #aaa;">${med.categoria || 'Medicamento'}</small>
+        `;
+        
+        item.addEventListener('click', () => selectMedicamento(med, input));
+        item.addEventListener('mouseenter', () => {
+            document.querySelectorAll('.suggestion-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+        
+        container.appendChild(item);
+    });
+    
+    // Posicionar container
+    const inputContainer = input.closest('.col');
+    if (inputContainer) {
+        inputContainer.style.position = 'relative';
+        inputContainer.appendChild(container);
+    }
+}
+
+function selectMedicamento(med, input) {
+    input.value = med.nome;
+    
+    // Preencher campos relacionados
+    const medicamentoContainer = input.closest('.medicamento-item');
+    if (medicamentoContainer) {
+        // Concentração/Posologia
+        const concentracaoInput = medicamentoContainer.querySelector('input[name*="posologia"]');
+        if (concentracaoInput && med.concentracao) {
+            concentracaoInput.value = med.concentracao;
+        }
+        
+        // Via de administração
+        const viaSelect = medicamentoContainer.querySelector('select[name*="via"]');
+        if (viaSelect && med.via_padrao) {
+            viaSelect.value = med.via_padrao;
+        }
+        
+        // Frequência
+        const frequenciaInput = medicamentoContainer.querySelector('input[name*="frequencia"]');
+        if (frequenciaInput && med.frequencia_padrao) {
+            frequenciaInput.value = med.frequencia_padrao;
+        }
+        
+        // Quantidade
+        const quantidadeInput = medicamentoContainer.querySelector('input[name*="duracao"]');
+        if (quantidadeInput && med.quantidade_padrao) {
+            quantidadeInput.value = med.quantidade_padrao;
+        }
+    }
+    
+    clearSuggestions('medicament');
+    
+    // Trigger salvamento automático
+    const form = input.closest('form');
+    if (form) {
+        const receitaId = form.id.split('-')[2];
+        setTimeout(() => salvarAutomatico(receitaId), 300);
+    }
+}
+
+function updateActiveItem(items, activeIndex) {
+    items.forEach((item, index) => {
+        item.classList.toggle('active', index === activeIndex);
+        if (index === activeIndex) {
+            item.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
+        } else {
+            item.style.backgroundColor = 'transparent';
+        }
+    });
+}
+
+function clearSuggestions(type) {
+    const existing = document.getElementById(`suggestions-${type}`);
+    if (existing) {
+        existing.remove();
+    }
 }
 
 
