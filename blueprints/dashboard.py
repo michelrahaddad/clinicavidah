@@ -8,6 +8,10 @@ from datetime import datetime, timedelta
 from functools import wraps
 import logging
 
+# Import database and models
+from core.database import db
+from models import Paciente, Receita, ExamesLab, ExamesImg, Medico, Atestado
+
 logger = logging.getLogger(__name__)
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')

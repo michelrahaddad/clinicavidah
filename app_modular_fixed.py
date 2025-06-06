@@ -87,17 +87,17 @@ def register_main_routes(app):
         """Página inicial - redireciona baseado na autenticação"""
         if 'usuario' in session:
             return redirect(url_for('dashboard.index'))
-        return redirect(url_for('auth.login'))
+        return redirect('/auth/login')
     
     @app.route('/dashboard')
     def dashboard():
         """Dashboard principal do sistema"""
         if 'usuario' not in session:
-            return redirect(url_for('auth.login'))
+            return redirect('/auth/login')
         
         try:
             from core.database import db
-            from models import Paciente, Receita, ExamesLab, ExamesImg
+            from models import Paciente, Receita, ExameLab, ExameImg
             from datetime import datetime, timedelta
             
             user = session.get('usuario')
