@@ -66,7 +66,7 @@
                                 <!-- Medicamentos -->
                                 <div id="medicamentos-container-{{ receita.id }}" class="medicamentos-container">
                                     {% for loop_index in range(receita.medicamentos|length) %}
-                                    <div class="medicamento-item mb-4 p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; border-left: 4px solid #007bff;">
+                                    <div class="medicamento-item mb-3 p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; border-left: 4px solid #007bff;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <h6 class="text-info mb-0">Medicamento {{ loop_index + 1 }}</h6>
                                             <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerMedicamento(this)">
@@ -74,52 +74,46 @@
                                             </button>
                                         </div>
                                         
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-light">Princípio Ativo / Medicamento</label>
+                                        <!-- Layout horizontal idêntico à página de receitas -->
+                                        <div class="row g-2 mb-3">
+                                            <div class="col">
+                                                <label class="form-label text-light small mb-1">Princípio ativo</label>
                                                 <input type="text" class="form-control glass-input medicamento-autocomplete" 
                                                        name="principio_ativo_{{ loop.index0 }}" 
                                                        value="{{ receita.medicamentos[loop_index].medicamento }}" 
-                                                       placeholder="Digite o nome do medicamento" required>
+                                                       placeholder="Ex: Dipir" required>
                                             </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label class="form-label text-light">Posologia</label>
+                                            <div class="col">
+                                                <label class="form-label text-light small mb-1">Conc.</label>
                                                 <input type="text" class="form-control glass-input" 
                                                        name="posologia_{{ loop.index0 }}" 
                                                        value="{{ receita.medicamentos[loop_index].posologia }}" 
-                                                       placeholder="Ex: 1 comprimido" required>
+                                                       placeholder="500" required>
                                             </div>
-                                        </div>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label text-light">Via de Administração</label>
+                                            <div class="col">
+                                                <label class="form-label text-light small mb-1">Via</label>
                                                 <select class="form-select glass-input" name="via_{{ loop.index0 }}" required>
                                                     <option value="Oral" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oral' else '' }}>Oral</option>
-                                                    <option value="Intramuscular" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intramuscular' else '' }}>Intramuscular</option>
-                                                    <option value="Intravenosa" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intravenosa' else '' }}>Intravenosa</option>
-                                                    <option value="Subcutânea" {{ 'selected' if receita.medicamentos[loop_index].via == 'Subcutânea' else '' }}>Subcutânea</option>
+                                                    <option value="Intramuscular" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intramuscular' else '' }}>IM</option>
+                                                    <option value="Intravenosa" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intravenosa' else '' }}>IV</option>
+                                                    <option value="Subcutânea" {{ 'selected' if receita.medicamentos[loop_index].via == 'Subcutânea' else '' }}>SC</option>
                                                     <option value="Tópica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Tópica' else '' }}>Tópica</option>
-                                                    <option value="Sublingual" {{ 'selected' if receita.medicamentos[loop_index].via == 'Sublingual' else '' }}>Sublingual</option>
-                                                    <option value="Retal" {{ 'selected' if receita.medicamentos[loop_index].via == 'Retal' else '' }}>Retal</option>
-                                                    <option value="Nasal" {{ 'selected' if receita.medicamentos[loop_index].via == 'Nasal' else '' }}>Nasal</option>
-                                                    <option value="Oftálmica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oftálmica' else '' }}>Oftálmica</option>
-                                                    <option value="Ótica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Ótica' else '' }}>Ótica</option>
+                                                    <option value="Sublingual" {{ 'selected' if receita.medicamentos[loop_index].via == 'Sublingual' else '' }}>SL</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label text-light">Frequência</label>
+                                            <div class="col">
+                                                <label class="form-label text-light small mb-1">Freq</label>
                                                 <input type="text" class="form-control glass-input" 
                                                        name="frequencia_{{ loop.index0 }}" 
                                                        value="{{ receita.medicamentos[loop_index].frequencia or '' }}" 
-                                                       placeholder="Ex: 3x ao dia">
+                                                       placeholder="Sel">
                                             </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label class="form-label text-light">Duração do Tratamento</label>
+                                            <div class="col">
+                                                <label class="form-label text-light small mb-1">Qtd</label>
                                                 <input type="text" class="form-control glass-input" 
                                                        name="duracao_{{ loop.index0 }}" 
                                                        value="{{ receita.medicamentos[loop_index].duracao }}" 
-                                                       placeholder="Ex: 7 dias" required>
+                                                       placeholder="30 comp" required>
                                             </div>
                                         </div>
                                     </div>
@@ -306,43 +300,42 @@ function adicionarMedicamento(receitaId) {
             </button>
         </div>
         
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label class="form-label text-light">Princípio Ativo / Medicamento</label>
+        <!-- Layout horizontal idêntico à página de receitas -->
+        <div class="row g-2 mb-3">
+            <div class="col">
+                <label class="form-label text-light small mb-1">Princípio ativo</label>
                 <input type="text" class="form-control glass-input medicamento-autocomplete" 
                        name="principio_ativo_${newIndex}" 
-                       placeholder="Digite o nome do medicamento" required>
+                       placeholder="Ex: Dipir" required>
             </div>
-            <div class="col-md-6 mb-3">
-                <label class="form-label text-light">Posologia</label>
+            <div class="col">
+                <label class="form-label text-light small mb-1">Conc.</label>
                 <input type="text" class="form-control glass-input" 
                        name="posologia_${newIndex}" 
-                       placeholder="Ex: 1 comprimido" required>
+                       placeholder="500" required>
             </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label class="form-label text-light">Via de Administração</label>
+            <div class="col">
+                <label class="form-label text-light small mb-1">Via</label>
                 <select class="form-select glass-input" name="via_${newIndex}" required>
                     <option value="Oral">Oral</option>
-                    <option value="Intramuscular">Intramuscular</option>
-                    <option value="Intravenosa">Intravenosa</option>
-                    <option value="Sublingual">Sublingual</option>
+                    <option value="Intramuscular">IM</option>
+                    <option value="Intravenosa">IV</option>
+                    <option value="Subcutânea">SC</option>
                     <option value="Tópica">Tópica</option>
+                    <option value="Sublingual">SL</option>
                 </select>
             </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label text-light">Frequência</label>
+            <div class="col">
+                <label class="form-label text-light small mb-1">Freq</label>
                 <input type="text" class="form-control glass-input" 
                        name="frequencia_${newIndex}" 
-                       placeholder="Ex: 3x ao dia" required>
+                       placeholder="Sel" required>
             </div>
-            <div class="col-md-4 mb-3">
-                <label class="form-label text-light">Duração</label>
+            <div class="col">
+                <label class="form-label text-light small mb-1">Qtd</label>
                 <input type="text" class="form-control glass-input" 
                        name="duracao_${newIndex}" 
-                       placeholder="Ex: 7 dias" required>
+                       placeholder="30 comp" required>
             </div>
         </div>
     `;
