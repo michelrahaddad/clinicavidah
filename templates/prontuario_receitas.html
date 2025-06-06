@@ -363,15 +363,25 @@ function removerMedicamento(button) {
 // Salvamento automático ao modificar campos
 function salvarAutomatico(receitaId) {
     const form = document.getElementById(`receita-form-${receitaId}`);
+    if (!form) {
+        console.error('Form não encontrado:', `receita-form-${receitaId}`);
+        return;
+    }
     
-    // Usar FormData do próprio formulário para capturar todos os dados
+    // Debug: listar todos os campos do formulário
     const formData = new FormData(form);
+    const formDataDebug = {};
+    for (let [key, value] of formData.entries()) {
+        formDataDebug[key] = value;
+    }
+    console.log('Dados do formulário:', formDataDebug);
     
     fetch(`/receita/editar/${receitaId}`, {
         method: 'POST',
         body: formData
     })
     .then(response => {
+        console.log('Response status:', response.status);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
@@ -379,14 +389,13 @@ function salvarAutomatico(receitaId) {
     })
     .then(data => {
         if (data.success) {
-            // Mostrar indicador de salvamento discreto
-            console.log('Receita salva automaticamente');
+            console.log('✓ Receita salva automaticamente');
         } else {
-            console.error('Erro ao salvar automaticamente:', data.error);
+            console.error('✗ Erro ao salvar automaticamente:', data.error);
         }
     })
     .catch(error => {
-        console.error('Erro ao salvar receita:', error);
+        console.error('✗ Erro ao salvar receita:', error);
     });
 }
 
