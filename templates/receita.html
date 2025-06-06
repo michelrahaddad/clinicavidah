@@ -214,17 +214,18 @@
     </form>
     
     <!-- Navigation Icons -->
-    <div class="d-flex justify-content-center gap-3 mt-4" style="position: relative; z-index: 10;">
-        <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-info glass-button" 
-           style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 11;">
+    <div class="d-flex justify-content-center gap-3 mt-4" style="position: relative; z-index: 1000; clear: both;">
+        <a href="{{ url_for('exames_img.exames_img') }}" 
+           class="btn btn-outline-info" 
+           style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 1001; display: inline-block; text-decoration: none;">
             <i class="fas fa-x-ray me-2"></i>Exames de Imagem
         </a>
-        <a href="{{ url_for('exames_lab.exames_lab') }}" 
-           class="btn btn-outline-success glass-button"
-           style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 11; pointer-events: auto; cursor: pointer;"
-           onclick="window.location.href='{{ url_for('exames_lab.exames_lab') }}'">
+        <button type="button" 
+                class="btn btn-outline-success"
+                style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 1001; display: inline-block;"
+                onclick="window.location.href='{{ url_for('exames_lab.exames_lab') }}'">
             <i class="fas fa-vials me-2"></i>Exames Lab
-        </a>
+        </button>
     </div>
 </div>
 
@@ -233,6 +234,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     setupPatientAutocomplete();
     setupMedicamentAutocomplete();
+    
+    // Garantir que botões de navegação funcionem
+    const examLabBtn = document.querySelector('button[onclick*="exames_lab"]');
+    if (examLabBtn) {
+        examLabBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = '/exames_lab';
+        });
+    }
 });
 
 function setupPatientAutocomplete() {
