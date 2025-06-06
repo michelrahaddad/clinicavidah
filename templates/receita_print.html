@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Receita Médica - Impressão</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .patient-info { margin-bottom: 20px; }
+        .medications { margin: 20px 0; }
+        .medication-item { margin: 10px 0; padding: 10px; border-left: 3px solid #007bff; }
+        .footer { margin-top: 40px; text-align: center; }
+        @media print {
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>RECEITA MÉDICA</h1>
+        <p><strong>Dr(a): {{ medico }}</strong></p>
+        <p>CRM: {{ crm }}</p>
+    </div>
+    
+    <div class="patient-info">
+        <h3>Dados do Paciente</h3>
+        <p><strong>Nome:</strong> {{ paciente }}</p>
+        <p><strong>Data:</strong> {{ data }}</p>
+    </div>
+    
+    <div class="medications">
+        <h3>Medicamentos Prescritos</h3>
+        {% for medicamento, posologia, via, frequencia, duracao in zip(medicamentos, posologias, vias, frequencias, duracoes) %}
+        <div class="medication-item">
+            <strong>{{ medicamento }}</strong><br>
+            Concentração: {{ posologia }}<br>
+            Via: {{ via }}<br>
+            Frequência: {{ frequencia }}<br>
+            Duração: {{ duracao }}
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="footer">
+        <p>Data: {{ data }}</p>
+        {% if assinatura %}
+        <p>Assinatura: {{ assinatura }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="no-print">
+        <button onclick="window.print()">Imprimir</button>
+        <button onclick="history.back()">Voltar</button>
+    </div>
+</body>
+</html>

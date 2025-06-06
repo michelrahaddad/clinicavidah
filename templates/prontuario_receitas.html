@@ -79,7 +79,7 @@
                                             <div class="col">
                                                 <label class="form-label text-light small mb-1">Princípio ativo</label>
                                                 <input type="text" class="form-control glass-input medicamento-autocomplete" 
-                                                       name="principio_ativo_{{ loop.index0 }}" 
+                                                       name="principio_ativo_{{ loop.index0 }}" data-base-id="principio_ativo_{{ loop.index0 }}" 
                                                        value="{{ medicamento.medicamento }}" 
                                                        placeholder="Ex: Dipir" required>
                                             </div>
@@ -415,6 +415,9 @@ function setupMedicamentAutocomplete() {
     console.log('Inputs encontrados para autocomplete:', medicamentInputs.length);
     
     medicamentInputs.forEach((input, index) => {
+        // Garantir que cada input tenha um name único baseado no seu índice
+        const baseId = input.getAttribute('data-base-id') || `principio_ativo_${index}`;
+        input.name = baseId;
         console.log(`Configurando input ${index}:`, input.name);
         
         // Remove listeners anteriores

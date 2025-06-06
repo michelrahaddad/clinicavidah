@@ -640,13 +640,35 @@ def gerar_pdf_receita_cronologia(receita_id):
                                  assinatura=medico.assinatura if medico else None,
                                  zip=zip)
         
-        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
-        
-        response = make_response(pdf_file)
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = f'inline; filename=receita_{receita_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
-        
-        return response
+        try:
+            pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+            
+            response = make_response(pdf_file)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = f'inline; filename=receita_{receita_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
+            
+            logging.info(f'PDF gerado com sucesso para receita {receita_id}')
+            return response
+            
+        except Exception as pdf_error:
+            logging.error(f'Erro específico do WeasyPrint: {pdf_error}')
+            # Fallback para mostrar HTML se PDF falhar
+            return render_template('receita_print.html',
+                                 paciente=paciente.nome if paciente else receita.nome_paciente,
+                                 cpf=paciente.cpf if paciente else '',
+                                 idade=paciente.idade if paciente else '',
+                                 endereco=paciente.endereco if paciente else '',
+                                 cidade_uf=paciente.cidade_uf if paciente else '',
+                                 medicamentos=medicamentos_list,
+                                 posologias=posologias_list,
+                                 vias=vias_list,
+                                 frequencias=frequencias_list,
+                                 duracoes=duracoes_list,
+                                 medico=medico.nome if medico else receita.medico_nome,
+                                 crm=medico.crm if medico else '',
+                                 data=formatar_data_brasileira(receita.data),
+                                 assinatura=medico.assinatura if medico else None,
+                                 zip=zip)
         
     except Exception as e:
         logging.error(f'Erro ao gerar PDF da receita {receita_id}: {e}')
