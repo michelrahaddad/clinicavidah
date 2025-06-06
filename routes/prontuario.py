@@ -904,11 +904,8 @@ def prontuario_receitas(paciente):
                 'data': formatar_data_brasileira(receita.data),
                 'data_original': receita.data,
                 'medicamentos': medicamentos_list,
-                'observacoes': receita.observacoes or '',
                 'medico_nome': medico_nome,
-                'total_medicamentos': len(medicamentos_list),
-                'crm': getattr(receita, 'crm', ''),
-                'especialidade': getattr(receita, 'especialidade', '')
+                'total_medicamentos': len(medicamentos_list)
             })
         
         return render_template('prontuario_receitas.html', 
