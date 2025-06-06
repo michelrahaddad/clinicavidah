@@ -6,6 +6,9 @@ from flask import Blueprint, render_template, session, redirect, url_for, jsonif
 from sqlalchemy import func, desc
 from datetime import datetime, timedelta
 from functools import wraps
+import logging
+
+logger = logging.getLogger(__name__)
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
 
