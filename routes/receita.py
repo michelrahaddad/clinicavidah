@@ -508,3 +508,140 @@ def get_pacientes():
     except Exception as e:
         print(f"Erro na API de pacientes: {e}")
         return jsonify([])
+
+@receita_bp.route('/editar/<int:receita_id>', methods=['POST'])
+def editar_receita(receita_id):
+    """Edita uma receita existente"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return jsonify({'success': False, 'error': 'Não autorizado'}), 401
+    
+    try:
+        receita = Receita.query.get_or_404(receita_id)
+        
+        # Verificar se o médico logado é o autor da receita ou é admin
+        if 'admin_usuario' not in session and receita.medico_nome != session['usuario']:
+            return jsonify({'success': False, 'error': 'Permissão negada'}), 403
+        
+        # Atualizar data da receita se fornecida
+        data_receita = request.form.get('data_receita')
+        if data_receita:
+            try:
+                receita.data = datetime.strptime(data_receita, '%Y-%m-%d').date()
+            except ValueError:
+                pass
+        
+        # Coletar dados dos medicamentos
+        medicamentos = []
+        posologias = []
+        vias = []
+        frequencias = []
+        duracoes = []
+        
+        # Processar todos os medicamentos do formulário
+        index = 0
+        while True:
+            medicamento = request.form.get(f'principio_ativo_{index}')
+            if not medicamento:
+                break
+                
+            posologia = request.form.get(f'posologia_{index}', '')
+            via = request.form.get(f'via_{index}', 'Oral')
+            frequencia = request.form.get(f'frequencia_{index}', '')
+            duracao = request.form.get(f'duracao_{index}', '')
+            
+            medicamentos.append(sanitizar_entrada(medicamento))
+            posologias.append(sanitizar_entrada(posologia))
+            vias.append(sanitizar_entrada(via))
+            frequencias.append(sanitizar_entrada(frequencia))
+            duracoes.append(sanitizar_entrada(duracao))
+            
+            index += 1
+        
+        if not medicamentos:
+            return jsonify({'success': False, 'error': 'Pelo menos um medicamento é obrigatório'}), 400
+        
+        # Atualizar receita
+        receita.medicamentos = ','.join(medicamentos)
+        receita.posologias = ','.join(posologias)
+        receita.vias = ','.join(vias)
+        receita.frequencias = ','.join(frequencias)
+        receita.duracoes = ','.join(duracoes)
+        
+        db.session.commit()
+        
+        logging.info(f"Receita {receita_id} editada com sucesso")
+        return jsonify({'success': True, 'message': 'Receita atualizada com sucesso'})
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f'Erro ao editar receita {receita_id}: {e}')
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@receita_bp.route('/pdf/<int:receita_id>')
+def gerar_pdf_receita_cronologia(receita_id):
+    """Gera PDF de uma receita específica"""
+    if 'usuario' not in session and 'admin_usuario' not in session:
+        return redirect(url_for('auth.login'))
+    
+    try:
+        receita = Receita.query.get_or_404(receita_id)
+        
+        # Verificar se o médico logado é o autor da receita ou é admin
+        if 'admin_usuario' not in session and receita.medico_nome != session['usuario']:
+            flash('Permissão negada', 'error')
+            return redirect(url_for('prontuario.prontuario'))
+        
+        # Buscar dados do médico
+        medico = Medico.query.filter_by(nome=receita.medico_nome).first()
+        
+        # Buscar dados do paciente
+        paciente = Paciente.query.get(receita.id_paciente)
+        
+        # Preparar dados para o PDF
+        medicamentos_list = receita.medicamentos.split(',')
+        posologias_list = receita.posologias.split(',')
+        vias_list = receita.vias.split(',')
+        frequencias_list = receita.frequencias.split(',') if receita.frequencias else []
+        duracoes_list = receita.duracoes.split(',')
+        
+        # Garantir que todas as listas tenham o mesmo tamanho
+        max_len = len(medicamentos_list)
+        while len(posologias_list) < max_len:
+            posologias_list.append('')
+        while len(vias_list) < max_len:
+            vias_list.append('Oral')
+        while len(frequencias_list) < max_len:
+            frequencias_list.append('')
+        while len(duracoes_list) < max_len:
+            duracoes_list.append('')
+        
+        # Gerar PDF
+        pdf_html = render_template('receita_pdf.html',
+                                 paciente=paciente.nome if paciente else receita.nome_paciente,
+                                 cpf=paciente.cpf if paciente else '',
+                                 idade=paciente.idade if paciente else '',
+                                 endereco=paciente.endereco if paciente else '',
+                                 cidade_uf=paciente.cidade_uf if paciente else '',
+                                 medicamentos=medicamentos_list,
+                                 posologias=posologias_list,
+                                 vias=vias_list,
+                                 frequencias=frequencias_list,
+                                 duracoes=duracoes_list,
+                                 medico=medico.nome if medico else receita.medico_nome,
+                                 crm=medico.crm if medico else '',
+                                 data=formatar_data_brasileira(receita.data),
+                                 assinatura=medico.assinatura if medico else None,
+                                 zip=zip)
+        
+        pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+        
+        response = make_response(pdf_file)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'inline; filename=receita_{receita_id}_{datetime.now().strftime("%Y%m%d")}.pdf'
+        
+        return response
+        
+    except Exception as e:
+        logging.error(f'Erro ao gerar PDF da receita {receita_id}: {e}')
+        flash('Erro ao gerar PDF da receita', 'error')
+        return redirect(url_for('prontuario.prontuario'))
