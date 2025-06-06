@@ -1,1 +1,3 @@
-# Utils package initialization
+"""
+Utilitários do Sistema Médico VIDAH
+"""

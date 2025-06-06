@@ -59,9 +59,16 @@ def create_app(config_name=None):
 def register_blueprints(app):
     """Registra todos os blueprints da aplicação"""
     
-    # Blueprint de autenticação
+    # Blueprints modulares novos
     from blueprints.auth import auth_bp
+    from blueprints.dashboard import dashboard_bp
+    from blueprints.prescriptions import prescriptions_bp
+    from blueprints.patients import patients_bp
+    
     app.register_blueprint(auth_bp)
+    app.register_blueprint(dashboard_bp)
+    app.register_blueprint(prescriptions_bp)
+    app.register_blueprint(patients_bp)
     
     # Blueprints existentes (compatibilidade)
     try:
@@ -91,6 +98,18 @@ def register_blueprints(app):
     try:
         from routes.medicamentos import medicamentos_bp
         app.register_blueprint(medicamentos_bp)
+    except ImportError:
+        pass
+    
+    try:
+        from routes.admin import admin_bp
+        app.register_blueprint(admin_bp)
+    except ImportError:
+        pass
+    
+    try:
+        from routes.pacientes import pacientes_bp as old_pacientes_bp
+        app.register_blueprint(old_pacientes_bp, url_prefix='/pacientes_old')
     except ImportError:
         pass
     

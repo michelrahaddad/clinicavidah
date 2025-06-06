@@ -3,8 +3,6 @@ Blueprint de autenticação do Sistema Médico VIDAH
 """
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, jsonify
 from werkzeug.security import check_password_hash, generate_password_hash
-from models import Medico, Admin
-from app import db
 from validators.base import StringValidator, ValidationError
 from validators.medical import get_validator
 from core.logging import get_logger, log_action
