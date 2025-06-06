@@ -148,19 +148,19 @@ def get_dashboard_statistics(user_type, user):
                 
                 # Atividades da semana
                 stats['receitas_semana'] = db.session.query(func.count(Receita.id)).filter(
-                    Receita.medico == user,
+                    Receita.id_medico == medico.id,
                     func.date(Receita.data_criacao) >= week_ago
                 ).scalar() or 0
                 
                 stats['exames_semana'] = (
-                    db.session.query(func.count(ExamesLab.id)).filter(
-                        ExamesLab.medico == user,
-                        func.date(ExamesLab.data_criacao) >= week_ago
+                    db.session.query(func.count(ExameLab.id)).filter(
+                        ExameLab.id_medico == medico.id,
+                        func.date(ExameLab.created_at) >= week_ago
                     ).scalar() or 0
                 ) + (
-                    db.session.query(func.count(ExamesImg.id)).filter(
-                        ExamesImg.medico == user,
-                        func.date(ExamesImg.data_criacao) >= week_ago
+                    db.session.query(func.count(ExameImg.id)).filter(
+                        ExameImg.id_medico == medico.id,
+                        func.date(ExameImg.created_at) >= week_ago
                     ).scalar() or 0
                 )
         
