@@ -1,15 +1,12 @@
 """
 Sistema Médico VIDAH - Aplicação principal
-Ponto de entrada da aplicação usando arquitetura modular
+Temporariamente usando app.py para evitar importações circulares
 """
+import sys
 import os
-from app_modular import create_app
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Configurar ambiente
-config_name = os.environ.get('FLASK_ENV', 'development')
+from app import app
 
-# Criar aplicação usando factory pattern
-app = create_app(config_name)
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)

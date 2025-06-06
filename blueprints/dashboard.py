@@ -5,14 +5,21 @@ Painel principal com estatísticas e acesso rápido
 from flask import Blueprint, render_template, session, redirect, url_for, jsonify
 from sqlalchemy import func, desc
 from datetime import datetime, timedelta
-from models import Receita, ExamesLab, ExamesImg, Atestado, Paciente, Medico
-from app import db
-from blueprints.auth import require_auth
-from validators.base import sanitize_input
-from core.logging import get_logger, log_action
+from functools import wraps
 
-logger = get_logger('dashboard')
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
+
+
+def require_auth():
+    """Decorator para verificar autenticação"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'usuario' not in session:
+                return redirect(url_for('auth.login'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 
 @dashboard_bp.route('/')
