@@ -124,26 +124,27 @@ def get_dashboard_statistics(user_type, user):
             ).scalar() or 0
             
             stats['exames_semana'] = (
-                db.session.query(func.count(ExamesLab.id)).filter(
-                    func.date(ExamesLab.data_criacao) >= week_ago
+                db.session.query(func.count(ExameLab.id)).filter(
+                    func.date(ExameLab.created_at) >= week_ago
                 ).scalar() or 0
             ) + (
-                db.session.query(func.count(ExamesImg.id)).filter(
-                    func.date(ExamesImg.data_criacao) >= week_ago
+                db.session.query(func.count(ExameImg.id)).filter(
+                    func.date(ExameImg.created_at) >= week_ago
                 ).scalar() or 0
             )
             
         else:
-            # Estatísticas do médico
-            medico = db.session.query(Medico).filter_by(nome=user).first()
+            # Estatísticas do médico - corrigindo query com user sendo dict
+            user_name = user.get('nome') if isinstance(user, dict) else user
+            medico = db.session.query(Medico).filter_by(nome=user_name).first()
             if medico:
-                stats['total_receitas'] = db.session.query(func.count(Receita.id)).filter_by(medico=user).scalar() or 0
-                stats['total_exames_lab'] = db.session.query(func.count(ExamesLab.id)).filter_by(medico=user).scalar() or 0
-                stats['total_exames_img'] = db.session.query(func.count(ExamesImg.id)).filter_by(medico=user).scalar() or 0
-                stats['total_atestados'] = db.session.query(func.count(Atestado.id)).filter_by(medico=user).scalar() or 0
+                stats['total_receitas'] = db.session.query(func.count(Receita.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_exames_lab'] = db.session.query(func.count(ExameLab.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_exames_img'] = db.session.query(func.count(ExameImg.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).filter_by(id_medico=medico.id).scalar() or 0
                 
                 # Pacientes únicos atendidos
-                stats['total_pacientes'] = db.session.query(func.count(func.distinct(Receita.nome_paciente))).filter_by(medico=user).scalar() or 0
+                stats['total_pacientes'] = db.session.query(func.count(func.distinct(Receita.nome_paciente))).filter_by(id_medico=medico.id).scalar() or 0
                 
                 # Atividades da semana
                 stats['receitas_semana'] = db.session.query(func.count(Receita.id)).filter(
