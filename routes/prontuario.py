@@ -1246,28 +1246,35 @@ def medicamentos_pdf(receita_id):
             flash('Receita não encontrada.', 'error')
             return redirect(url_for('prontuario.prontuario'))
         
-        # Get doctor information
+        # Get doctor and patient information
         medico = db.session.query(Medico).filter_by(id=receita.id_medico).first()
+        paciente = db.session.query(Paciente).filter_by(id=receita.id_paciente).first()
         
-        # Parse medications
-        medicamentos_list = []
-        if receita.medicamentos:
-            for med in receita.medicamentos.split('\n'):
-                if med.strip():
-                    medicamentos_list.append(med.strip())
+        # Process medications to avoid duplicates (same logic as receita.py)
+        medicamentos_raw = receita.medicamentos.split(',')
+        medicamentos_unicos = []
+        seen = set()
+        for med in medicamentos_raw:
+            if med.strip() and med.strip() not in seen:
+                medicamentos_unicos.append(med.strip())
+                seen.add(med.strip())
         
-        # Prepare data for PDF
-        context = {
-            'titulo': f'Receita Médica #{receita.id}',
-            'nome_paciente': receita.nome_paciente,
-            'data': receita.data.strftime('%d/%m/%Y'),
-            'medicamentos': medicamentos_list,
-            'medico_nome': medico.nome if medico else 'N/A',
-            'medico_crm': medico.crm if medico else 'N/A'
-        }
-        
-        # Generate PDF
-        html_content = render_template('medicamentos_pdf.html', **context)
+        # Generate PDF using same template as receita.py
+        html_content = render_template('receita_pdf.html',
+                                     nome_paciente=receita.nome_paciente,
+                                     cpf_paciente=paciente.cpf if paciente else None,
+                                     idade_paciente=f"{paciente.idade} anos" if paciente and paciente.idade else None,
+                                     endereco_paciente=paciente.endereco if paciente else None,
+                                     cidade_uf_paciente=paciente.cidade_uf if paciente else None,
+                                     medicamentos=medicamentos_unicos,
+                                     posologias=receita.posologias.split(',')[:len(medicamentos_unicos)] if receita.posologias else [],
+                                     duracoes=receita.duracoes.split(',')[:len(medicamentos_unicos)] if receita.duracoes else [],
+                                     vias=receita.vias.split(',')[:len(medicamentos_unicos)] if receita.vias else [],
+                                     medico=medico.nome if medico else "Médico não encontrado",
+                                     crm=medico.crm if medico else "CRM não disponível",
+                                     data=receita.data.strftime('%d/%m/%Y'),
+                                     assinatura=medico.assinatura if medico and medico.assinatura else None,
+                                     zip=zip)
         
         # Simple PDF generation without external dependencies
         try:
