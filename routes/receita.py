@@ -608,7 +608,7 @@ def gerar_pdf_receita_cronologia(receita_id):
         medicamentos_list = receita.medicamentos.split(',')
         posologias_list = receita.posologias.split(',')
         vias_list = receita.vias.split(',')
-        frequencias_list = receita.frequencias.split(',') if receita.frequencias else []
+        frequencias_list = receita.duracoes.split(',') if receita.duracoes else []  # Usando duracoes como frequencia temporariamente
         duracoes_list = receita.duracoes.split(',')
         
         # Garantir que todas as listas tenham o mesmo tamanho
