@@ -872,26 +872,62 @@ def prontuario_receitas(paciente):
         # Organizar receitas por data cronológica
         receitas_organizadas = []
         for receita, medico_nome in receitas:
-            # Processar medicamentos individuais
+            # Processar medicamentos individuais - corrigindo para vírgula
             medicamentos_list = []
             if receita.medicamentos:
-                medicamentos_raw = receita.medicamentos.split('\n')
-                posologias_raw = receita.posologias.split('\n') if receita.posologias else []
-                duracoes_raw = receita.duracoes.split('\n') if receita.duracoes else []
-                vias_raw = receita.vias.split('\n') if receita.vias else []
+                # Parse medication data stored as comma-separated values
+                medicamentos_raw = receita.medicamentos.split(',')
+                posologias_raw = receita.posologias.split(',') if receita.posologias else []
+                duracoes_raw = receita.duracoes.split(',') if receita.duracoes else []
+                vias_raw = receita.vias.split(',') if receita.vias else []
                 
+                # Remove duplicates and process each medication
+                seen = set()
                 for i, med in enumerate(medicamentos_raw):
-                    if med.strip():
-                        medicamentos_list.append({
-                            'medicamento': med.strip(),
-                            'posologia': posologias_raw[i].strip() if i < len(posologias_raw) else '',
-                            'duracao': duracoes_raw[i].strip() if i < len(duracoes_raw) else '',
-                            'via': vias_raw[i].strip() if i < len(vias_raw) else ''
-                        })
+                    if med.strip() and med.strip() not in seen:
+                        seen.add(med.strip())
+                        
+                        # Extract components from the medication string format
+                        # Expected format: "dipirona 500mg - Oral - 3x - 30 comprimidos"
+                        med_parts = med.strip().split(' - ')
+                        
+                        if len(med_parts) >= 4:
+                            # Full format with all components
+                            nome_concentracao = med_parts[0]  # "dipirona 500mg"
+                            via = med_parts[1]  # "Oral"
+                            frequencia = med_parts[2]  # "3x"
+                            quantidade = med_parts[3]  # "30 comprimidos"
+                            
+                            # Split name and concentration
+                            nome_parts = nome_concentracao.split(' ')
+                            if len(nome_parts) >= 2:
+                                medicamento = nome_parts[0]  # "dipirona"
+                                concentracao = ' '.join(nome_parts[1:])  # "500mg"
+                            else:
+                                medicamento = nome_concentracao
+                                concentracao = posologias_raw[i].strip() if i < len(posologias_raw) else ''
+                            
+                            medicamentos_list.append({
+                                'medicamento': medicamento,
+                                'posologia': concentracao,
+                                'via': via,
+                                'frequencia': frequencia,
+                                'duracao': quantidade
+                            })
+                        else:
+                            # Fallback format
+                            medicamentos_list.append({
+                                'medicamento': med.strip(),
+                                'posologia': posologias_raw[i].strip() if i < len(posologias_raw) else '',
+                                'duracao': duracoes_raw[i].strip() if i < len(duracoes_raw) else '',
+                                'via': vias_raw[i].strip() if i < len(vias_raw) else '',
+                                'frequencia': ''
+                            })
             
             receitas_organizadas.append({
                 'id': receita.id,
                 'data': formatar_data_brasileira(receita.data),
+                'data_iso': receita.data.strftime('%Y-%m-%d') if receita.data else '',
                 'data_original': receita.data,
                 'medicamentos': medicamentos_list,
                 'medico_nome': medico_nome,
