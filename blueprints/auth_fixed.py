@@ -53,7 +53,7 @@ def login():
             senha = request.form.get('senha', '').strip()
             
             # Debug dos dados recebidos
-            current_app.logger.info(f"Login attempt - Nome: '{nome}', CRM: '{crm}', Senha length: {len(senha) if senha else 0}")
+            print(f"Login attempt - Nome: '{nome}', CRM: '{crm}', Senha length: {len(senha) if senha else 0}")
             
             if not nome or not senha:
                 flash('Nome e senha são obrigatórios', 'error')
