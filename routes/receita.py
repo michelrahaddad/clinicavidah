@@ -641,6 +641,11 @@ def gerar_pdf_receita_cronologia(receita_id):
                                  zip=zip)
         
         try:
+            # Log dos dados antes da geração do PDF
+            logging.info(f'Iniciando geração de PDF para receita {receita_id}')
+            logging.info(f'Medicamentos: {medicamentos_list}')
+            logging.info(f'Template data: paciente={paciente.nome if paciente else receita.nome_paciente}')
+            
             pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
             
             response = make_response(pdf_file)
@@ -652,6 +657,7 @@ def gerar_pdf_receita_cronologia(receita_id):
             
         except Exception as pdf_error:
             logging.error(f'Erro específico do WeasyPrint: {pdf_error}')
+            logging.error(f'Template HTML: {pdf_html[:500]}...')
             # Fallback para mostrar HTML se PDF falhar
             return render_template('receita_print.html',
                                  paciente=paciente.nome if paciente else receita.nome_paciente,
