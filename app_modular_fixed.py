@@ -66,10 +66,12 @@ def register_blueprints(app):
         # Import blueprints
         from auth_simple import auth_simple
         from blueprints.dashboard import dashboard_bp
+        from routes.medical import medical_bp
         
         # Register blueprints
         app.register_blueprint(auth_simple, url_prefix='/auth')
         app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
+        app.register_blueprint(medical_bp)
         
         logger.info("Blueprints registrados com sucesso")
         
@@ -114,14 +116,14 @@ def register_main_routes(app):
             if user_type == 'admin':
                 stats['pacientes'] = db.session.query(Paciente).count()
                 stats['receitas'] = db.session.query(Receita).count()
-                stats['exames_lab'] = db.session.query(ExamesLab).count()
-                stats['exames_img'] = db.session.query(ExamesImg).count()
+                stats['exames_lab'] = db.session.query(ExameLab).count()
+                stats['exames_img'] = db.session.query(ExameImg).count()
             else:
                 # Para médicos, mostrar apenas seus dados
                 stats['pacientes'] = db.session.query(Paciente).filter_by(medico=user).count()
                 stats['receitas'] = db.session.query(Receita).filter_by(medico=user).count()
-                stats['exames_lab'] = db.session.query(ExamesLab).filter_by(medico=user).count()
-                stats['exames_img'] = db.session.query(ExamesImg).filter_by(medico=user).count()
+                stats['exames_lab'] = db.session.query(ExameLab).filter_by(medico=user).count()
+                stats['exames_img'] = db.session.query(ExameImg).filter_by(medico=user).count()
             
             return render_template('dashboard.html', 
                                  user=user, 

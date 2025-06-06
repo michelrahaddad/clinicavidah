@@ -12,7 +12,17 @@ import logging
 from core.database import db
 from models import Paciente, Receita, ExameLab, ExameImg, Medico, AtestadoMedico
 
+
+import logging
+import traceback
+
+# Configurar logging detalhado
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s'
+)
 logger = logging.getLogger(__name__)
+
 
 def sanitize_input(text):
     """Sanitiza entrada do usuário"""
@@ -110,6 +120,11 @@ def get_dashboard_statistics(user_type, user):
     """Calcula estatísticas para o dashboard"""
     stats = {}
     
+    logger.info(f"=== INICIANDO CÁLCULO DE ESTATÍSTICAS ===")
+    logger.info(f"User type: {user_type}")
+    logger.info(f"User data: {user}")
+    logger.info(f"User type is dict: {isinstance(user, dict)}")
+    
     try:
         # Data de hoje e última semana
         today = datetime.now().date()
@@ -118,24 +133,37 @@ def get_dashboard_statistics(user_type, user):
         
         if user_type == 'admin':
             # Estatísticas administrativas
-            stats['total_receitas'] = db.session.query(func.count(Receita.id)).scalar() or 0
-            stats['total_exames_lab'] = db.session.query(func.count(ExameLab.id)).scalar() or 0
-            stats['total_exames_img'] = db.session.query(func.count(ExameImg.id)).scalar() or 0
-            stats['total_atestados'] = db.session.query(func.count(AtestadoMedicoMedico.id)).scalar() or 0
-            stats['total_pacientes'] = db.session.query(func.count(Paciente.id)).scalar() or 0
-            stats['total_medicos'] = db.session.query(func.count(Medico.id)).scalar() or 0
+            stats['total_receitas'] = logger.debug("Executando query: contagem de receitas")
+        db.session.query(func.count(Receita.id)).scalar() or 0
+        logger.debug(f"Resultado da query: {result}")
+            stats['total_exames_lab'] = logger.debug("Executando query: contagem de exames lab")
+        db.session.query(func.count(ExameLab.id)).scalar() or 0
+        logger.debug(f"Resultado da query: {result}")
+            stats['total_exames_img'] = logger.debug("Executando query: contagem de exames img")
+        db.session.query(func.count(ExameImg.id)).scalar() or 0
+        logger.debug(f"Resultado da query: {result}")
+            stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).scalar() or 0
+            stats['total_pacientes'] = logger.debug("Executando query: contagem de pacientes")
+        db.session.query(func.count(Paciente.id)).scalar() or 0
+        logger.debug(f"Resultado da query: {result}")
+            stats['total_medicos'] = logger.debug("Executando query: contagem de médicos")
+        db.session.query(func.count(Medico.id)).scalar() or 0
+        logger.debug(f"Resultado da query: {result}")
             
             # Atividades da semana
-            stats['receitas_semana'] = db.session.query(func.count(Receita.id)).filter(
+            stats['receitas_semana'] = logger.debug("Executando query: contagem de receitas")
+        result = db.session.query(func.count(Receita.id)).filter(
                 func.date(Receita.data_criacao) >= week_ago
             ).scalar() or 0
             
             stats['exames_semana'] = (
-                db.session.query(func.count(ExameLab.id)).filter(
+                logger.debug("Executando query: contagem de exames lab")
+        result = db.session.query(func.count(ExameLab.id)).filter(
                     func.date(ExameLab.created_at) >= week_ago
                 ).scalar() or 0
             ) + (
-                db.session.query(func.count(ExameImg.id)).filter(
+                logger.debug("Executando query: contagem de exames img")
+        result = db.session.query(func.count(ExameImg.id)).filter(
                     func.date(ExameImg.created_at) >= week_ago
                 ).scalar() or 0
             )
@@ -145,27 +173,33 @@ def get_dashboard_statistics(user_type, user):
             user_name = user.get('nome') if isinstance(user, dict) else user
             medico = db.session.query(Medico).filter_by(nome=user_name).first()
             if medico:
-                stats['total_receitas'] = db.session.query(func.count(Receita.id)).filter_by(id_medico=medico.id).scalar() or 0
-                stats['total_exames_lab'] = db.session.query(func.count(ExameLab.id)).filter_by(id_medico=medico.id).scalar() or 0
-                stats['total_exames_img'] = db.session.query(func.count(ExameImg.id)).filter_by(id_medico=medico.id).scalar() or 0
-                stats['total_atestados'] = db.session.query(func.count(AtestadoMedicoMedico.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_receitas'] = logger.debug("Executando query: contagem de receitas")
+        result = db.session.query(func.count(Receita.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_exames_lab'] = logger.debug("Executando query: contagem de exames lab")
+        result = db.session.query(func.count(ExameLab.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_exames_img'] = logger.debug("Executando query: contagem de exames img")
+        result = db.session.query(func.count(ExameImg.id)).filter_by(id_medico=medico.id).scalar() or 0
+                stats['total_atestados'] = db.session.query(func.count(AtestadoMedico.id)).filter_by(id_medico=medico.id).scalar() or 0
                 
                 # Pacientes únicos atendidos
                 stats['total_pacientes'] = db.session.query(func.count(func.distinct(Receita.nome_paciente))).filter_by(id_medico=medico.id).scalar() or 0
                 
                 # Atividades da semana
-                stats['receitas_semana'] = db.session.query(func.count(Receita.id)).filter(
+                stats['receitas_semana'] = logger.debug("Executando query: contagem de receitas")
+        result = db.session.query(func.count(Receita.id)).filter(
                     Receita.id_medico == medico.id,
                     func.date(Receita.data_criacao) >= week_ago
                 ).scalar() or 0
                 
                 stats['exames_semana'] = (
-                    db.session.query(func.count(ExameLab.id)).filter(
+                    logger.debug("Executando query: contagem de exames lab")
+        result = db.session.query(func.count(ExameLab.id)).filter(
                         ExameLab.id_medico == medico.id,
                         func.date(ExameLab.created_at) >= week_ago
                     ).scalar() or 0
                 ) + (
-                    db.session.query(func.count(ExameImg.id)).filter(
+                    logger.debug("Executando query: contagem de exames img")
+        result = db.session.query(func.count(ExameImg.id)).filter(
                         ExameImg.id_medico == medico.id,
                         func.date(ExameImg.created_at) >= week_ago
                     ).scalar() or 0
@@ -176,7 +210,13 @@ def get_dashboard_statistics(user_type, user):
         stats['exames_mes'] = get_monthly_count(ExameLab, user_type, user, month_ago) + get_monthly_count(ExameImg, user_type, user, month_ago)
         
     except Exception as e:
-        logger.error(f"Error calculating stats: {str(e)}")
+        logger.error(f"=== ERRO CRÍTICO NO CÁLCULO DE ESTATÍSTICAS ===")
+        logger.error(f"Tipo do erro: {type(e).__name__}")
+        logger.error(f"Mensagem: {str(e)}")
+        logger.error(f"Traceback completo:")
+        logger.error(traceback.format_exc())
+        logger.error(f"User type: {user_type}")
+        logger.error(f"User data: {user}")
         stats = {
             'total_receitas': 0,
             'total_exames_lab': 0,
@@ -270,18 +310,21 @@ def get_chart_data(user_type, user):
                 month_start = (now.replace(day=1) - timedelta(days=30*i))
                 month_end = month_start + timedelta(days=30)
                 
-                receitas_count = db.session.query(func.count(Receita.id)).filter(
+                receitas_count = logger.debug("Executando query: contagem de receitas")
+        result = db.session.query(func.count(Receita.id)).filter(
                     Receita.data_criacao >= month_start,
                     Receita.data_criacao < month_end
                 ).scalar() or 0
                 
                 exames_count = (
-                    db.session.query(func.count(ExameLab.id)).filter(
+                    logger.debug("Executando query: contagem de exames lab")
+        result = db.session.query(func.count(ExameLab.id)).filter(
                         ExameLab.created_at >= month_start,
                         ExameLab.created_at < month_end
                     ).scalar() or 0
                 ) + (
-                    db.session.query(func.count(ExameImg.id)).filter(
+                    logger.debug("Executando query: contagem de exames img")
+        result = db.session.query(func.count(ExameImg.id)).filter(
                         ExameImg.created_at >= month_start,
                         ExameImg.created_at < month_end
                     ).scalar() or 0
@@ -299,7 +342,8 @@ def get_chart_data(user_type, user):
                     month_start = (now.replace(day=1) - timedelta(days=30*i))
                     month_end = month_start + timedelta(days=30)
                     
-                    receitas_count = db.session.query(func.count(Receita.id)).filter(
+                    receitas_count = logger.debug("Executando query: contagem de receitas")
+        result = db.session.query(func.count(Receita.id)).filter(
                         Receita.id_medico == medico.id,
                         Receita.data_criacao >= month_start,
                         Receita.data_criacao < month_end

@@ -36,17 +36,19 @@ def login():
             return render_template('login.html')
         
         # Buscar médico no banco
+        logger.info(f"Buscando médico no banco: {nome}, {crm}")
         medico = db.session.query(Medico).filter_by(nome=nome, crm=crm).first()
         
+        logger.info(f"Médico encontrado: {medico.nome if medico else None}")
         if medico and check_password_hash(medico.senha, senha):
             # Login bem-sucedido
-            session['usuario'] = {
+            logger.info("Login bem-sucedido, criando sessão")
+        session['usuario'] = {
                 'id': medico.id,
                 'nome': medico.nome,
                 'crm': medico.crm,
                 'tipo': 'medico'
             }
-            logger.info(f"Login bem-sucedido para {nome}")
             return redirect(url_for('dashboard.index'))
         else:
             flash('Credenciais inválidas', 'error')
