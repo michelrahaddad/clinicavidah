@@ -192,8 +192,8 @@
             </div>
         </div>
         
-        <div class="mt-4 d-flex justify-content-between">
-            <a href="{{ url_for('dashboard.dashboard') }}" class="btn neural-btn px-4 py-2" style="border-radius: 15px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white;">
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('dashboard.dashboard') }}" class="btn neural-btn px-4 py-2" style="border-radius: 15px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; z-index: 10;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2" style="margin-top: -2px;">
                     <rect x="3" y="3" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
                     <rect x="14" y="3" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
@@ -206,8 +206,10 @@
                 </svg>
                 VOLTAR
             </a>
-            <button type="submit" class="btn btn-success btn-lg neural-btn px-5 py-3" 
-                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+            <button type="submit" 
+                    id="gerar-pdf-btn"
+                    class="btn btn-success btn-lg neural-btn px-5 py-3" 
+                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); cursor: pointer; z-index: 10; position: relative;">
                 <i class="fas fa-file-pdf me-2"></i>GERAR PDF
             </button>
         </div>
@@ -221,7 +223,47 @@
 document.addEventListener('DOMContentLoaded', function() {
     setupPatientAutocomplete();
     setupMedicamentAutocomplete();
+    setupPdfButton();
 });
+
+function setupPdfButton() {
+    const pdfBtn = document.getElementById('gerar-pdf-btn');
+    if (pdfBtn) {
+        console.log('Botão PDF encontrado e configurado');
+        
+        // Garantir que o botão está clicável
+        pdfBtn.style.pointerEvents = 'auto';
+        pdfBtn.style.cursor = 'pointer';
+        
+        // Adicionar listener para debug
+        pdfBtn.addEventListener('click', function(e) {
+            console.log('Clique no botão Gerar PDF detectado');
+            
+            // Validar formulário antes de enviar
+            const nomePaciente = document.getElementById('nome_paciente');
+            const principioAtivo = document.getElementById('principio_ativo_0');
+            
+            if (!nomePaciente || !nomePaciente.value.trim()) {
+                e.preventDefault();
+                alert('Nome do paciente é obrigatório');
+                nomePaciente.focus();
+                return false;
+            }
+            
+            if (!principioAtivo || !principioAtivo.value.trim()) {
+                e.preventDefault();
+                alert('Pelo menos um medicamento é obrigatório');
+                principioAtivo.focus();
+                return false;
+            }
+            
+            console.log('Formulário válido, enviando...');
+            // Permitir envio do formulário
+        });
+    } else {
+        console.error('Botão PDF não encontrado!');
+    }
+}
 
 function setupPatientAutocomplete() {
     const nomeInput = document.getElementById('nome_paciente');
