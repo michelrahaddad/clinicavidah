@@ -63,13 +63,13 @@ def create_app(config_name=None):
 def register_blueprints(app):
     """Registra todos os blueprints da aplicação"""
     try:
-        # Import fixed blueprints
-        from blueprints.auth_fixed import auth_bp
+        # Import blueprints
+        from auth_simple import auth_simple
         from blueprints.dashboard import dashboard_bp
         
         # Register blueprints
-        app.register_blueprint(auth_bp)
-        app.register_blueprint(dashboard_bp)
+        app.register_blueprint(auth_simple, url_prefix='/auth')
+        app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
         
         logger.info("Blueprints registrados com sucesso")
         
