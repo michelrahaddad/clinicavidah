@@ -11,7 +11,7 @@
         </div>
     </div>
     
-    <form action="{{ url_for('receita.salvar_receita') }}" method="post" id="receita-form" onsubmit="return validateForm()">
+    <form action="{{ url_for('receita.salvar_receita') }}" method="post" id="receita-form">
         <input type="hidden" name="refazer" value="{{ refazer|default(false) }}">
         
         <!-- Dados do Paciente -->
@@ -207,10 +207,8 @@
                 VOLTAR
             </a>
             <button type="submit" 
-                    id="gerar-pdf-btn"
                     class="btn btn-success btn-lg px-5 py-3" 
-                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3); cursor: pointer; position: relative; border: none; background: #28a745; color: white;"
-                    onclick="console.log('Botão clicado diretamente'); return true;">
+                    style="border-radius: 25px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
                 <i class="fas fa-file-pdf me-2"></i>GERAR PDF
             </button>
         </div>
@@ -224,89 +222,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     setupPatientAutocomplete();
     setupMedicamentAutocomplete();
-    setupPdfButton();
+    console.log('Sistema Médico VIDAH carregado');
 });
-
-function setupPdfButton() {
-    const pdfBtn = document.getElementById('gerar-pdf-btn');
-    const form = document.getElementById('receita-form');
-    
-    if (pdfBtn && form) {
-        console.log('Botão PDF e formulário encontrados');
-        
-        // Garantir que o botão está totalmente clicável
-        pdfBtn.style.pointerEvents = 'auto';
-        pdfBtn.style.cursor = 'pointer';
-        pdfBtn.style.position = 'relative';
-        pdfBtn.style.zIndex = '1000';
-        
-        // Remover todos os listeners existentes e adicionar novo
-        const newBtn = pdfBtn.cloneNode(true);
-        pdfBtn.parentNode.replaceChild(newBtn, pdfBtn);
-        
-        // Adicionar listener robusto
-        newBtn.addEventListener('click', function(event) {
-            console.log('=== CLIQUE DETECTADO NO BOTÃO PDF ===');
-            event.preventDefault();
-            event.stopPropagation();
-            
-            // Validação básica
-            const nomePaciente = document.getElementById('nome_paciente');
-            const principioAtivo = document.getElementById('principio_ativo_0');
-            
-            if (!nomePaciente || !nomePaciente.value.trim()) {
-                alert('Nome do paciente é obrigatório');
-                nomePaciente.focus();
-                return false;
-            }
-            
-            if (!principioAtivo || !principioAtivo.value.trim()) {
-                alert('Pelo menos um medicamento é obrigatório');
-                principioAtivo.focus();
-                return false;
-            }
-            
-            console.log('Formulário válido, enviando para:', form.action);
-            
-            // Enviar formulário manualmente
-            try {
-                form.submit();
-                console.log('Formulário enviado com sucesso');
-            } catch (error) {
-                console.error('Erro ao enviar formulário:', error);
-                // Fallback: forçar envio
-                window.location.href = form.action + '?' + new URLSearchParams(new FormData(form)).toString();
-            }
-        });
-        
-        console.log('Botão PDF reconfigurado com sucesso');
-    } else {
-        console.error('Botão PDF ou formulário não encontrados!');
-    }
-}
-
-// Função de validação global
-function validateForm() {
-    console.log('=== VALIDAÇÃO DO FORMULÁRIO ===');
-    
-    const nomePaciente = document.getElementById('nome_paciente');
-    const principioAtivo = document.getElementById('principio_ativo_0');
-    
-    if (!nomePaciente || !nomePaciente.value.trim()) {
-        alert('Nome do paciente é obrigatório');
-        nomePaciente.focus();
-        return false;
-    }
-    
-    if (!principioAtivo || !principioAtivo.value.trim()) {
-        alert('Pelo menos um medicamento é obrigatório');
-        principioAtivo.focus();
-        return false;
-    }
-    
-    console.log('Validação aprovada, prosseguindo...');
-    return true;
-}
 
 function setupPatientAutocomplete() {
     const nomeInput = document.getElementById('nome_paciente');
