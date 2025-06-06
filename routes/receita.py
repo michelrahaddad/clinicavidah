@@ -509,7 +509,7 @@ def get_pacientes():
         print(f"Erro na API de pacientes: {e}")
         return jsonify([])
 
-@receita_bp.route('/editar/<int:receita_id>', methods=['POST'])
+@receita_bp.route('/receita/editar/<int:receita_id>', methods=['POST'])
 def editar_receita(receita_id):
     """Edita uma receita existente"""
     if 'usuario' not in session and 'admin_usuario' not in session:
@@ -584,7 +584,7 @@ def editar_receita(receita_id):
         logging.error(f'Erro ao editar receita {receita_id}: {e}')
         return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
 
-@receita_bp.route('/pdf/<int:receita_id>')
+@receita_bp.route('/receita/pdf/<int:receita_id>')
 def gerar_pdf_receita_cronologia(receita_id):
     """Gera PDF de uma receita específica"""
     if 'usuario' not in session and 'admin_usuario' not in session:

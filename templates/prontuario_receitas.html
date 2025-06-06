@@ -79,7 +79,8 @@
                                             <div class="col">
                                                 <label class="form-label text-light small mb-1">Princípio ativo</label>
                                                 <input type="text" class="form-control glass-input medicamento-autocomplete" 
-                                                       name="principio_ativo_{{ loop.index0 }}" data-base-id="principio_ativo_{{ loop.index0 }}" 
+                                                       id="principio_ativo_{{ loop.index0 }}"
+                                                       name="principio_ativo_{{ loop.index0 }}" 
                                                        value="{{ medicamento.medicamento }}" 
                                                        placeholder="Ex: Dipir" required>
                                             </div>
@@ -202,7 +203,7 @@ function setupMedicamentAutocomplete() {
     console.log('Inputs encontrados para autocomplete:', inputs.length);
     
     inputs.forEach((input, index) => {
-        console.log('Configurando input', index + ':', input.id);
+        console.log('Configurando input', index + ':', input.name || input.id);
         
         input.addEventListener('input', function() {
             const query = this.value;
@@ -304,18 +305,22 @@ function adicionarMedicamento(receitaId) {
             <div class="col">
                 <label class="form-label text-light small mb-1">Princípio ativo</label>
                 <input type="text" class="form-control glass-input medicamento-autocomplete" 
+                       id="principio_ativo_${newIndex}"
                        name="principio_ativo_${newIndex}" 
                        placeholder="Ex: Dipir" required>
             </div>
             <div class="col">
                 <label class="form-label text-light small mb-1">Conc.</label>
                 <input type="text" class="form-control glass-input" 
+                       id="posologia_${newIndex}"
                        name="posologia_${newIndex}" 
                        placeholder="500" required>
             </div>
             <div class="col">
                 <label class="form-label text-light small mb-1">Via</label>
-                <select class="form-select glass-input" name="via_${newIndex}" required>
+                <select class="form-select glass-input" 
+                        id="via_${newIndex}"
+                        name="via_${newIndex}" required>
                     <option value="Oral">Oral</option>
                     <option value="Intramuscular">IM</option>
                     <option value="Intravenosa">IV</option>
@@ -327,12 +332,14 @@ function adicionarMedicamento(receitaId) {
             <div class="col">
                 <label class="form-label text-light small mb-1">Freq</label>
                 <input type="text" class="form-control glass-input" 
+                       id="frequencia_${newIndex}"
                        name="frequencia_${newIndex}" 
                        placeholder="Sel" required>
             </div>
             <div class="col">
                 <label class="form-label text-light small mb-1">Qtd</label>
                 <input type="text" class="form-control glass-input" 
+                       id="duracao_${newIndex}"
                        name="duracao_${newIndex}" 
                        placeholder="30 comp" required>
             </div>
