@@ -530,6 +530,9 @@ def editar_receita(receita_id):
             except ValueError:
                 pass
         
+        # Debug: Imprimir todos os dados recebidos
+        logging.info(f"Dados recebidos para receita {receita_id}: {dict(request.form)}")
+        
         # Coletar dados dos medicamentos
         medicamentos = []
         posologias = []
@@ -549,6 +552,8 @@ def editar_receita(receita_id):
             frequencia = request.form.get(f'frequencia_{index}', '')
             duracao = request.form.get(f'duracao_{index}', '')
             
+            logging.info(f"Medicamento {index}: {medicamento}, {posologia}, {via}, {frequencia}, {duracao}")
+            
             medicamentos.append(sanitizar_entrada(medicamento))
             posologias.append(sanitizar_entrada(posologia))
             vias.append(sanitizar_entrada(via))
@@ -556,6 +561,8 @@ def editar_receita(receita_id):
             duracoes.append(sanitizar_entrada(duracao))
             
             index += 1
+        
+        logging.info(f"Total de medicamentos coletados: {len(medicamentos)}")
         
         if not medicamentos:
             return jsonify({'success': False, 'error': 'Pelo menos um medicamento é obrigatório'}), 400
