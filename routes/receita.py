@@ -656,8 +656,23 @@ def gerar_pdf_receita_cronologia(receita_id):
             flash('Permissão negada', 'error')
             return redirect(url_for('prontuario.prontuario'))
         
-        # Buscar dados do médico
-        medico = Medico.query.filter_by(nome=receita.medico_nome).first()
+        # Buscar dados do médico que prescreveu a receita - múltiplas tentativas
+        medico = None
+        
+        # 1. Tentar buscar pelo ID do médico na receita
+        if receita.id_medico:
+            medico = Medico.query.get(receita.id_medico)
+        
+        # 2. Fallback: buscar pelo nome do médico
+        if not medico and receita.medico_nome:
+            medico = Medico.query.filter_by(nome=receita.medico_nome).first()
+        
+        # 3. Fallback: buscar médico logado na sessão
+        if not medico and 'usuario' in session:
+            if isinstance(session['usuario'], dict) and 'id' in session['usuario']:
+                medico = Medico.query.get(session['usuario']['id'])
+            else:
+                medico = Medico.query.filter_by(nome=session['usuario']).first()
         
         # Buscar dados do paciente
         paciente = Paciente.query.get(receita.id_paciente)
@@ -680,6 +695,12 @@ def gerar_pdf_receita_cronologia(receita_id):
         while len(duracoes_list) < max_len:
             duracoes_list.append('')
         
+        # Log completo dos dados do médico para debug da assinatura
+        logging.info(f'PDF - Médico encontrado: {medico.nome if medico else "NENHUM"}')
+        logging.info(f'PDF - CRM: {medico.crm if medico else "NENHUM"}')
+        logging.info(f'PDF - Assinatura presente: {bool(medico and medico.assinatura)}')
+        logging.info(f'PDF - Tamanho da assinatura: {len(medico.assinatura) if medico and medico.assinatura else 0} caracteres')
+        
         # Gerar PDF com dados completos integrados do banco de dados
         pdf_html = render_template('receita_pdf.html',
                                  nome_paciente=paciente.nome if paciente else receita.nome_paciente,
@@ -694,7 +715,7 @@ def gerar_pdf_receita_cronologia(receita_id):
                                  medico=medico.nome if medico else receita.medico_nome,
                                  crm=medico.crm if medico else '',
                                  data=formatar_data_brasileira(receita.data),
-                                 assinatura=medico.assinatura if medico and medico.assinatura else None,
+                                 assinatura=medico.assinatura if medico and medico.assinatura and medico.assinatura != 'assinatura' else None,
                                  zip=zip)
         
         try:
