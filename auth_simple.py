@@ -3,6 +3,8 @@ Sistema de autenticação simplificado
 """
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash
 from werkzeug.security import check_password_hash
+from core.database import db
+from models import Medico
 import logging
 
 # Configurar logging
@@ -34,9 +36,9 @@ def login():
             return render_template('login.html')
         
         # Buscar médico no banco
-        medico = db.session.query(Medico).filter_by(nome=nome).first()
+        medico = db.session.query(Medico).filter_by(nome=nome, crm=crm).first()
         
-        if medico and medico.senha == senha:
+        if medico and check_password_hash(medico.senha, senha):
             # Login bem-sucedido
             session['usuario'] = {
                 'id': medico.id,
