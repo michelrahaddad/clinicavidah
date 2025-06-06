@@ -565,6 +565,70 @@ function removerMedicamento(index) {
     }
 }
 
+// Funcionalidade de preenchimento automático dos dados do paciente
+function preencherDadosPaciente(nomePaciente) {
+    console.log('Buscando dados do paciente:', nomePaciente);
+    
+    // Fazer requisição para buscar dados completos do paciente
+    fetch(`/receita/api/paciente_dados/${encodeURIComponent(nomePaciente)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.dados) {
+                const pacienteData = data.dados;
+                console.log('Dados do paciente encontrados:', pacienteData);
+                
+                // Preencher campos automaticamente
+                const cpfField = document.getElementById('cpf_paciente');
+                const idadeField = document.getElementById('idade_paciente');
+                const enderecoField = document.getElementById('endereco_completo');
+                const cidadeUfField = document.getElementById('cidade_uf_completo');
+                
+                if (cpfField && pacienteData.cpf) {
+                    cpfField.value = pacienteData.cpf;
+                    cpfField.style.background = 'rgba(40, 167, 69, 0.1)'; // Verde claro para indicar preenchimento automático
+                }
+                
+                if (idadeField && pacienteData.idade) {
+                    idadeField.value = pacienteData.idade;
+                    idadeField.style.background = 'rgba(40, 167, 69, 0.1)';
+                }
+                
+                if (enderecoField && pacienteData.endereco) {
+                    enderecoField.value = pacienteData.endereco;
+                    enderecoField.style.background = 'rgba(40, 167, 69, 0.1)';
+                }
+                
+                if (cidadeUfField && pacienteData.cidade_uf) {
+                    cidadeUfField.value = pacienteData.cidade_uf;
+                    cidadeUfField.style.background = 'rgba(40, 167, 69, 0.1)';
+                }
+                
+                console.log('✓ Dados do paciente preenchidos automaticamente');
+            } else {
+                console.log('Paciente não encontrado no banco de dados');
+                // Limpar campos se paciente não for encontrado
+                ['cpf_paciente', 'idade_paciente', 'endereco_completo', 'cidade_uf_completo'].forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.value = '';
+                        field.style.background = 'rgba(255, 255, 255, 0.05)';
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados do paciente:', error);
+        });
+}
+
+// Configurar evento para o campo nome do paciente
+document.getElementById('nome_paciente').addEventListener('blur', function() {
+    const nomePaciente = this.value.trim();
+    if (nomePaciente) {
+        preencherDadosPaciente(nomePaciente);
+    }
+});
+
 // Limpar sugestões quando clicar fora
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.autocomplete-suggestions')) {
