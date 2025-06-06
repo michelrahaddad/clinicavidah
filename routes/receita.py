@@ -318,10 +318,44 @@ def gerar_pdf_reimprimir_receita(receita_obj):
                 medicamentos_unicos.append(med.strip())
                 seen.add(med.strip())
         
+        # Process signature for PDF visibility
+        assinatura_para_pdf = None
+        temp_sig_path = None
+        
+        if medico and medico.assinatura and medico.assinatura != 'assinatura':
+            try:
+                import base64
+                import tempfile
+                
+                if medico.assinatura.startswith('data:image'):
+                    # Process signature to make it black and visible
+                    processed_signature = create_black_signature(medico.assinatura)
+                    
+                    # Extract base64 data from processed signature
+                    header, data = processed_signature.split(',', 1)
+                    image_data = base64.b64decode(data)
+                    
+                    # Create temporary file
+                    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.png')
+                    temp_file.write(image_data)
+                    temp_file.close()
+                    temp_sig_path = temp_file.name
+                    
+                    # Use file URL for WeasyPrint
+                    assinatura_para_pdf = f"file://{temp_sig_path}"
+                    logging.info(f'PDF Principal - Assinatura processada e salva: {temp_sig_path}')
+                else:
+                    assinatura_para_pdf = medico.assinatura
+                    
+            except Exception as e:
+                logging.error(f'Erro ao processar assinatura principal: {e}')
+                assinatura_para_pdf = None
+        
         # Log complete data for debugging
         logging.info(f'PDF Generation - Paciente: {paciente.nome if paciente else "N/A"}, CPF: {paciente.cpf if paciente else "N/A"}')
         logging.info(f'PDF Generation - Médico: {medico.nome if medico else "N/A"}, CRM: {medico.crm if medico else "N/A"}')
         logging.info(f'PDF Generation - Assinatura presente: {bool(medico and medico.assinatura and medico.assinatura != "assinatura")}')
+        logging.info(f'PDF Generation - Assinatura processada: {assinatura_para_pdf is not None}')
         
         pdf_html = render_template('receita_pdf.html',
                                  nome_paciente=receita_obj.nome_paciente,
@@ -336,10 +370,19 @@ def gerar_pdf_reimprimir_receita(receita_obj):
                                  medico=medico.nome if medico else "Médico não encontrado",
                                  crm=medico.crm if medico else "CRM não disponível",
                                  data=data_atual,
-                                 assinatura=medico.assinatura if medico and medico.assinatura and medico.assinatura != 'assinatura' else None,
+                                 assinatura=assinatura_para_pdf,
                                  zip=zip)
         
         pdf_file = weasyprint.HTML(string=pdf_html, base_url=request.url_root).write_pdf()
+        
+        # Clean up temporary signature file
+        if temp_sig_path:
+            try:
+                import os
+                os.unlink(temp_sig_path)
+                logging.info(f'PDF Principal - Arquivo temporário removido: {temp_sig_path}')
+            except Exception as e:
+                logging.error(f'Erro ao remover arquivo temporário: {e}')
         
         response = make_response(pdf_file)
         response.headers['Content-Type'] = 'application/pdf'
