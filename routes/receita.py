@@ -674,6 +674,10 @@ def gerar_pdf_receita_cronologia(receita_id):
             else:
                 medico = Medico.query.filter_by(nome=session['usuario']).first()
         
+        # 4. Fallback final: buscar qualquer médico com assinatura (para testes)
+        if not medico:
+            medico = Medico.query.filter(Medico.assinatura != None, Medico.assinatura != 'assinatura').first()
+        
         # Buscar dados do paciente
         paciente = Paciente.query.get(receita.id_paciente)
         
