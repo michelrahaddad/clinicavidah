@@ -65,10 +65,10 @@
 
                                 <!-- Medicamentos -->
                                 <div id="medicamentos-container-{{ receita.id }}" class="medicamentos-container">
-                                    {% for loop_index in range(receita.medicamentos|length) %}
+                                    {% for medicamento in receita.medicamentos %}
                                     <div class="medicamento-item mb-3 p-3" style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; border-left: 4px solid #007bff;">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <h6 class="text-info mb-0">Medicamento {{ loop_index + 1 }}</h6>
+                                            <h6 class="text-info mb-0">Medicamento {{ loop.index }}</h6>
                                             <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerMedicamento(this)">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -80,39 +80,39 @@
                                                 <label class="form-label text-light small mb-1">Princípio ativo</label>
                                                 <input type="text" class="form-control glass-input medicamento-autocomplete" 
                                                        name="principio_ativo_{{ loop.index0 }}" 
-                                                       value="{{ receita.medicamentos[loop_index].medicamento }}" 
+                                                       value="{{ medicamento.medicamento }}" 
                                                        placeholder="Ex: Dipir" required>
                                             </div>
                                             <div class="col">
                                                 <label class="form-label text-light small mb-1">Conc.</label>
                                                 <input type="text" class="form-control glass-input" 
                                                        name="posologia_{{ loop.index0 }}" 
-                                                       value="{{ receita.medicamentos[loop_index].posologia }}" 
+                                                       value="{{ medicamento.posologia }}" 
                                                        placeholder="500" required>
                                             </div>
                                             <div class="col">
                                                 <label class="form-label text-light small mb-1">Via</label>
                                                 <select class="form-select glass-input" name="via_{{ loop.index0 }}" required>
-                                                    <option value="Oral" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oral' else '' }}>Oral</option>
-                                                    <option value="Intramuscular" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intramuscular' else '' }}>IM</option>
-                                                    <option value="Intravenosa" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intravenosa' else '' }}>IV</option>
-                                                    <option value="Subcutânea" {{ 'selected' if receita.medicamentos[loop_index].via == 'Subcutânea' else '' }}>SC</option>
-                                                    <option value="Tópica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Tópica' else '' }}>Tópica</option>
-                                                    <option value="Sublingual" {{ 'selected' if receita.medicamentos[loop_index].via == 'Sublingual' else '' }}>SL</option>
+                                                    <option value="Oral" {{ 'selected' if medicamento.via == 'Oral' else '' }}>Oral</option>
+                                                    <option value="Intramuscular" {{ 'selected' if medicamento.via == 'Intramuscular' else '' }}>IM</option>
+                                                    <option value="Intravenosa" {{ 'selected' if medicamento.via == 'Intravenosa' else '' }}>IV</option>
+                                                    <option value="Subcutânea" {{ 'selected' if medicamento.via == 'Subcutânea' else '' }}>SC</option>
+                                                    <option value="Tópica" {{ 'selected' if medicamento.via == 'Tópica' else '' }}>Tópica</option>
+                                                    <option value="Sublingual" {{ 'selected' if medicamento.via == 'Sublingual' else '' }}>SL</option>
                                                 </select>
                                             </div>
                                             <div class="col">
                                                 <label class="form-label text-light small mb-1">Freq</label>
                                                 <input type="text" class="form-control glass-input" 
                                                        name="frequencia_{{ loop.index0 }}" 
-                                                       value="{{ receita.medicamentos[loop_index].frequencia or '' }}" 
+                                                       value="{{ medicamento.frequencia or '' }}" 
                                                        placeholder="Sel">
                                             </div>
                                             <div class="col">
                                                 <label class="form-label text-light small mb-1">Qtd</label>
                                                 <input type="text" class="form-control glass-input" 
                                                        name="duracao_{{ loop.index0 }}" 
-                                                       value="{{ receita.medicamentos[loop_index].duracao }}" 
+                                                       value="{{ medicamento.duracao }}" 
                                                        placeholder="30 comp" required>
                                             </div>
                                         </div>
