@@ -117,7 +117,7 @@
                                             <div class="col-md-4 mb-3">
                                                 <label class="form-label text-light">Duração do Tratamento</label>
                                                 <input type="text" class="form-control glass-input" 
-                                                       name="duracao_{{ loop_index }}" 
+                                                       name="duracao_{{ loop.index0 }}" 
                                                        value="{{ receita.medicamentos[loop_index].duracao }}" 
                                                        placeholder="Ex: 7 dias" required>
                                             </div>
