@@ -63,7 +63,7 @@
         </a>
         {% else %}
         <!-- Botão padrão para voltar ao dashboard -->
-        <a href="{{ url_for('dashboard.index') }}" 
+        <a href="{{ url_for('dashboard.dashboard') }}" 
            class="btn neural-btn rounded-circle p-3 dashboard-btn" 
            title="Voltar ao Dashboard"
            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);">
@@ -111,67 +111,67 @@
                     
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard.index') }}">
+                            <a class="nav-link" href="{{ url_for('dashboard.dashboard') }}">
                                 <i class="fas fa-tachometer-alt me-2"></i>
                                 Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#estatisticas">
+                            <a class="nav-link" href="{{ url_for('estatisticas_neurais.estatisticas_neurais') }}">
                                 <i class="fas fa-brain me-2"></i>
                                 Estatísticas Neurais
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#prontuario">
+                            <a class="nav-link" href="{{ url_for('prontuario.prontuario') }}">
                                 <i class="fas fa-file-medical me-2"></i>
                                 Prontuário
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#pacientes">
+                            <a class="nav-link" href="{{ url_for('pacientes.novo_paciente') }}">
                                 <i class="fas fa-user-plus me-2"></i>
                                 Novo Paciente
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#receitas">
+                            <a class="nav-link" href="{{ url_for('receita.receita') }}">
                                 <i class="fas fa-prescription-bottle-alt me-2"></i>
                                 Receitas
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#exames-lab">
+                            <a class="nav-link" href="{{ url_for('exames_lab.exames_lab') }}">
                                 <i class="fas fa-flask me-2"></i>
                                 Exames Lab
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#exames-img">
+                            <a class="nav-link" href="{{ url_for('exames_img.exames_img') }}">
                                 <i class="fas fa-x-ray me-2"></i>
                                 Exames Imagem
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#relatorio-medico">
+                            <a class="nav-link" href="{{ url_for('relatorio_medico.relatorio_medico') }}">
                                 <i class="fas fa-file-medical-alt me-2"></i>
                                 Relatório Médico
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#atestado-medico">
+                            <a class="nav-link" href="{{ url_for('atestado_medico.atestado_medico') }}">
                                 <i class="fas fa-certificate me-2"></i>
                                 Atestado Médico
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#alto-custo">
+                            <a class="nav-link" href="{{ url_for('formulario_alto_custo.formulario_alto_custo') }}">
                                 <i class="fas fa-dollar-sign me-2"></i>
                                 Alto Custo
                             </a>
                         </li>
                         <li class="nav-item mt-3">
-                            <a class="nav-link text-danger" href="/auth/logout">
+                            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">
                                 <i class="fas fa-sign-out-alt me-2"></i>
                                 Sair
                             </a>

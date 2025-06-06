@@ -1,4 +1,4 @@
-from core.database import db
+from app import db
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
@@ -60,7 +60,6 @@ class Receita(db.Model):
     vias = Column(Text, nullable=False)
     medico_nome = Column(String(200), nullable=False)
     data = Column(String(10), nullable=False)
-    data_criacao = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
     
     # Foreign Keys
