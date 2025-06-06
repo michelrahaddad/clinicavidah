@@ -127,11 +127,9 @@
                                         <i class="fas fa-plus"></i> Adicionar Medicamento
                                     </button>
 
-                                    <form style="display: inline;" action="/receita/pdf/{{ receita.id }}" method="get" target="_blank">
-                                        <button type="submit" class="btn btn-outline-info">
-                                            <i class="fas fa-file-pdf"></i> Gerar PDF
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-outline-info" onclick="abrirPDF({{ receita.id }})">
+                                        <i class="fas fa-file-pdf"></i> Gerar PDF
+                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -615,6 +613,12 @@ function clearSuggestions(type) {
     }
 }
 
+// Função para abrir PDF em nova aba sem interferir no formulário
+function abrirPDF(receitaId) {
+    const url = `/receita/pdf/${receitaId}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+    console.log(`PDF aberto para receita ${receitaId}`);
+}
 
 </script>
 
