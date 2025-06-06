@@ -1,97 +1,90 @@
 #!/usr/bin/env python3
 """
-Teste automatizado para verificar se a correção da assinatura digital funcionou
+Teste automático da assinatura digital no PDF
+Verifica se a assinatura do médico está sendo integrada corretamente
 """
+
 import requests
 import sys
-import logging
-from datetime import datetime
+import os
 
-# Configurar logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-def test_signature_correction():
-    """Testa automaticamente se a assinatura digital está funcionando corretamente"""
+def testar_assinatura_pdf():
+    """Testa se a assinatura digital está funcionando no PDF"""
     
     base_url = "http://localhost:5000"
+    
+    # Criar sessão
     session = requests.Session()
     
     try:
-        # 1. Fazer login
-        logger.info("Fazendo login no sistema...")
+        # Fazer login
         login_data = {
-            'nome': 'Dr. João Teste',
-            'crm': '183279-SP',
-            'senha': '12345'
+            'nome': 'Michel Raineri Haddad',
+            'crm': '183299-SP'
         }
         
+        print("🔑 Fazendo login...")
         login_response = session.post(f"{base_url}/login", data=login_data)
         
-        if "Dashboard" not in login_response.text and "dashboard" not in login_response.text:
-            logger.error("Login falhou - tentando outras credenciais...")
-            # Tentar com senha diferente
-            login_data['senha'] = '123456'
-            login_response = session.post(f"{base_url}/login", data=login_data)
-            
-            if "Dashboard" not in login_response.text and "dashboard" not in login_response.text:
-                logger.error("Login ainda falhou - sistema pode estar funcionando diferente")
-                return False
-        
-        logger.info("Login realizado com sucesso")
-        
-        # 2. Acessar página de receita
-        logger.info("Acessando página de receita...")
-        receita_response = session.get(f"{base_url}/receita")
-        
-        if receita_response.status_code != 200:
-            logger.error(f"Erro ao acessar receita: {receita_response.status_code}")
+        if login_response.status_code != 200:
+            print(f"❌ Erro no login: {login_response.status_code}")
             return False
         
-        # 3. Criar uma receita de teste
-        logger.info("Criando receita de teste...")
-        receita_data = {
-            'nome_paciente': 'Paciente Teste Assinatura',
-            'cpf_paciente': '12345678901',
-            'principio_ativo_0': 'Dipirona',
-            'concentracao_0': '500mg',
-            'via_0': 'Oral',
-            'frequencia_0': '3x',
-            'quantidade_0': '30 comprimidos',
-            'data': datetime.now().strftime('%d/%m/%Y')
-        }
+        # Testar geração de PDF
+        print("📄 Testando geração de PDF...")
+        pdf_response = session.get(f"{base_url}/gerar_pdf_receita/25")
         
-        pdf_response = session.post(f"{base_url}/salvar_receita", data=receita_data)
+        if pdf_response.status_code != 200:
+            print(f"❌ Erro na geração do PDF: {pdf_response.status_code}")
+            return False
         
-        # 4. Verificar se PDF foi gerado
-        if pdf_response.headers.get('Content-Type') == 'application/pdf':
-            logger.info("✅ PDF gerado com sucesso!")
-            
-            # Salvar PDF para verificação manual se necessário
-            with open('teste_receita_assinatura.pdf', 'wb') as f:
-                f.write(pdf_response.content)
-            
-            logger.info("PDF salvo como 'teste_receita_assinatura.pdf'")
-            logger.info("✅ Teste de correção da assinatura digital PASSOU!")
+        # Verificar se é realmente um PDF
+        content_type = pdf_response.headers.get('content-type', '')
+        print(f"📋 Content-Type: {content_type}")
+        
+        if 'application/pdf' not in content_type:
+            print("❌ Resposta não é um PDF")
+            print(f"Conteúdo recebido: {pdf_response.text[:200]}...")
+            return False
+        
+        # Verificar tamanho do PDF
+        pdf_size = len(pdf_response.content)
+        print(f"📏 Tamanho do PDF: {pdf_size} bytes")
+        
+        if pdf_size < 10000:  # PDF muito pequeno pode indicar problema
+            print("⚠️  PDF parece muito pequeno")
+            return False
+        
+        # Salvar PDF para verificação
+        with open('receita_teste_assinatura.pdf', 'wb') as f:
+            f.write(pdf_response.content)
+        
+        print("✅ PDF gerado com sucesso!")
+        print("📁 Arquivo salvo como: receita_teste_assinatura.pdf")
+        
+        # Verificar se contém dados da assinatura (procurar por base64)
+        pdf_text = str(pdf_response.content)
+        if 'data:image' in pdf_text and 'base64' in pdf_text:
+            print("✅ Assinatura digital detectada no PDF!")
             return True
         else:
-            logger.error("❌ PDF não foi gerado corretamente")
-            logger.info(f"Response status: {pdf_response.status_code}")
-            logger.info(f"Response headers: {pdf_response.headers}")
+            print("❌ Assinatura digital não encontrada no PDF")
             return False
             
     except Exception as e:
-        logger.error(f"Erro durante o teste: {e}")
+        print(f"❌ Erro durante o teste: {e}")
         return False
 
 if __name__ == "__main__":
-    logger.info("=== TESTE AUTOMATIZADO DE CORREÇÃO DA ASSINATURA DIGITAL ===")
+    print("🔬 Iniciando teste automático da assinatura digital...")
+    print("=" * 50)
     
-    success = test_signature_correction()
+    sucesso = testar_assinatura_pdf()
     
-    if success:
-        logger.info("🎉 TESTE PASSOU - Correção da assinatura digital funcionando!")
+    print("=" * 50)
+    if sucesso:
+        print("🎉 TESTE PASSOU: Assinatura digital funcionando!")
         sys.exit(0)
     else:
-        logger.error("❌ TESTE FALHOU - Verificar logs para detalhes")
+        print("🚫 TESTE FALHOU: Problema com assinatura digital")
         sys.exit(1)
