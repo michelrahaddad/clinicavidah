@@ -291,83 +291,63 @@ function clearSuggestions(input) {
 
 function adicionarMedicamento(receitaId) {
     const container = document.getElementById(`medicamentos-container-${receitaId}`);
-    const rows = container.querySelectorAll('.medicamento-row');
-    const newIndex = rows.length;
+    const items = container.querySelectorAll('.medicamento-item');
+    const newIndex = items.length;
     
-    const newRow = document.createElement('div');
-    newRow.className = 'medicamento-row mb-4 p-4';
-    newRow.id = `medicamento-${receitaId}-${newIndex}`;
-    newRow.style.cssText = 'background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);';
+    const newItem = document.createElement('div');
+    newItem.className = 'medicamento-item mb-4 p-3';
+    newItem.style.cssText = 'background: rgba(255, 255, 255, 0.05); border-radius: 10px; border-left: 4px solid #007bff;';
     
-    newRow.innerHTML = `
+    newItem.innerHTML = `
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="text-info mb-0 fw-bold">
-                <i class="fas fa-capsules me-2"></i>Medicamento ${newIndex + 1}
-            </h6>
-            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerMedicamento(${receitaId}, ${newIndex})" style="border-radius: 50%; width: 30px; height: 30px; padding: 0;">
-                <i class="fas fa-times"></i>
+            <h6 class="text-info mb-0">Medicamento ${newIndex + 1}</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerMedicamento(this)">
+                <i class="fas fa-trash"></i>
             </button>
         </div>
-        <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label text-light fw-semibold mb-2">
-                    <i class="fas fa-pills me-1 text-success"></i>Princípio ativo
-                </label>
-                <div class="position-relative">
-                    <input type="text" name="principio_ativo[]" id="principio_ativo_${receitaId}_${newIndex}" class="form-control glass-input medicamento-autocomplete" 
-                           autocomplete="off" data-index="${newIndex}"
-                           style="height: 48px; font-size: 1rem; font-weight: 500;">
-                    <div class="autocomplete-suggestions" id="suggestions_medicamento_${receitaId}_${newIndex}"></div>
-                </div>
+        
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label text-light">Princípio Ativo / Medicamento</label>
+                <input type="text" class="form-control glass-input medicamento-autocomplete" 
+                       name="principio_ativo_${newIndex}" 
+                       placeholder="Digite o nome do medicamento" required>
             </div>
-            <div class="col-md-2">
-                <label class="form-label text-light fw-semibold mb-2">
-                    <i class="fas fa-weight me-1 text-warning"></i>Conc.
-                </label>
-                <input type="text" name="concentracao[]" id="concentracao_${receitaId}_${newIndex}" class="form-control glass-input" 
-                       style="height: 48px; font-size: 1rem;">
+            <div class="col-md-6 mb-3">
+                <label class="form-label text-light">Posologia</label>
+                <input type="text" class="form-control glass-input" 
+                       name="posologia_${newIndex}" 
+                       placeholder="Ex: 1 comprimido" required>
             </div>
-            <div class="col-md-2">
-                <label class="form-label text-light fw-semibold mb-2">
-                    <i class="fas fa-route me-1 text-primary"></i>Via
-                </label>
-                <select name="via[]" id="via_${receitaId}_${newIndex}" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                    <option value="">Selecione</option>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label text-light">Via de Administração</label>
+                <select class="form-select glass-input" name="via_${newIndex}" required>
                     <option value="Oral">Oral</option>
-                    <option value="Sublingual">Sublingual</option>
                     <option value="Intramuscular">Intramuscular</option>
-                    <option value="Endovenosa">Endovenosa</option>
+                    <option value="Intravenosa">Intravenosa</option>
+                    <option value="Sublingual">Sublingual</option>
                     <option value="Tópica">Tópica</option>
-                    <option value="Ocular">Ocular</option>
-                    <option value="Nasal">Nasal</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <label class="form-label text-light fw-semibold mb-2">
-                    <i class="fas fa-clock me-1 text-info"></i>Freq
-                </label>
-                <select name="frequencia[]" id="frequencia_${receitaId}_${newIndex}" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
-                    <option value="">Selecione</option>
-                    <option value="1x">1x</option>
-                    <option value="2x">2x</option>
-                    <option value="3x">3x</option>
-                    <option value="4x">4x</option>
-                    <option value="6x">6x</option>
-                    <option value="8x">8x</option>
-                    <option value="Se necessário">Se necessário</option>
-                </select>
+            <div class="col-md-4 mb-3">
+                <label class="form-label text-light">Frequência</label>
+                <input type="text" class="form-control glass-input" 
+                       name="frequencia_${newIndex}" 
+                       placeholder="Ex: 3x ao dia" required>
             </div>
-            <div class="col-md-3">
-                <label class="form-label text-light fw-semibold mb-2">
-                    <i class="fas fa-box me-1 text-danger"></i>Qtd
-                </label>
-                <input type="text" name="quantidade[]" id="quantidade_${receitaId}_${newIndex}" class="form-control glass-input" 
-                       style="height: 48px; font-size: 1rem;">
+            <div class="col-md-4 mb-3">
+                <label class="form-label text-light">Duração</label>
+                <input type="text" class="form-control glass-input" 
+                       name="duracao_${newIndex}" 
+                       placeholder="Ex: 7 dias" required>
             </div>
         </div>
     `;
     
-    container.appendChild(newRow);
+    container.appendChild(newItem);
     
     // Reconfigurar autocomplete para o novo input
     setupMedicamentAutocomplete();
@@ -375,31 +355,9 @@ function adicionarMedicamento(receitaId) {
 
 function removerMedicamento(button) {
     const medicamentoItem = button.closest('.medicamento-item');
-    const container = medicamentoItem.parentNode;
-    medicamentoItem.remove();
-    
-    // Reindexar medicamentos
-    const receitaId = container.id.split('-').pop();
-    atualizarNumerosMedicamentos(receitaId);
-}
-
-// Função para atualizar números dos medicamentos
-function atualizarNumerosMedicamentos(receitaId) {
-    const container = document.getElementById(`medicamentos-container-${receitaId}`);
-    const medicamentos = container.querySelectorAll('.medicamento-item');
-    
-    medicamentos.forEach((medicamento, index) => {
-        const titulo = medicamento.querySelector('h6');
-        titulo.textContent = `Medicamento ${index + 1}`;
-        
-        // Atualizar nomes dos inputs
-        const inputs = medicamento.querySelectorAll('input, select');
-        inputs.forEach(input => {
-            const name = input.name;
-            const prefix = name.split('_')[0];
-            input.name = `${prefix}_${index}`;
-        });
-    });
+    if (medicamentoItem) {
+        medicamentoItem.remove();
+    }
 }
 
 // Função para salvar receita
