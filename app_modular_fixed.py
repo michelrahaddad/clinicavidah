@@ -5,6 +5,8 @@ Estrutura modular com Blueprints, logging centralizado e validadores
 import os
 import logging
 from datetime import timedelta
+from core.logging_config import auth_logger, dashboard_logger, audit_logger, log_user_action
+
 from flask import Flask, request, session, redirect, url_for, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -97,6 +99,7 @@ def register_main_routes(app):
         return redirect('/auth/login')
     
     @app.route('/dashboard')
+    log_user_action(session.get("usuario", {}), "ACCESS_DASHBOARD")
     def dashboard():
         """Dashboard principal do sistema"""
         if 'usuario' not in session:
@@ -138,6 +141,7 @@ def register_main_routes(app):
     
     @app.route('/health')
     def health_check():
+    audit_logger.info("Health check accessed")
         """Health check endpoint"""
         return {'status': 'healthy', 'service': 'Sistema Médico VIDAH'}, 200
 

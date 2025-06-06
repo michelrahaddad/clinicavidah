@@ -6,10 +6,13 @@ from core.database import db
 from models import Paciente, Receita, ExameLab, ExameImg, Medico, AtestadoMedico
 from datetime import datetime
 import json
+from core.logging_config import medical_logger, log_user_action, log_database_operation
+
 
 medical_bp = Blueprint('medical', __name__, url_prefix='/medical')
 
 @medical_bp.route('/receitas')
+    log_user_action(session["usuario"], "VIEW_RECEITAS")
 def receitas():
     """Lista todas as receitas do médico"""
     if 'usuario' not in session:
@@ -64,6 +67,7 @@ def nova_receita():
                 receita.id_paciente = novo_paciente.id
             
             db.session.add(receita)
+    medical_logger.info(f"New receita created for patient: {receita.nome_paciente}"); log_database_operation("INSERT", "receitas", session["usuario"], f"Receita for {receita.nome_paciente}")
             db.session.commit()
             
             flash('Receita criada com sucesso!', 'success')
@@ -76,6 +80,7 @@ def nova_receita():
     return render_template('medical/nova_receita.html')
 
 @medical_bp.route('/exames-lab')
+    log_user_action(session["usuario"], "VIEW_EXAMES_LAB")
 def exames_lab():
     """Lista exames laboratoriais"""
     if 'usuario' not in session:
@@ -92,6 +97,7 @@ def exames_lab():
     return render_template('medical/exames_lab.html', exames=exames)
 
 @medical_bp.route('/pacientes')
+    log_user_action(session["usuario"], "VIEW_PACIENTES")
 def pacientes():
     """Lista todos os pacientes"""
     if 'usuario' not in session:
