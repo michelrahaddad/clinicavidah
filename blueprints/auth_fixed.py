@@ -119,21 +119,21 @@ def register():
             # Validações básicas
             if not all([nome, crm, especialidade, senha, confirmar_senha]):
                 flash('Todos os campos são obrigatórios', 'error')
-                return render_template('auth/register.html')
+                return render_template('register.html')
             
             if senha != confirmar_senha:
                 flash('Senhas não coincidem', 'error')
-                return render_template('auth/register.html')
+                return render_template('register.html')
             
             if len(senha) < 6:
                 flash('Senha deve ter pelo menos 6 caracteres', 'error')
-                return render_template('auth/register.html')
+                return render_template('register.html')
             
             # Verificar se médico já existe
             existing = db.session.query(Medico).filter_by(nome=nome, crm=crm).first()
             if existing:
                 flash('Médico já cadastrado com este nome e CRM', 'error')
-                return render_template('auth/register.html')
+                return render_template('register.html')
             
             # Criar novo médico
             medico = Medico()
@@ -152,7 +152,7 @@ def register():
             db.session.rollback()
             flash('Erro ao cadastrar médico', 'error')
     
-    return render_template('auth/register.html')
+    return render_template('register.html')
 
 
 @auth_bp.route('/profile')
@@ -168,13 +168,13 @@ def profile():
         user_type = session.get('usuario_tipo', 'medico')
         
         if user_type == 'admin':
-            return render_template('auth/profile.html', 
+            return render_template('profile.html', 
                                  user={'nome': user, 'tipo': 'Administrador'})
         
         # Buscar dados do médico
         medico = db.session.query(Medico).filter_by(nome=user).first()
         if medico:
-            return render_template('auth/profile.html', user=medico, user_type=user_type)
+            return render_template('profile.html', user=medico, user_type=user_type)
         else:
             flash('Dados do usuário não encontrados', 'error')
             return redirect(url_for('dashboard.index'))
@@ -209,21 +209,21 @@ def change_password():
             # Validações
             if not all([senha_atual, nova_senha, confirmar_senha]):
                 flash('Todos os campos são obrigatórios', 'error')
-                return render_template('auth/change_password.html')
+                return render_template('change_password.html')
             
             if nova_senha != confirmar_senha:
                 flash('Nova senha e confirmação não coincidem', 'error')
-                return render_template('auth/change_password.html')
+                return render_template('change_password.html')
             
             if len(nova_senha) < 6:
                 flash('Nova senha deve ter pelo menos 6 caracteres', 'error')
-                return render_template('auth/change_password.html')
+                return render_template('change_password.html')
             
             # Verificar senha atual
             medico = db.session.query(Medico).filter_by(nome=user).first()
             if not medico or not check_password_hash(medico.senha, senha_atual):
                 flash('Senha atual incorreta', 'error')
-                return render_template('auth/change_password.html')
+                return render_template('change_password.html')
             
             # Atualizar senha
             medico.senha = generate_password_hash(nova_senha)
@@ -236,4 +236,4 @@ def change_password():
             db.session.rollback()
             flash('Erro ao alterar senha', 'error')
     
-    return render_template('auth/change_password.html')
+    return render_template('change_password.html')

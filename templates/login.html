@@ -77,11 +77,11 @@
                         </button>
                         
                         <div class="text-center mb-4">
-                            <a href="{{ url_for('password_recovery.forgot_password') }}" 
+                            <a href="{{ url_for('auth.change_password') }}" 
                                class="text-decoration-none text-light-emphasis" 
                                style="font-size: 0.9rem;">
                                 <i class="fas fa-key me-1"></i>
-                                Esqueci minha senha
+                                Alterar senha
                             </a>
                         </div>
                     </form>
@@ -89,7 +89,7 @@
                     <div class="text-center pb-4">
                         <div class="divider-gradient mx-auto mb-4" style="width: 60px; height: 2px; background: linear-gradient(45deg, #6c757d, #adb5bd); border-radius: 1px;"></div>
                         <p class="text-muted mb-3">Não possui conta?</p>
-                        <a href="{{ url_for('medicos.cadastrar_medico') }}" 
+                        <a href="{{ url_for('auth.register') }}" 
                            class="btn btn-outline-light neural-btn px-4 py-2" 
                            style="border-radius: 20px; font-weight: 500;">
                             <i class="fas fa-user-plus me-2"></i>
