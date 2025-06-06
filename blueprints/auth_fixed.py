@@ -50,7 +50,10 @@ def login():
             
             nome = request.form.get('nome', '').strip()
             crm = request.form.get('crm', '').strip()
-            senha = request.form.get('senha', '')
+            senha = request.form.get('senha', '').strip()
+            
+            # Debug dos dados recebidos
+            current_app.logger.info(f"Login attempt - Nome: '{nome}', CRM: '{crm}', Senha length: {len(senha) if senha else 0}")
             
             if not nome or not senha:
                 flash('Nome e senha são obrigatórios', 'error')
@@ -68,10 +71,21 @@ def login():
             
             # Verificar médico se CRM foi fornecido
             if crm:
+                # Primeiro tentar buscar por nome e CRM
                 medico = db.session.query(Medico).filter_by(nome=nome, crm=crm).first()
+                
+                # Se não encontrar, tentar só por CRM (caso o nome tenha diferenças)
+                if not medico:
+                    medico = db.session.query(Medico).filter_by(crm=crm).first()
+                
+                # Se ainda não encontrar, tentar só por nome
+                if not medico:
+                    medico = db.session.query(Medico).filter_by(nome=nome).first()
+                
                 if medico and check_password_hash(medico.senha, senha):
-                    session['usuario'] = nome
+                    session['usuario'] = medico.nome
                     session['usuario_tipo'] = 'medico'
+                    session['medico_id'] = medico.id
                     session.permanent = True
                     
                     flash('Login realizado com sucesso!', 'success')
