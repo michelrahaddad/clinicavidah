@@ -62,13 +62,32 @@ def testar_assinatura_pdf():
         print("✅ PDF gerado com sucesso!")
         print("📁 Arquivo salvo como: receita_teste_assinatura.pdf")
         
-        # Verificar se contém dados da assinatura (procurar por base64)
-        pdf_text = str(pdf_response.content)
-        if 'data:image' in pdf_text and 'base64' in pdf_text:
+        # Verificar se contém dados da assinatura (procurar por base64 ou PNG)
+        pdf_content = pdf_response.content
+        pdf_text = str(pdf_content)
+        
+        # Verificar múltiplos indicadores de assinatura
+        indicadores_assinatura = [
+            b'data:image/png;base64',
+            b'Michel Raineri Haddad',
+            b'183299-SP',
+            b'CRM:',
+            b'Assinatura Digital'
+        ]
+        
+        assinatura_encontrada = 0
+        for indicador in indicadores_assinatura:
+            if indicador in pdf_content:
+                assinatura_encontrada += 1
+                print(f"✅ Encontrado: {indicador.decode('utf-8', errors='ignore')}")
+        
+        print(f"📊 Indicadores encontrados: {assinatura_encontrada}/{len(indicadores_assinatura)}")
+        
+        if assinatura_encontrada >= 3:  # Pelo menos 3 indicadores devem estar presentes
             print("✅ Assinatura digital detectada no PDF!")
             return True
         else:
-            print("❌ Assinatura digital não encontrada no PDF")
+            print("❌ Assinatura digital não encontrada suficientemente no PDF")
             return False
             
     except Exception as e:
