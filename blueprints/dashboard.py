@@ -10,7 +10,7 @@ import logging
 
 # Import database and models
 from core.database import db
-from models import Paciente, Receita, ExameLab, ExameImg, Medico, AtestadoMedicoMedico
+from models import Paciente, Receita, ExameLab, ExameImg, Medico, AtestadoMedico
 
 logger = logging.getLogger(__name__)
 

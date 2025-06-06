@@ -91,7 +91,7 @@ def register_main_routes(app):
     def index():
         """Página inicial - redireciona baseado na autenticação"""
         if 'usuario' in session:
-            return redirect(url_for('dashboard.index'))
+            return redirect('/dashboard/')
         return redirect('/auth/login')
     
     @app.route('/dashboard')
