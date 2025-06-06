@@ -214,13 +214,15 @@
     </form>
     
     <!-- Navigation Icons -->
-    <div class="d-flex justify-content-center gap-3 mt-4">
+    <div class="d-flex justify-content-center gap-3 mt-4" style="position: relative; z-index: 10;">
         <a href="{{ url_for('exames_img.exames_img') }}" class="btn btn-outline-info glass-button" 
-           style="border-radius: 15px; padding: 12px 20px;">
+           style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 11;">
             <i class="fas fa-x-ray me-2"></i>Exames de Imagem
         </a>
-        <a href="{{ url_for('exames_lab.exames_lab') }}" class="btn btn-outline-success glass-button"
-           style="border-radius: 15px; padding: 12px 20px;">
+        <a href="{{ url_for('exames_lab.exames_lab') }}" 
+           class="btn btn-outline-success glass-button"
+           style="border-radius: 15px; padding: 12px 20px; position: relative; z-index: 11; pointer-events: auto; cursor: pointer;"
+           onclick="window.location.href='{{ url_for('exames_lab.exames_lab') }}'">
             <i class="fas fa-vials me-2"></i>Exames Lab
         </a>
     </div>
