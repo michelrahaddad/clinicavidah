@@ -718,3 +718,32 @@ def gerar_pdf_receita_cronologia(receita_id):
         logging.error(f'Erro ao gerar PDF da receita {receita_id}: {e}')
         flash('Erro ao gerar PDF da receita', 'error')
         return redirect(url_for('prontuario.prontuario'))
+
+@receita_bp.route('/api/paciente_dados/<nome_paciente>')
+def get_paciente_dados(nome_paciente):
+    """API to get complete patient data for auto-fill"""
+    try:
+        from models import Paciente
+        paciente = Paciente.query.filter_by(nome=nome_paciente).first()
+        if paciente:
+            return jsonify({
+                'success': True,
+                'dados': {
+                    'nome': paciente.nome,
+                    'cpf': paciente.cpf,
+                    'idade': f"{paciente.idade} anos" if paciente.idade > 0 else "",
+                    'endereco': paciente.endereco if paciente.endereco != 'Não informado' else "",
+                    'cidade_uf': paciente.cidade_uf if paciente.cidade_uf != 'Não informado/XX' else ""
+                }
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Paciente não encontrado'
+            })
+    except Exception as e:
+        logging.error(f'Error fetching patient data: {e}')
+        return jsonify({
+            'success': False,
+            'message': 'Erro interno do servidor'
+        })
