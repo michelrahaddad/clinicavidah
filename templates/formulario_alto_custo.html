@@ -273,5 +273,151 @@
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupPatientAutocomplete();
+    setupCidAutocomplete();
+    setupResponsavelToggle();
+});
+
+function setupPatientAutocomplete() {
+    const nomeInput = document.getElementById('nome_paciente');
+    if (!nomeInput) return;
+
+    nomeInput.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            hidePatientSuggestions();
+            return;
+        }
+
+        fetch('/api/pacientes?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+                showPatientSuggestions(data, nomeInput);
+            })
+            .catch(error => console.error('Erro na busca de pacientes:', error));
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#paciente-suggestions') && !e.target.closest('#nome_paciente')) {
+            hidePatientSuggestions();
+        }
+    });
+}
+
+function setupCidAutocomplete() {
+    const cidInput = document.getElementById('cid_search');
+    if (!cidInput) return;
+
+    cidInput.addEventListener('input', function() {
+        const query = this.value;
+        if (query.length < 2) {
+            hideCidSuggestions();
+            return;
+        }
+
+        fetch('/api/buscar_cid10?q=' + encodeURIComponent(query))
+            .then(response => response.json())
+            .then(data => {
+                showCidSuggestions(data, cidInput);
+            })
+            .catch(error => console.error('Erro na busca de CID-10:', error));
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('#cid-suggestions') && !e.target.closest('#cid_search')) {
+            hideCidSuggestions();
+        }
+    });
+}
+
+function setupResponsavelToggle() {
+    const incapazCheckbox = document.getElementById('incapaz');
+    const responsavelSection = document.getElementById('responsavel-section');
+    
+    if (incapazCheckbox && responsavelSection) {
+        incapazCheckbox.addEventListener('change', function() {
+            responsavelSection.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+}
+
+function showPatientSuggestions(pacientes, input) {
+    const suggestionsDiv = document.getElementById('paciente-suggestions');
+    if (!suggestionsDiv) return;
+
+    suggestionsDiv.innerHTML = '';
+    
+    if (pacientes.length === 0) {
+        suggestionsDiv.style.display = 'none';
+        return;
+    }
+
+    pacientes.forEach(paciente => {
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        div.innerHTML = `
+            <strong>${paciente.nome}</strong><br>
+            <small class="text-muted">${paciente.cpf || 'CPF não informado'}</small>
+        `;
+        
+        div.addEventListener('click', function() {
+            input.value = paciente.nome;
+            hidePatientSuggestions();
+        });
+        
+        suggestionsDiv.appendChild(div);
+    });
+    
+    suggestionsDiv.style.display = 'block';
+}
+
+function showCidSuggestions(cids, input) {
+    const suggestionsDiv = document.getElementById('cid-suggestions');
+    if (!suggestionsDiv) return;
+
+    suggestionsDiv.innerHTML = '';
+    
+    if (cids.length === 0) {
+        suggestionsDiv.style.display = 'none';
+        return;
+    }
+
+    cids.forEach(cid => {
+        const div = document.createElement('div');
+        div.className = 'suggestion-item';
+        div.innerHTML = `
+            <strong>${cid.codigo}</strong> - ${cid.descricao}<br>
+            <small class="text-muted">${cid.categoria}</small>
+        `;
+        
+        div.addEventListener('click', function() {
+            input.value = `${cid.codigo} - ${cid.descricao}`;
+            document.getElementById('cid_codigo').value = cid.codigo;
+            document.getElementById('cid_descricao').value = cid.descricao;
+            hideCidSuggestions();
+        });
+        
+        suggestionsDiv.appendChild(div);
+    });
+    
+    suggestionsDiv.style.display = 'block';
+}
+
+function hidePatientSuggestions() {
+    const suggestionsDiv = document.getElementById('paciente-suggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+function hideCidSuggestions() {
+    const suggestionsDiv = document.getElementById('cid-suggestions');
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
+}
+</script>
 
 {% endblock %}
