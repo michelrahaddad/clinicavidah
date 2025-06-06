@@ -20,155 +20,6 @@
             border-radius: 0 0 20px 20px;
         }
         
-        .cronologia-container {
-            position: relative;
-        }
-        
-        .timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: linear-gradient(to bottom, #667eea, #764ba2);
-        }
-        
-        .timeline-item {
-            position: relative;
-            margin-bottom: 2rem;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .timeline-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .timeline-item::before {
-            content: '💊';
-            position: absolute;
-            left: -45px;
-            top: 20px;
-            width: 30px;
-            height: 30px;
-            background: white;
-            border: 3px solid #667eea;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            z-index: 10;
-        }
-        
-        .receita-header {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 1.5rem;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        
-        .receita-header:hover {
-            background: linear-gradient(45deg, #5a6fd8, #6a4190);
-        }
-        
-        .receita-content {
-            padding: 1.5rem;
-            display: none;
-        }
-        
-        .receita-content.active {
-            display: block;
-        }
-        
-        .data-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-        
-        .medicamento-card {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-        }
-        
-        .medicamento-nome {
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .medicamento-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        
-        .info-item {
-            display: flex;
-            align-items: center;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            margin-right: 0.5rem;
-            color: #495057;
-        }
-        
-        .observacoes-section {
-            background: #e3f2fd;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .btn-editar {
-            background: linear-gradient(45deg, #28a745, #20c997);
-            border: none;
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-editar:hover {
-            background: linear-gradient(45deg, #218838, #1ba085);
-            transform: translateY(-2px);
-        }
-        
-        .btn-pdf {
-            background: linear-gradient(45deg, #dc3545, #fd7e14);
-            border: none;
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-pdf:hover {
-            background: linear-gradient(45deg, #c82333, #e56a0c);
-            transform: translateY(-2px);
-        }
-        
         .stats-card {
             background: white;
             border-radius: 15px;
@@ -181,18 +32,6 @@
             font-size: 2rem;
             font-weight: bold;
             color: #667eea;
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
-        }
-        
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: #dee2e6;
         }
         
         /* Estilos para cronologia lateral */
@@ -286,6 +125,98 @@
         .receita-detalhada {
             padding: 1rem;
         }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+        
+        /* Estilos do template base para receitas médicas */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(102, 126, 234, 0.25);
+            color: white;
+        }
+        
+        .glass-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .neural-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+        
+        .neural-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-header {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .text-light {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        .text-muted {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+        
+        .autocomplete-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .medicamento-autocomplete {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -370,7 +301,7 @@
             <!-- Área principal para exibir a receita -->
             <div class="col-md-8">
                 <div id="receita-principal" class="receita-area">
-                    <div class="text-center py-5 text-muted" id="mensagem-inicial">
+                    <div class="text-center py-5 text-muted" id="mensagem-inicial" style="display: {{ 'none' if receitas else 'block' }};">
                         <i class="fas fa-prescription-bottle-alt fa-3x mb-3"></i>
                         <h5>Selecione uma receita na cronologia</h5>
                         <p>Clique em uma data na lateral para visualizar a receita completa</p>
@@ -378,306 +309,163 @@
                     
                     {% for receita in receitas %}
                     <div class="receita-detalhada" id="receita-{{ receita.id }}" style="display: {{ 'block' if loop.first else 'none' }};">
-                        <div class="card">
-                            <div class="card-header bg-primary text-white">
-                                <div class="row align-items-center">
-                                    <div class="col-md-8">
-                                        <h5 class="mb-0">
-                                            <i class="fas fa-prescription-bottle-alt me-2"></i>
-                                            Receita Médica - {{ receita.data }}
-                                        </h5>
-                                    </div>
-                                    <div class="col-md-4 text-end">
-                                        <button class="btn btn-outline-light btn-sm" onclick="editarReceita({{ receita.id }})">
-                                            <i class="fas fa-edit me-1"></i> Editar
-                                        </button>
+                        <form action="/prontuario/salvar_receita" method="post" id="receita-form-{{ receita.id }}">
+                            <input type="hidden" name="receita_id" value="{{ receita.id }}">
+                            
+                            <!-- Dados do Paciente -->
+                            <div class="card glass-card">
+                                <div class="card-header">
+                                    <h5 class="mb-0 text-light">
+                                        <i class="fas fa-user me-2"></i>
+                                        Dados do Paciente - {{ receita.data }}
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label for="nome_paciente_{{ receita.id }}" class="form-label text-light">
+                                                    <i class="fas fa-user me-2"></i>Nome do Paciente *
+                                                </label>
+                                                <input type="text" 
+                                                       id="nome_paciente_{{ receita.id }}"
+                                                       name="nome_paciente"
+                                                       class="form-control glass-input" 
+                                                       value="{{ paciente_nome }}"
+                                                       readonly
+                                                       style="height: 50px; font-size: 1.1rem; font-weight: 500;">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-body">
-                                <form id="form-receita-{{ receita.id }}">
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Nome do Paciente</label>
-                                            <input type="text" class="form-control" id="nome-paciente-{{ receita.id }}" value="{{ paciente_nome }}" readonly>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Data</label>
-                                            <input type="date" class="form-control" id="data-receita-{{ receita.id }}" value="{{ receita.data_original }}">
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">Médico</label>
-                                            <input type="text" class="form-control" value="{{ receita.medico_nome }}" readonly>
+                            
+                            <!-- Medicamentos Prescritos -->
+                            <div class="card glass-card mt-4">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="mb-0 text-light">
+                                            <i class="fas fa-pills me-2 text-info"></i>
+                                            Medicamentos Prescritos
+                                        </h5>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-sm btn-success neural-btn px-3 py-1" onclick="adicionarMedicamento({{ receita.id }})" style="border-radius: 12px; font-size: 0.8rem;">
+                                                <i class="fas fa-plus me-1"></i>+ Medicamento
+                                            </button>
                                         </div>
                                     </div>
-                                    
-                                    <div class="mb-3">
-                                        <h6>
-                                            <i class="fas fa-pills text-primary me-2"></i>
-                                            Medicamentos
-                                        </h6>
-                                        <div id="medicamentos-container-{{ receita.id }}">
-                                            {% for loop_index in range(receita.medicamentos|length) %}
-                                            <div class="medicamento-row row mb-3" data-index="{{ loop_index }}">
+                                    <p class="text-muted mb-0 small">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Formato: [Princípio ativo] / [Conc.] / [Via] / [Freq] / [Qtd]
+                                    </p>
+                                </div>
+                                <div class="card-body">
+                                    <div id="medicamentos-container-{{ receita.id }}">
+                                        {% for loop_index in range(receita.medicamentos|length) %}
+                                        <div class="medicamento-row mb-4 p-4" id="medicamento-{{ receita.id }}-{{ loop_index }}" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="text-info mb-0 fw-bold">
+                                                    <i class="fas fa-capsules me-2"></i>Medicamento {{ loop_index + 1 }}
+                                                </h6>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerMedicamento({{ receita.id }}, {{ loop_index }})" style="border-radius: 50%; width: 30px; height: 30px; padding: 0;">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <div class="row g-3 align-items-end">
                                                 <div class="col-md-3">
-                                                    <label class="form-label">Medicamento</label>
-                                                    <input type="text" class="form-control" name="medicamento_{{ loop_index }}" 
-                                                           value="{{ receita.medicamentos[loop_index].medicamento }}" 
-                                                           data-medicamento-autocomplete>
+                                                    <label class="form-label text-light fw-semibold mb-2">
+                                                        <i class="fas fa-pills me-1 text-success"></i>Princípio ativo
+                                                    </label>
+                                                    <div class="position-relative">
+                                                        <input type="text" name="principio_ativo[]" id="principio_ativo_{{ receita.id }}_{{ loop_index }}" class="form-control glass-input medicamento-autocomplete" 
+                                                               value="{{ receita.medicamentos[loop_index].medicamento }}" 
+                                                               autocomplete="off" data-index="{{ loop_index }}"
+                                                               style="height: 48px; font-size: 1rem; font-weight: 500;">
+                                                        <div class="autocomplete-suggestions" id="suggestions_medicamento_{{ receita.id }}_{{ loop_index }}"></div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Posologia</label>
-                                                    <input type="text" class="form-control" name="posologia_{{ loop_index }}" 
-                                                           value="{{ receita.medicamentos[loop_index].posologia }}">
+                                                    <label class="form-label text-light fw-semibold mb-2">
+                                                        <i class="fas fa-weight me-1 text-warning"></i>Conc.
+                                                    </label>
+                                                    <input type="text" name="concentracao[]" id="concentracao_{{ receita.id }}_{{ loop_index }}" class="form-control glass-input" 
+                                                           value="{{ receita.medicamentos[loop_index].posologia }}" 
+                                                           style="height: 48px; font-size: 1rem;">
                                                 </div>
                                                 <div class="col-md-2">
-                                                    <label class="form-label">Duração</label>
-                                                    <input type="text" class="form-control" name="duracao_{{ loop_index }}" 
-                                                           value="{{ receita.medicamentos[loop_index].duracao }}">
-                                                </div>
-                                                <div class="col-md-2">
-                                                    <label class="form-label">Via</label>
-                                                    <select class="form-control" name="via_{{ loop_index }}">
+                                                    <label class="form-label text-light fw-semibold mb-2">
+                                                        <i class="fas fa-route me-1 text-primary"></i>Via
+                                                    </label>
+                                                    <select name="via[]" id="via_{{ receita.id }}_{{ loop_index }}" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
+                                                        <option value="">Selecione</option>
                                                         <option value="Oral" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oral' else '' }}>Oral</option>
-                                                        <option value="Tópica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Tópica' else '' }}>Tópica</option>
-                                                        <option value="Injetável" {{ 'selected' if receita.medicamentos[loop_index].via == 'Injetável' else '' }}>Injetável</option>
-                                                        <option value="Oftálmica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oftálmica' else '' }}>Oftálmica</option>
-                                                        <option value="Nasal" {{ 'selected' if receita.medicamentos[loop_index].via == 'Nasal' else '' }}>Nasal</option>
                                                         <option value="Sublingual" {{ 'selected' if receita.medicamentos[loop_index].via == 'Sublingual' else '' }}>Sublingual</option>
+                                                        <option value="Intramuscular" {{ 'selected' if receita.medicamentos[loop_index].via == 'Intramuscular' else '' }}>Intramuscular</option>
+                                                        <option value="Endovenosa" {{ 'selected' if receita.medicamentos[loop_index].via == 'Endovenosa' else '' }}>Endovenosa</option>
+                                                        <option value="Tópica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Tópica' else '' }}>Tópica</option>
+                                                        <option value="Ocular" {{ 'selected' if receita.medicamentos[loop_index].via == 'Ocular' else '' }}>Ocular</option>
+                                                        <option value="Nasal" {{ 'selected' if receita.medicamentos[loop_index].via == 'Nasal' else '' }}>Nasal</option>
                                                     </select>
                                                 </div>
-                                                <div class="col-md-1">
-                                                    <label class="form-label">&nbsp;</label>
-                                                    <button type="button" class="btn btn-danger btn-sm d-block" onclick="removerMedicamento({{ receita.id }}, {{ loop_index }})">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
+                                                <div class="col-md-2">
+                                                    <label class="form-label text-light fw-semibold mb-2">
+                                                        <i class="fas fa-clock me-1 text-info"></i>Freq
+                                                    </label>
+                                                    <select name="frequencia[]" id="frequencia_{{ receita.id }}_{{ loop_index }}" class="form-control glass-input" style="height: 48px; font-size: 1rem;">
+                                                        <option value="">Selecione</option>
+                                                        <option value="1x" {{ 'selected' if '1x' in receita.medicamentos[loop_index].duracao else '' }}>1x</option>
+                                                        <option value="2x" {{ 'selected' if '2x' in receita.medicamentos[loop_index].duracao else '' }}>2x</option>
+                                                        <option value="3x" {{ 'selected' if '3x' in receita.medicamentos[loop_index].duracao else '' }}>3x</option>
+                                                        <option value="4x" {{ 'selected' if '4x' in receita.medicamentos[loop_index].duracao else '' }}>4x</option>
+                                                        <option value="6x" {{ 'selected' if '6x' in receita.medicamentos[loop_index].duracao else '' }}>6x</option>
+                                                        <option value="8x" {{ 'selected' if '8x' in receita.medicamentos[loop_index].duracao else '' }}>8x</option>
+                                                        <option value="Se necessário">Se necessário</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label text-light fw-semibold mb-2">
+                                                        <i class="fas fa-box me-1 text-danger"></i>Qtd
+                                                    </label>
+                                                    <input type="text" name="quantidade[]" id="quantidade_{{ receita.id }}_{{ loop_index }}" class="form-control glass-input" 
+                                                           value="{{ receita.medicamentos[loop_index].duracao }}" 
+                                                           style="height: 48px; font-size: 1rem;">
                                                 </div>
                                             </div>
-                                            {% endfor %}
                                         </div>
-                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarMedicamento({{ receita.id }})">
-                                            <i class="fas fa-plus me-1"></i> Adicionar Medicamento
-                                        </button>
+                                        {% endfor %}
                                     </div>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label">Observações</label>
-                                        <textarea class="form-control" rows="3" id="observacoes-{{ receita.id }}" placeholder="Adicione observações médicas aqui..."></textarea>
-                                    </div>
-                                    
-                                    <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-success" onclick="salvarReceita({{ receita.id }})">
-                                            <i class="fas fa-save me-2"></i>
-                                            Salvar Alterações
-                                        </button>
-                                        <button type="button" class="btn btn-primary" onclick="gerarPdfReceita({{ receita.id }})">
-                                            <i class="fas fa-file-pdf me-2"></i>
-                                            Gerar PDF
-                                        </button>
-                                        <a href="/receita?receita_id={{ receita.id }}" class="btn btn-outline-primary">
-                                            <i class="fas fa-external-link-alt me-2"></i>
-                                            Abrir Original
-                                        </a>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    {% endfor %}
                             
-                            <div class="receita-content" id="content-{{ receita.id }}">
-                                <!-- Template de receita médica inline -->
-                                <div id="receita-inline-{{ receita.id }}" style="display: none;">
-                                    <div class="receita-form-container">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="card">
-                                                    <div class="card-header bg-primary text-white">
-                                                        <h5 class="mb-0">
-                                                            <i class="fas fa-prescription-bottle-alt me-2"></i>
-                                                            Receita Médica - {{ receita.data }}
-                                                        </h5>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <form id="form-receita-{{ receita.id }}">
-                                                            <div class="row mb-3">
-                                                                <div class="col-md-6">
-                                                                    <label class="form-label">Nome do Paciente</label>
-                                                                    <input type="text" class="form-control" id="nome-paciente-{{ receita.id }}" value="{{ paciente_nome }}" readonly>
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <label class="form-label">Data</label>
-                                                                    <input type="date" class="form-control" id="data-receita-{{ receita.id }}" value="{{ receita.data_original }}">
-                                                                </div>
-                                                                <div class="col-md-3">
-                                                                    <label class="form-label">Médico</label>
-                                                                    <input type="text" class="form-control" value="{{ receita.medico_nome }}" readonly>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div class="mb-3">
-                                                                <h6>
-                                                                    <i class="fas fa-pills text-primary me-2"></i>
-                                                                    Medicamentos
-                                                                </h6>
-                                                                <div id="medicamentos-container-{{ receita.id }}">
-                                                                    {% for loop_index in range(receita.medicamentos|length) %}
-                                                                    <div class="medicamento-row row mb-3" data-index="{{ loop_index }}">
-                                                                        <div class="col-md-3">
-                                                                            <label class="form-label">Medicamento</label>
-                                                                            <input type="text" class="form-control" name="medicamento_{{ loop_index }}" 
-                                                                                   value="{{ receita.medicamentos[loop_index].medicamento }}" 
-                                                                                   data-medicamento-autocomplete>
-                                                                        </div>
-                                                                        <div class="col-md-2">
-                                                                            <label class="form-label">Posologia</label>
-                                                                            <input type="text" class="form-control" name="posologia_{{ loop_index }}" 
-                                                                                   value="{{ receita.medicamentos[loop_index].posologia }}">
-                                                                        </div>
-                                                                        <div class="col-md-2">
-                                                                            <label class="form-label">Duração</label>
-                                                                            <input type="text" class="form-control" name="duracao_{{ loop_index }}" 
-                                                                                   value="{{ receita.medicamentos[loop_index].duracao }}">
-                                                                        </div>
-                                                                        <div class="col-md-2">
-                                                                            <label class="form-label">Via</label>
-                                                                            <select class="form-control" name="via_{{ loop_index }}">
-                                                                                <option value="Oral" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oral' else '' }}>Oral</option>
-                                                                                <option value="Tópica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Tópica' else '' }}>Tópica</option>
-                                                                                <option value="Injetável" {{ 'selected' if receita.medicamentos[loop_index].via == 'Injetável' else '' }}>Injetável</option>
-                                                                                <option value="Oftálmica" {{ 'selected' if receita.medicamentos[loop_index].via == 'Oftálmica' else '' }}>Oftálmica</option>
-                                                                                <option value="Nasal" {{ 'selected' if receita.medicamentos[loop_index].via == 'Nasal' else '' }}>Nasal</option>
-                                                                                <option value="Sublingual" {{ 'selected' if receita.medicamentos[loop_index].via == 'Sublingual' else '' }}>Sublingual</option>
-                                                                            </select>
-                                                                        </div>
-                                                                        <div class="col-md-1">
-                                                                            <label class="form-label">&nbsp;</label>
-                                                                            <button type="button" class="btn btn-danger btn-sm d-block" onclick="removerMedicamento({{ receita.id }}, {{ loop_index }})">
-                                                                                <i class="fas fa-times"></i>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                    {% endfor %}
-                                                                </div>
-                                                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarMedicamento({{ receita.id }})">
-                                                                    <i class="fas fa-plus me-1"></i> Adicionar Medicamento
-                                                                </button>
-                                                            </div>
-                                                            
-                                                            <div class="mb-3">
-                                                                <label class="form-label">Observações</label>
-                                                                <textarea class="form-control" rows="3" id="observacoes-{{ receita.id }}">{{ receita.observacoes }}</textarea>
-                                                            </div>
-                                                            
-                                                            <div class="d-flex gap-2">
-                                                                <button type="button" class="btn btn-success" onclick="salvarReceita({{ receita.id }})">
-                                                                    <i class="fas fa-save me-2"></i>
-                                                                    Salvar Alterações
-                                                                </button>
-                                                                <button type="button" class="btn btn-primary" onclick="gerarPdfReceita({{ receita.id }})">
-                                                                    <i class="fas fa-file-pdf me-2"></i>
-                                                                    Gerar PDF
-                                                                </button>
-                                                                <button type="button" class="btn btn-secondary" onclick="fecharReceitaInline({{ receita.id }})">
-                                                                    <i class="fas fa-times me-2"></i>
-                                                                    Fechar
-                                                                </button>
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="mt-4">
+                                <!-- Botão Voltar -->
+                                <div class="mb-3">
+                                    <a href="/prontuario" class="btn neural-btn px-3 py-2" style="border-radius: 15px; font-weight: 600; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; font-size: 0.9rem;">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-1">
+                                            <rect x="3" y="3" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                                            <rect x="14" y="3" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                                            <rect x="3" y="14" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                                            <rect x="14" y="14" width="7" height="7" rx="1" fill="white" opacity="0.9"/>
+                                            <circle cx="6.5" cy="6.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                                            <circle cx="17.5" cy="6.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                                            <circle cx="6.5" cy="17.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                                            <circle cx="17.5" cy="17.5" r="1.5" fill="rgba(102, 126, 234, 0.8)"/>
+                                        </svg>
+                                        VOLTAR
+                                    </a>
                                 </div>
                                 
-                                <!-- Visualização resumida (mostrada por padrão) -->
-                                <div id="receita-resumo-{{ receita.id }}">
-                                    <div class="row">
-                                        <div class="col-md-8">
-                                            <h6 class="mb-3">
-                                                <i class="fas fa-pills text-primary me-2"></i>
-                                                Medicamentos Prescritos
-                                            </h6>
-                                            
-                                            {% for medicamento in receita.medicamentos %}
-                                            <div class="medicamento-card">
-                                                <div class="medicamento-nome">
-                                                    {{ medicamento.medicamento }}
-                                                </div>
-                                                <div class="medicamento-info">
-                                                    <div class="info-item">
-                                                        <span class="info-label">
-                                                            <i class="fas fa-clock text-info me-1"></i>
-                                                            Posologia:
-                                                        </span>
-                                                        {{ medicamento.posologia or 'Não especificada' }}
-                                                    </div>
-                                                    <div class="info-item">
-                                                        <span class="info-label">
-                                                            <i class="fas fa-calendar text-warning me-1"></i>
-                                                            Duração:
-                                                        </span>
-                                                        {{ medicamento.duracao or 'Não especificada' }}
-                                                    </div>
-                                                    <div class="info-item">
-                                                        <span class="info-label">
-                                                            <i class="fas fa-route text-success me-1"></i>
-                                                            Via:
-                                                        </span>
-                                                        {{ medicamento.via or 'Não especificada' }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {% endfor %}
-                                            
-                                            {% if receita.observacoes %}
-                                            <div class="observacoes-section">
-                                                <h6 class="mb-2">
-                                                    <i class="fas fa-sticky-note text-info me-2"></i>
-                                                    Observações Médicas
-                                                </h6>
-                                                <p class="mb-0">{{ receita.observacoes }}</p>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                        
-                                        <div class="col-md-4">
-                                            <div class="d-grid gap-2">
-                                                <button class="btn btn-editar" onclick="abrirReceitaInline({{ receita.id }})">
-                                                    <i class="fas fa-edit me-2"></i>
-                                                    Editar Receita
-                                                </button>
-                                                
-                                                <button class="btn btn-pdf" onclick="gerarPdfReceita({{ receita.id }})">
-                                                    <i class="fas fa-file-pdf me-2"></i>
-                                                    Gerar PDF
-                                                </button>
-                                                
-                                                <a href="/receita?receita_id={{ receita.id }}" class="btn btn-outline-primary">
-                                                    <i class="fas fa-external-link-alt me-2"></i>
-                                                    Abrir Original
-                                                </a>
-                                            </div>
-                                            
-                                            <div class="mt-3 p-3 bg-light rounded">
-                                                <h6 class="mb-2">
-                                                    <i class="fas fa-info-circle text-primary me-2"></i>
-                                                    Detalhes
-                                                </h6>
-                                                <small class="text-muted">
-                                                    <strong>Data:</strong> {{ receita.data }}<br>
-                                                    <strong>Médico:</strong> {{ receita.medico_nome }}<br>
-                                                    <strong>Total de medicamentos:</strong> {{ receita.total_medicamentos }}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Botão Gerar PDF Centralizado -->
+                                <div class="text-center">
+                                    <input type="submit" 
+                                           value="📄 GERAR PDF"
+                                           class="btn btn-success px-4 py-2" 
+                                           style="border-radius: 20px; font-weight: 600; font-size: 1rem; box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3); min-width: 180px; cursor: pointer; border: none;">
                                 </div>
                             </div>
-                        </div>
-                        {% endfor %}
+                        </form>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -698,43 +486,90 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function toggleReceita(receitaId) {
-            const content = document.getElementById(`content-${receitaId}`);
-            const icon = document.getElementById(`icon-${receitaId}`);
+        function mostrarReceita(receitaId) {
+            // Esconder todas as receitas
+            document.querySelectorAll('.receita-detalhada').forEach(r => r.style.display = 'none');
+            document.getElementById('mensagem-inicial').style.display = 'none';
             
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            } else {
-                // Fechar todas as outras receitas
-                document.querySelectorAll('.receita-content').forEach(c => c.classList.remove('active'));
-                document.querySelectorAll('.toggle-icon').forEach(i => {
-                    i.classList.remove('fa-chevron-up');
-                    i.classList.add('fa-chevron-down');
-                });
-                
-                // Abrir a receita clicada
-                content.classList.add('active');
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            }
+            // Mostrar a receita selecionada
+            document.getElementById(`receita-${receitaId}`).style.display = 'block';
+            
+            // Atualizar estado ativo na cronologia
+            document.querySelectorAll('.receita-item-lateral').forEach(item => item.classList.remove('active'));
+            document.querySelector(`[data-receita-id="${receitaId}"] .receita-item-lateral`).classList.add('active');
         }
         
-        function editarReceita(receitaId) {
+        function editarModoReceita(receitaId) {
+            // Redirecionar para a página de edição de receita
             window.location.href = `/receita?receita_id=${receitaId}`;
+        }
+        
+        function salvarReceita(receitaId) {
+            // Implementar salvamento via AJAX
+            alert('Funcionalidade de salvamento será implementada');
         }
         
         function gerarPdfReceita(receitaId) {
             window.open(`/receita/pdf/${receitaId}`, '_blank');
         }
         
-        // Abrir a primeira receita automaticamente
+        function adicionarMedicamento(receitaId) {
+            const container = document.getElementById(`medicamentos-container-${receitaId}`);
+            const rows = container.querySelectorAll('.medicamento-row');
+            const newIndex = rows.length;
+            
+            const newRow = document.createElement('div');
+            newRow.className = 'medicamento-row row mb-3';
+            newRow.setAttribute('data-index', newIndex);
+            newRow.innerHTML = `
+                <div class="col-md-3">
+                    <label class="form-label">Medicamento</label>
+                    <input type="text" class="form-control" name="medicamento_${newIndex}" data-medicamento-autocomplete>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Posologia</label>
+                    <input type="text" class="form-control" name="posologia_${newIndex}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Duração</label>
+                    <input type="text" class="form-control" name="duracao_${newIndex}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Via</label>
+                    <select class="form-control" name="via_${newIndex}">
+                        <option value="Oral">Oral</option>
+                        <option value="Tópica">Tópica</option>
+                        <option value="Injetável">Injetável</option>
+                        <option value="Oftálmica">Oftálmica</option>
+                        <option value="Nasal">Nasal</option>
+                        <option value="Sublingual">Sublingual</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-danger btn-sm d-block" onclick="removerMedicamento(${receitaId}, ${newIndex})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(newRow);
+        }
+        
+        function removerMedicamento(receitaId, index) {
+            const container = document.getElementById(`medicamentos-container-${receitaId}`);
+            const row = container.querySelector(`[data-index="${index}"]`);
+            if (row) {
+                row.remove();
+            }
+        }
+        
+        // Mostrar primeira receita automaticamente
         document.addEventListener('DOMContentLoaded', function() {
-            const firstReceita = document.querySelector('.timeline-item');
+            const firstReceita = document.querySelector('.timeline-item-lateral');
             if (firstReceita) {
                 const receitaId = firstReceita.getAttribute('data-receita-id');
-                toggleReceita(receitaId);
+                mostrarReceita(receitaId);
             }
         });
     </script>
