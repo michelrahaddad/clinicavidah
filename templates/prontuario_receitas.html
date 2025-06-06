@@ -17,7 +17,7 @@
             <div class="card glass-card" style="height: 100%;">
                 <div class="card-header text-center py-2">
                     <h6 class="mb-0 text-light">
-                        <strong>Cronologia receitas</strong>
+                        <strong>receita</strong>
                     </h6>
                 </div>
                 <div class="card-body p-2" style="overflow-y: auto; height: calc(100% - 60px);">
@@ -45,18 +45,9 @@
         <!-- Coluna direita - Receita única (75% da largura) -->
         <div class="col-9" style="height: 80vh;">
             <div id="receita-container" style="height: 100%;">
-                <!-- Estado inicial quando nenhuma receita está selecionada -->
-                <div id="receita-vazia" class="card glass-card text-center h-100 d-flex align-items-center justify-content-center">
-                    <div>
-                        <i class="fas fa-prescription-bottle-alt fa-4x text-muted mb-3"></i>
-                        <h4 class="text-light">Selecione uma receita</h4>
-                        <p class="text-muted">Clique em uma data na cronologia para visualizar a receita</p>
-                    </div>
-                </div>
-                
                 {% if receitas %}
                 {% for receita in receitas %}
-                <div class="receita-content h-100" id="receita-{{ receita.id }}" style="display: none;">
+                <div class="receita-content h-100" id="receita-{{ receita.id }}" style="display: {{ 'block' if loop.first else 'none' }};">
                     <!-- Card principal da receita -->
                     <div class="card glass-card h-100">
                         <div class="card-header text-center py-3">
@@ -163,12 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function mostrarReceita(receitaId) {
-    // Esconder estado vazio
-    const receitaVazia = document.getElementById('receita-vazia');
-    if (receitaVazia) {
-        receitaVazia.style.display = 'none';
-    }
-    
     // Esconder todas as receitas
     document.querySelectorAll('.receita-content').forEach(r => r.style.display = 'none');
     
