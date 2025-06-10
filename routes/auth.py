@@ -124,7 +124,12 @@ def login():
             
             # Se não é admin, verificar se é médico (CRM obrigatório para médicos)
             if crm:  # Se CRM foi fornecido, tentar login como médico
-                medico = Medico.query.filter_by(nome=nome, crm=crm).first()
+                # Case-insensitive search for both name and CRM
+                from sqlalchemy import func
+                medico = Medico.query.filter(
+                    func.lower(Medico.nome) == func.lower(nome),
+                    func.lower(Medico.crm) == func.lower(crm)
+                ).first()
                 
                 if medico and medico.senha and check_password_hash(medico.senha, senha):
                     session['usuario'] = medico.nome
