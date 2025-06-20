@@ -1,0 +1,37 @@
+<svg width="200" height="80" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E40AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Blue background rectangle -->
+  <rect x="0" y="0" width="200" height="80" rx="8" fill="url(#blueGradient)"/>
+  
+  <!-- White human figure in exercise/pilates pose -->
+  <g fill="white">
+    <!-- Head -->
+    <circle cx="30" cy="25" r="6"/>
+    
+    <!-- Body -->
+    <rect x="26" y="30" width="8" height="15" rx="4"/>
+    
+    <!-- Arms stretched out -->
+    <rect x="15" y="32" width="12" height="3" rx="1.5"/>
+    <rect x="37" y="32" width="12" height="3" rx="1.5"/>
+    
+    <!-- Legs -->
+    <rect x="24" y="44" width="3" height="12" rx="1.5"/>
+    <rect x="31" y="44" width="3" height="12" rx="1.5"/>
+  </g>
+  
+  <!-- Text "Corpo em" -->
+  <text x="65" y="30" font-family="Arial, sans-serif" font-size="14" font-weight="normal" fill="#10B981">Corpo em</text>
+  
+  <!-- Text "Harmonia" -->
+  <text x="65" y="48" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#10B981">Harmonia</text>
+  
+  <!-- Subtitle -->
+  <text x="65" y="62" font-family="Arial, sans-serif" font-size="8" fill="white">Studio de Pilates e Movimento</text>
+</svg>

@@ -1,0 +1,233 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 13%, 19%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215, 13%, 45%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 13%, 19%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 13%, 19%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(163, 94%, 36%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(210, 13%, 19%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(210, 13%, 19%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: hsl(210, 13%, 19%);
+  --radius: 0.5rem;
+  
+  /* Vidah Brand Colors */
+  --vidah-green: hsl(163, 94%, 36%);
+  --vidah-blue: hsl(207, 90%, 54%);
+  --vidah-gray: hsl(212, 13%, 45%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 4%, 16%);
+  --muted-foreground: hsl(240, 5%, 65%);
+  --popover: hsl(240, 10%, 4%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 4%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 4%, 16%);
+  --input: hsl(240, 4%, 16%);
+  --primary: hsl(163, 94%, 36%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(240, 4%, 16%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 4%, 16%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 5%, 84%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer utilities {
+  .gradient-bg {
+    background: linear-gradient(135deg, #00B894 0%, #0984E3 100%);
+  }
+  
+  .gradient-text {
+    background: linear-gradient(135deg, #00B894 0%, #0984E3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+    will-change: transform;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+    will-change: box-shadow;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
+    will-change: transform, opacity;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out;
+    will-change: opacity;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -20px, 0); }
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 20px rgba(0, 184, 148, 0.3); }
+  to { box-shadow: 0 0 30px rgba(0, 184, 148, 0.6); }
+}
+
+@keyframes slideUp {
+  from { transform: translate3d(0, 30px, 0); opacity: 0; }
+  to { transform: translate3d(0, 0, 0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vidah-green);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vidah-blue);
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Button hover effects */
+.btn-vidah {
+  @apply bg-[#00B894] text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-[#009d7f] transition-all transform hover:scale-105;
+}
+
+.btn-vidah-outline {
+  @apply border-2 border-[#0984E3] text-[#0984E3] px-8 py-4 rounded-full font-semibold text-lg hover:bg-[#0984E3] hover:text-white transition-all;
+}
+
+/* Loading states */
+.loading {
+  @apply opacity-50 pointer-events-none;
+}
+
+/* Form styles */
+.form-input {
+  @apply w-full p-3 border-2 rounded-xl focus:border-[#00B894] outline-none transition-colors;
+}
+
+/* Card styles */
+.plan-card {
+  @apply bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 relative;
+}
+
+.plan-card.popular {
+  @apply border-2 border-[#00B894] transform scale-105;
+  box-shadow: 0 20px 40px rgba(0, 184, 148, 0.15);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4;
+  }
+  
+  .hero-title {
+    @apply text-4xl;
+  }
+  
+  .section-title {
+    @apply text-3xl;
+  }
+  
+  /* Logo responsive adjustments */
+  .logo-header {
+    max-width: 120px;
+    height: auto;
+  }
+  
+  .logo-footer {
+    max-width: 100px;
+    height: auto;
+  }
+}
+
+/* Logo optimization */
+.logo-vidah {
+  filter: brightness(1.1) contrast(1.15) saturate(1.1);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  transition: all 0.3s ease;
+}
+
+.logo-vidah:hover {
+  filter: brightness(1.2) contrast(1.2) saturate(1.2);
+  transform: scale(1.02);
+}
+
+/* Ensure logos maintain aspect ratio and quality */
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .logo-header {
+    max-width: 200px;
+  }
+  
+  .logo-footer {
+    max-width: 160px;
+  }
+}
