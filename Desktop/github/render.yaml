@@ -1,13 +1,9 @@
 services:
   - type: web
-    name: cartao-vidah
+    name: clinicavidah
     env: node
-    plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    healthCheckPath: /api/health
+    buildCommand: yarn build && yarn start
+    startCommand: node dist/index.js
     envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
+      - key: VITE_API_URL
         sync: false
